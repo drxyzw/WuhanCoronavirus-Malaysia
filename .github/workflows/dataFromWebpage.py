@@ -4,6 +4,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
+from datetime import datetime
 
 def cell2CumulNewCases(inStr):
     criterion = re.compile("^[0-9]+$")
@@ -69,7 +70,7 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
 url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Cases_by_state"
 # find a table with "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 captionWanted = "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
-rawCSVFilename = 'outputRaw.csv'
+rawCSVFilename = 'byStatesRaw.csv'
 getWebTableByCaption2CSV(url, captionWanted, rawCSVFilename)
 
 with open(rawCSVFilename, newline='') as csvfile:
@@ -157,25 +158,45 @@ columnsRaw = data[0]
 columns = [""] * len(columnsRaw)
 for i in range(len(columnsRaw)):
     columns[i] = processColumnNames(columnsRaw[i])
-dates = [""] * (len(data)-1)
+datesStr = [""] * (len(data)-1)
 cumulCases = [[0 for x in range(len(columns)-1)] for y in range(len(data)-1)]
 for i in range(1, len(data)):
-    date = data[i][0]
-    day, month = date.split("/")
-    dates[i-1] = "2020-" + str(month).zfill(2) + "-" + str(day).zfill(2)
+    dateStr = data[i][0]
+    day, month = dateStr.split("/")
+    datesStr[i-1] = "2020-" + str(month).zfill(2) + "-" + str(day).zfill(2)
 
     for j in range(1, len(columns)):
         cumulCase, newCase = cell2CumulNewCases(data[i][j])
         cumulCases[i-1][j-1] = cumulCase
-# save as CSV
-with open('output.csv', 'w') as csvfile:
+# save cumulative infecteds CSV
+with open('totalInfectedByStates.csv', 'w') as csvfile:
     for j in range(len(columns)-1):
         csvfile.write(str(columns[j]) + ',')
     csvfile.write(str(columns[len(columns)-1]) + '\n')
     for i in range(len(cumulCases)):
-        csvfile.write(dates[i] + ',')
+        csvfile.write(datesStr[i] + ',')
         for j in range(len(cumulCases[0])-1):
             csvfile.write(str(cumulCases[i][j]) + ',')
         csvfile.write(str(cumulCases[i][len(cumulCases[0])-1]) + '\n')
+# save daily new infecteds CSV
+with open('newDailyInfectedByStates.csv', 'w') as csvfile:
+    newDailyCases = [[0 for x in range(len(cumulCases[0]))] for y in range(len(cumulCases))]
+    newDailyCases[0] = cumulCases[0]
+    prevDate = datetime.strptime(datesStr[0], "%Y-%m-%d")
+    for i in range(1, len(datesStr)):
+        nowDate = datetime.strptime(datesStr[i], "%Y-%m-%d")
+        days = (nowDate - prevDate).days
+        for j in range(len(newDailyCases[0])):
+            newDailyCases[i][j] = (cumulCases[i][j] - cumulCases[i-1][j]) / days
+        prevDate = nowDate
+
+    for j in range(len(columns)-1):
+        csvfile.write(str(columns[j]) + ',')
+    csvfile.write(str(columns[len(columns)-1]) + '\n')
+    for i in range(len(newDailyCases)):
+        csvfile.write(datesStr[i] + ',')
+        for j in range(len(newDailyCases[0])-1):
+            csvfile.write(str(newDailyCases[i][j]) + ',')
+        csvfile.write(str(newDailyCases[i][len(newDailyCases[0])-1]) + '\n')
 
 print("a")
