@@ -9,14 +9,16 @@ def cell2CumulNewCases(inStr):
     criterion = re.compile("^[0-9]+$")
     if inStr == "":
         cumulCases, newCases = 0, 0
+    elif type(inStr) == int:
+        cumulCases, newCases = inStr, 0
     elif criterion.fullmatch(inStr):
-        cumulCases, newCases = int(inStr), 0
+        cumulCases, newCases = int(process_num(inStr)), 0
     else:
         criterion = re.compile("^[0-9]+\([^\)][0-9]+\)")
         idxBra = inStr.find('(')
         idxKet = inStr.find(')')
-        cumulCases = int(inStr[0:idxBra])
-        newCases = int(inStr[(idxBra+1):idxKet])
+        cumulCases = int(process_num(inStr[0:idxBra]))
+        newCases = int(process_num(inStr[(idxBra+1):idxKet]))
 
     return cumulCases, newCases
 
@@ -67,9 +69,10 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
 url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Cases_by_state"
 # find a table with "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 captionWanted = "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
-getWebTableByCaption2CSV(url, captionWanted, 'output.csv')
+rawCSVFilename = 'outputRaw.csv'
+getWebTableByCaption2CSV(url, captionWanted, rawCSVFilename)
 
-with open('output.csv', newline='') as csvfile:
+with open(rawCSVFilename, newline='') as csvfile:
     data = list(csv.reader(csvfile))
 # below is specific to the table on Malaysia's Wikipedia page
 
@@ -118,8 +121,8 @@ dataPT18_3 = (int(ratioPT18_3*data18_3[0]), int(ratioPT18_3*data18_3[1]))
 
 data[idx16_3][idxKL] = cumulNewCases2Cell(dataKL16_3)
 data[idx16_3].insert(idxKL+1, cumulNewCases2Cell(dataPT16_3)) 
-data[idx16_3][idxKL] = cumulNewCases2Cell(dataKL16_3)
-data[idx16_3].insert(idxKL+1, cumulNewCases2Cell(dataPT16_3)) 
+data[idx17_3][idxKL] = cumulNewCases2Cell(dataKL17_3)
+data[idx17_3].insert(idxKL+1, cumulNewCases2Cell(dataPT17_3)) 
 data[idx18_3][idxKL] = cumulNewCases2Cell(dataKL18_3)
 data[idx18_3].insert(idxKL+1, cumulNewCases2Cell(dataPT18_3)) 
 
@@ -127,4 +130,52 @@ data[idx18_3].insert(idxKL+1, cumulNewCases2Cell(dataPT18_3))
 for singleData in data:
     del singleData[len(singleData)-1]
 
-print(data)
+def processColumnNames(columnRaw):
+    switcher={
+        "Date":"Date",
+        "JH":"Johor",
+        "KD":"Kedah",
+        "KE":"Kelantan",
+        "ML":"Malacca",
+        "NS":"Negeri Sembilan",
+        "PH":"Pahang",
+        "PG":"Penang",
+        "PK":"Perak",
+        "PR":"Perlis",
+        "SB":"Sabah",
+        "SR":"Sarawak",
+        "SE":"Selangor",
+        "TR":"Terengganu",
+        "KL":"Kuala Lumpur",
+        "PT":"Putrajaya",
+        "LB":"Labuan"
+    }
+    return switcher.get(columnRaw, "Invalid input column")
+
+# Store variables: dates, cumulCases
+columnsRaw = data[0]
+columns = [""] * len(columnsRaw)
+for i in range(len(columnsRaw)):
+    columns[i] = processColumnNames(columnsRaw[i])
+dates = [""] * (len(data)-1)
+cumulCases = [[0 for x in range(len(columns)-1)] for y in range(len(data)-1)]
+for i in range(1, len(data)):
+    date = data[i][0]
+    day, month = date.split("/")
+    dates[i-1] = "2020-" + str(month).zfill(2) + "-" + str(day).zfill(2)
+
+    for j in range(1, len(columns)):
+        cumulCase, newCase = cell2CumulNewCases(data[i][j])
+        cumulCases[i-1][j-1] = cumulCase
+# save as CSV
+with open('output.csv', 'w') as csvfile:
+    for j in range(len(columns)-1):
+        csvfile.write(str(columns[j]) + ',')
+    csvfile.write(str(columns[len(columns)-1]) + '\n')
+    for i in range(len(cumulCases)):
+        csvfile.write(dates[i] + ',')
+        for j in range(len(cumulCases[0])-1):
+            csvfile.write(str(cumulCases[i][j]) + ',')
+        csvfile.write(str(cumulCases[i][len(cumulCases[0])-1]) + '\n')
+
+print("a")
