@@ -36,5 +36,19 @@ jobs:
       run: |
         cd ./.github/workflows/
         python dataFromWebpage.py
-        cat newDailyInfectedByStates.csv
-        
+    - name: Export the above results to GitHub repository
+      env:
+        GIT_OWNER_EMAIL: ${{ secrets.GIT_OWNER_EMAIL }}
+        PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+      run: |
+      git config user.email "$GIT_OWNER_EMAIL"
+      git config user.name "drxyzw"
+      if [[ `git status --porcelain` ]]; then
+        git add .
+        git commit -a -m "Automatically updating daily CSV data"
+        git remote rm origin
+        git remote add origin https://drxyzw:$PUSH_TOKEN@github.com/drxyzw/WuhanCoronavirus-Malaysia.git
+        git push origin HEAD:master
+      else
+        echo 'there is no change'
+      fi
