@@ -70,7 +70,7 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
 url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Cases_by_state"
 # find a table with "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 captionWanted = "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
-rawCSVFilename = 'byStatesRaw.csv'
+rawCSVFilename = '../../data/byStatesRaw.csv'
 getWebTableByCaption2CSV(url, captionWanted, rawCSVFilename)
 
 with open(rawCSVFilename, newline='') as csvfile:
@@ -169,7 +169,7 @@ for i in range(1, len(data)):
         cumulCase, newCase = cell2CumulNewCases(data[i][j])
         cumulCases[i-1][j-1] = cumulCase
 # save cumulative infecteds CSV
-with open('totalInfectedByStates.csv', 'w') as csvfile:
+with open('../../data/totalInfectedByStates.csv', 'w') as csvfile:
     for j in range(len(columns)-1):
         csvfile.write(str(columns[j]) + ',')
     csvfile.write(str(columns[len(columns)-1]) + '\n')
@@ -179,7 +179,7 @@ with open('totalInfectedByStates.csv', 'w') as csvfile:
             csvfile.write(str(cumulCases[i][j]) + ',')
         csvfile.write(str(cumulCases[i][len(cumulCases[0])-1]) + '\n')
 # save daily new infecteds CSV
-with open('newDailyInfectedByStates.csv', 'w') as csvfile:
+with open('../../data/newDailyInfectedByStates.csv', 'w') as csvfile:
     newDailyCases = [[0 for x in range(len(cumulCases[0]))] for y in range(len(cumulCases))]
     newDailyCases[0] = cumulCases[0]
     prevDate = datetime.strptime(datesStr[0], "%Y-%m-%d")
