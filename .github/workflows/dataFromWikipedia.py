@@ -67,6 +67,7 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
         writer.writerow(output_headers[0])
         writer.writerows(output_rows)
 
+
 url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Cases_by_state"
 # find a table with "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 captionWanted = "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
@@ -199,4 +200,4 @@ with open('../../data/newDailyInfectedByStates.csv', 'w') as csvfile:
             csvfile.write(str(newDailyCases[i][j]) + ',')
         csvfile.write(str(newDailyCases[i][len(newDailyCases[0])-1]) + '\n')
 
-print("a")
+print("Finished")
