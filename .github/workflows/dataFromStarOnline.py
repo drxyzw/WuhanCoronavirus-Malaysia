@@ -40,8 +40,6 @@ for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
 	day, monthStr = dateRaw.split("-")
 	month = datetime.strptime(monthStr, '%b').month
-	#dateNoYear = datetime.strptime(dateRaw, '%d')
-	#dateNoYear = datetime.strptime(dateRaw, '%d-%b')
 	dateStr = "2020-" + str(month).zfill(2) + "-" + str(day)
 	tableBody[i][0]  = dateStr
 tableBodyNp = np.flip(np.array(tableBody), axis = 0)
