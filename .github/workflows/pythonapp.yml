@@ -37,7 +37,7 @@ jobs:
     - name: Get the number of infecteds by states from Wikipedia
       run: |
         cd ./.github/workflows/
-        python dataFromWebpage.py
+        python dataFromWikipedia.py
     - name: Export the above results to GitHub repository
       env:
         GIT_OWNER_EMAIL: ${{ secrets.GIT_OWNER_EMAIL }}
