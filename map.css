@@ -1,0 +1,10 @@
+#malaysia-map {
+  background: aliceblue;
+  display: block;
+  position: absolute;
+  top: auto;
+  left: auto;
+  width: 50%;
+  min-width: 384px;
+  height: auto;
+}
