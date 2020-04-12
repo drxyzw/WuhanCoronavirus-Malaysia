@@ -54,9 +54,12 @@ table[0][3] = table[0][4]
 table[0][4] = 'Active cases'
 
 for i in range(1, len(tableBody)):
-    table[i][2] = table[i][3]
-    table[i][3] = table[i][4]
-    table[i][4] = table[i][1] - table[i][3] - table[i][4]
+    totalDeath = table[i][3]
+    totalRecovered = table[i][4]
+    activeCases = str(int(table[i][1]) - int(table[i][3]) - int(table[i][4]))
+    table[i][2] = totalDeath
+    table[i][3] = totalRecovered
+    table[i][4] = activeCases
 
 # save a total number file with active cases instead of new cases
 savetxt('../../data/dailyTotal.csv', table, delimiter = ',', fmt = '%s')
