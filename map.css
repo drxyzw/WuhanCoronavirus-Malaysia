@@ -1,10 +1,20 @@
 #malaysia-map {
   background: aliceblue;
   display: block;
-  position: absolute;
   top: auto;
   left: auto;
-  width: 50%;
   min-width: 384px;
+  float: left;
+  width: 50%;
+  height: auto;
+}
+
+#graph {
+  display: block;
+  top: auto;
+  left: auto;
+  min-width: 384px;
+  float: left;
+  width: 50%;
   height: auto;
 }
