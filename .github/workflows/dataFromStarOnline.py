@@ -35,7 +35,7 @@ for lineBytes in urllib.request.urlopen(url):
 tableHeader = parseFlourishTable(columnNames)
 tableHeaderNp = np.array(tableHeader)
 tableBody = parseFlourishTable(body)
-# convert date DD/MMM to DD/MM/YYYY
+# convert date DD/MMM to DD/MM/YYYY format
 for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
 	day, monthStr = dateRaw.split("-")
