@@ -53,7 +53,7 @@ table[0][2] = table[0][3]
 table[0][3] = table[0][4]
 table[0][4] = 'Active cases'
 
-for i in range(1, len(tableBody)):
+for i in range(1, len(table)):
     totalDeath = table[i][3]
     totalRecovered = table[i][4]
     activeCases = str(int(table[i][1]) - int(table[i][3]) - int(table[i][4]))

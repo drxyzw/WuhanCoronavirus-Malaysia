@@ -2,28 +2,44 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="map.css" />
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
 	<script src="./jquery.csv.min.js"></script>
+    <!-- <script type="text/javascript">	google.charts.load('current', {packages:['line']});</script> -->
     <script type="text/javascript">
-		google.load("visualization", "1", {packages:["corechart"]});
-		google.setOnLoadCallback(drawChart);
+		<!-- google.charts.load('current', {packages:['line']}); -->
+		<!-- google.charts.setOnLoadCallback(drawChart); -->
+		google.charts.load('current', {'packages':['corechart']});
+		google.charts.setOnLoadCallback(drawChart);
+		<!-- $(window).resize(function(){ -->
+			<!-- if(this.resizeTO) clearTimeout(this.resizeTO); -->
+			<!-- this.resizeTO = setTimeout(function() { -->
+				<!-- $(this).trigger('resizeEnd'); -->
+			<!-- }, 500); -->
+		<!-- }); -->
+		
+		<!-- $(window).on('resizeEnd', function() { -->
+			<!-- drawChart(); -->
+			<!-- <!-- $(window).resize(drawChart); --> -->
+		<!-- }); -->
+		
 		$(window).resize(function(){
 			drawChart();
-			$(window).resize(drawChart);
-			var mapHeight = document.getElementById("malaysia-map").style.height;
-			document.getElementById('graph').style.height = mapHeight;
+			<!-- $(window).resize(drawChart); -->
 		});
 		function drawChart() {
 			$.get("./data/dailyTotal.csv", function(csvString) {
-				<!-- var transData = [['Date', 'All visitors', 'New user', 'Mobile traffic']]; -->
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
-				for(var i = 0; i < arrayData.length; ++i)	{
+				for(var i = 0; i < arrayData.length; ++i) {
 					arrayData[i][0] = new Date(arrayData[i][0]);
 				}
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
-					title: 'Company Performance',
+					title: 'Nationwide history',
+					titleTextStyle : {
+						fontSize: 22
+					},
 					chartArea: {
 						left: '10%',
 						top: '20%',
@@ -31,6 +47,7 @@
 						height: '70%'
 					},
 					hAxis: {
+						minorGridlines: { count:0 },
 						format: 'dd-MMM'
 					},
 					legend: {
@@ -38,16 +55,52 @@
 						maxLines: 3
 					},
 					vAxis: {
+						minorGridlines: { count:0 },
 						minValue: new Date("01/01/2020")
 					},
+					backgroundColor: {
+						fill: 'honeydew'
+					},
 					witdh: '100%',
-					height: $(window).height()*0.6953
+					height: $(window).width()*0.739*0.5
 				};
+				var chart = new google.visualization.LineChart(document.getElementById("graph"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 0);
-				var chart = new google.visualization.LineChart(document.getElementById('graph'));
+				<!-- var chart = new google.charts.Line(document.getElementById('graph')); -->
+				<!-- chart.draw(data, google.charts.Line.convertOptions(options)); -->
 				chart.draw(data, options);
+				drawAxisLine(chart, new Date(2020, 3-1, 18));
 			});
+		}
+		function drawAxisLine(chart, value) {
+			var layout = chart.getChartLayoutInterface();
+			var chartArea = layout.getChartAreaBoundingBox();
+			var svg = chart.getContainer().getElementsByTagName('svg')[0];
+			var xLoc = layout.getXLocation(value);
+			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4));
+			svg.appendChild(createText(xLoc+10, chartArea.top + 0.2 * chartArea.height, 'MCO', '#00cccc', 16));
+		}
+		
+		function createLine(x1, y1, x2, y2, color, w) {
+			var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			line.setAttribute('x1', x1);
+			line.setAttribute('y1', y1);
+			line.setAttribute('x2', x2);
+			line.setAttribute('y2', y2);
+			line.setAttribute('stroke', color);
+			line.setAttribute('stroke-width', w);
+			return line;
+		}
+		function createText(x, y, text, color, size) {
+			var svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			var svgText = document.createTextNode(text);
+			svgElement.setAttribute('x', x);
+			svgElement.setAttribute('y', y);
+			svgElement.setAttribute('fill', color);
+			svgElement.setAttribute('font-size', size);
+			svgElement.appendChild(svgText);
+			return svgElement;
 		}
     </script>
 </head>
