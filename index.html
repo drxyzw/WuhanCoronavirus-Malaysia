@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-	<link rel="stylesheet" type="text/css" href="map.css" />
+	<link rel="stylesheet" type="text/css" href="index.css" />
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
@@ -36,9 +36,9 @@
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
-					title: 'Nationwide history',
+					title: 'Total Daily',
 					titleTextStyle : {
-						fontSize: 22
+						fontSize: 20
 					},
 					chartArea: {
 						left: '10%',
@@ -49,6 +49,9 @@
 					hAxis: {
 						minorGridlines: { count:0 },
 						format: 'dd-MMM'
+					},
+					vAxis: {
+						scaleType: 'log'
 					},
 					legend: {
 						position: 'top',
@@ -79,7 +82,7 @@
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(value);
 			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4));
-			svg.appendChild(createText(xLoc+10, chartArea.top + 0.2 * chartArea.height, 'MCO', '#00cccc', 16));
+			svg.appendChild(createText(xLoc+10, chartArea.top + 0.2 * chartArea.height, 'MCO', '#00cccc', 18));
 		}
 		
 		function createLine(x1, y1, x2, y2, color, w) {
@@ -104,10 +107,11 @@
 		}
     </script>
 </head>
+<body>
 <h1>Wuhan virus (COVID-19) statics in Malaysia</h1>
 <div class="svg-container">
 	<div><img id="malaysia-map" src="Blank_malaysia_map_interactive.svg"/></div>
     <div id="graph"></div>
 </div>
-
+</body>
 

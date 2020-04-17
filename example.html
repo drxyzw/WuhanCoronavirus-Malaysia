@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<head>      
+<meta charset="UTF-8">
+<!-- <script src="./jquery-1.10.2.js"></script>     -->
+<!-- <script src="./bootstrap.js"></script>      -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+
+<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+  <!-- google.load("visualization", "1", {packages:["corechart"]}); -->
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Task', 'Hours per Day'],
+      ['Work',     11],
+      ['Eat',      2],
+      ['Commute',  2],
+      ['Watch TV', 2],
+      ['Sleep',    7]
+    ]);
+
+    var options = {
+      title: 'My Daily Activities',
+      is3D: true
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('google_chart1'));
+    chart.draw(data, options);
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
+<script type="text/javascript">
+	google.charts.load('current', {'packages':['corechart']});
+  <!-- google.load("visualization", "1", {packages:["corechart"]}); -->
+  google.setOnLoadCallback(drawChart);
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Task', 'Hours per Day'],
+      ['Work',     11],
+      ['Eat',      2],
+      ['Commute',  2],
+      ['Watch TV', 2],
+      ['Sleep',    7]
+    ]);
+
+    var options = {
+      title: 'My Daily Activities',
+      is3D: true,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('google_chart2'));
+    chart.draw(data, options);
+  }
+</script>
+</head>
+
+<body>    
+<section>
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div class="well well-lg">
+        <ul id="myTab" class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#panel_conservative" data-toggle="tab">Side Tab 1</a></li>
+            <li><a href="#panel_mconservative" data-toggle="tab">Side Tab 2</a></li>                   
+        </ul>
+        </div>
+      </div>
+
+      <div class="col-md-9">
+      <div id="myTabContent" class="tab-content"> 
+
+          <div class="tab-pane fade in active" id="panel_conservative">
+              <div class="col-sm-12">
+                <div class="panel panel-default">
+
+                  <ul id="myTab1" class="nav nav-pills nav-justified">
+                      <li class="active"><a href="#cons18" data-toggle="tab">Tab NO 1</a></li>
+                      <li><a href="#cons31" data-toggle="tab">Tab NO 2</a></li>   
+                  </ul>
+
+                    <div class="panel-heading">
+                        <div id="myTabContent1" class="tab-content">
+
+                            <div class="tab-pane fade in active" id="cons18">
+                                <div class="row">                                      
+                                  <div class="col-sm-8">
+                                    <div class="row pad_right">
+              <div id="google_chart1" style="width: 500px;height: 300px;"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="cons31">
+                                <div class="row">
+
+                                  <div class="col-sm-8">
+                                    <div class="row pad_right">               
+              <div id="google_chart2" style="width: 500px;height: 300px;"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+              </div>
+          </div>
+
+          <div class="tab-pane fade" id="panel_mconservative">
+             content of side tab 2                  
+          </div>
+
+
+      </div>
+
+      </div>
+  </div>
+</div>       
+</section>
+</body>
