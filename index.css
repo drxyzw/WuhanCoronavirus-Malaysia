@@ -1,28 +1,67 @@
-#malaysia-map {
-  background: aliceblue;
+#nationwide-daily-wrapper {
   display: block;
-  top: auto;
-  left: auto;
-  min-width: 384px;
+  /* top: auto; */
+  /* left: auto; */
+  /* min-width: 384px; */
   float: left;
-  width: 50%;
-  height: auto;
+  /* clear: left; */
+  /* float: right; */
+  /* width: 50%; */
+  /* height: auto; */
+  width: 430px;
+  height: 323px;
 }
-
-#graph {
-  display: block;
-  top: auto;
-  left: auto;
-  min-width: 384px;
-  float: left;
-  width: 50%;
-  height: auto;
-}
-
 #linearlogbutton {
-	min-width: 384px;
-	width: 50%;
+  display: block;
+  /* top: auto; */
+  left: auto;
+	/* min-width: 384px; */
 	border: 0;
 	margin: 0;
 	padding: 0;
+  width: 430px;
+  height: 20px;
+  float: left;
+  clear: left;
 }
+
+#nationwide-daily {
+  display: block;
+  /* top: auto; */
+  /* left: auto; */
+  /* min-width: 384px; */
+  float: left;
+  /* clear: left; */
+  /* float: right; */
+  /* width: 50%; */
+  /* height: auto; */
+  width: 430px;
+  height: 303px;
+}
+
+#nationwide-dynamics {
+  /* display: block; */
+  /* top: auto; */
+  /* left: auto; */
+  /* min-width: 384px; */
+  float: left;
+  /* clear: left; */
+  /* width: 50%; */
+  /* height: auto; */
+  width: 430px;
+  height: 323px;
+}
+
+#malaysia-map {
+  background: aliceblue;
+  /* display: block; */
+  /* top: auto; */
+  /* left: auto; */
+  min-width: 384px;
+  /* float: left; */
+  width: 430px;
+  height: 323px;
+  /* width: 50%; */
+  /* height: auto; */
+}
+

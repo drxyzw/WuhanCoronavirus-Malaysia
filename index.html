@@ -5,45 +5,32 @@
 	<script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
 	<script src="./jquery.csv.min.js"></script>
-    <!-- <script type="text/javascript">	google.charts.load('current', {packages:['line']});</script> -->
     <script type="text/javascript">
 		var logScale = true;
-		<!-- google.charts.load('current', {packages:['line']}); -->
-		<!-- google.charts.setOnLoadCallback(drawChart); -->
+		var MCO = new Date(2020, 3-1, 18);
 		google.charts.load('current', {'packages':['corechart']});
-		google.charts.setOnLoadCallback(drawChart);
+		google.charts.setOnLoadCallback(drawChartFirst);
+		
 		<!-- $(window).resize(function(){ -->
-			<!-- if(this.resizeTO) clearTimeout(this.resizeTO); -->
-			<!-- this.resizeTO = setTimeout(function() { -->
-				<!-- $(this).trigger('resizeEnd'); -->
-			<!-- }, 500); -->
+			<!-- drawChartDailyTotal(); -->
+			<!-- drawChartDailyTotalDynamics(); -->
 		<!-- }); -->
-		
-		<!-- $(window).on('resizeEnd', function() { -->
-			<!-- drawChart(); -->
-			<!-- <!-- $(window).resize(drawChart); --> -->
-		<!-- }); -->
-		
-		$(window).resize(function(){
-			drawChart();
-			<!-- $(window).resize(drawChart); -->
-		});
+		function drawChartFirst() {
+			drawChartDailyTotal();
+			drawChartDailyTotalDynamics();
+			<!-- drawChartDailyTotal(); -->
+		}
 		function switchLinearLog() {
 			logScale = !logScale;
-			drawChart();
+			drawChartDailyTotal();
 		}
-		function drawChart() {
+		function drawChartDailyTotal() {
 			$.get("./data/dailyTotal.csv", function(csvString) {
+				<!-- nationwide-plot -->
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
-				for(var i = 0; i < arrayData.length; ++i) {
+				for(var i = 1; i < arrayData.length; ++i) {
 					arrayData[i][0] = new Date(arrayData[i][0]);
 				}
-				<!-- for(var i = 1; i < arrayData.length; ++i) { -->
-					<!-- arrayData[i][1] = 10; -->
-					<!-- arrayData[i][2] = 100; -->
-					<!-- arrayData[i][3] = 1000;					 -->
-					<!-- arrayData[i][4] = 10000;					 -->
-				<!-- } -->
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
@@ -52,16 +39,18 @@
 						fontSize: 20
 					},
 					chartArea: {
-						left: '10%',
+						left: '20%',
 						top: '20%',
-						width: '80%',
+						width: '70%',
 						height: '70%'
 					},
 					hAxis: {
+						title: "Date",
 						minorGridlines: { count:0 },
 						format: 'dd-MMM'
 					},
 					vAxis: {
+						title: "Confirmed cases",
 						minorGridlines: { count:0 },
 						scaleType: logScale ? 'log' : 'null',
 						viewWindow: {
@@ -73,28 +62,125 @@
 						maxLines: 3
 					},
 					backgroundColor: {
-						fill: 'honeydew'
+						fill: 'FFFAFA'
 					},
-					witdh: '100%',
-					height: $(window).width()*0.739*0.5-24
+					<!-- witdh: '100%', -->
+					<!-- height: $(window).width()*0.741*0.5-25 -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 				};
-				var chart = new google.visualization.LineChart(document.getElementById("graph"));
+				var chart = new google.visualization.LineChart(document.getElementById("nationwide-daily"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 0);
-				<!-- var chart = new google.charts.Line(document.getElementById('graph')); -->
-				<!-- chart.draw(data, google.charts.Line.convertOptions(options)); -->
 				chart.draw(data, options);
-				drawAxisLine(chart, new Date(2020, 3-1, 18));
+				<!-- drawAxisLine(chart, MCO, 'MCO'); -->
+			});
+				
+		}
+		function drawChartDailyTotalDynamics() {
+			$.get("./data/dailyTotalDynamics.csv", function(csvString) {
+				<!-- nationwide-dynamics -->
+				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+				var idxMCO = 0;
+				for(var i = 1; i < arrayData.length; ++i) {
+					<!-- arrayData[i][2] = 1000; -->
+					arrayData[i][2] = new Date(arrayData[i][2]);
+					if(arrayData[i][2].getYear() == MCO.getYear() && arrayData[i][2].getMonth() == MCO.getMonth() && arrayData[i][2].getDate() == MCO.getDate()) {
+						idxMCO = i;
+					}
+				}
+				var max = arrayData[arrayData.length-1][0];
+				var axisMax = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
+				var axisMin = 10.0;
+				var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10));
+				var data = new google.visualization.arrayToDataTable(arrayData);
+				data.setColumnProperty(2, 'role', 'tooltip');
+				var options =
+				{
+					<!-- focusTarget: 'category', -->
+					title: 'Total Daily Dynamics',
+					titleTextStyle : {
+						fontSize: 20
+					},
+					chartArea: {
+						left: '15%',
+						top: '20%',
+						width: '80%',
+						height: '70%'
+					},
+					hAxis: {
+						title: "Confirmed cases",
+						max: axisMax,
+						min: axisMin,
+						minorGridlines: { count:0 },
+						scaleType: 'log',
+						viewWindow: {
+							max: axisMax,
+							min: axisMin,
+						},
+						<!-- gridlines: { -->
+							<!-- count: 3, -->
+						<!-- } -->
+					},
+					vAxis: {
+						title: "Daily new cases",
+						max: axisMax,
+						min: axisMin,
+						minorGridlines: { count:0 },
+						scaleType: 'log',
+						viewWindow: {
+							max: axisMax,
+							min: axisMin,
+						},
+						<!-- gridlines: { -->
+							<!-- count: 3, -->
+							<!-- <!-- count: nGridlines --> -->
+						<!-- } -->
+					},
+					legend: {
+						position: 'none',
+					},
+					backgroundColor: {
+						fill: 'honeydew'
+					},
+					<!-- tooltip: { -->
+						<!-- isHtml: true -->
+					<!-- }, -->
+					<!-- witdh: '100%', -->
+					<!-- height: $(window).width()*0.739*0.5 -->
+					<!-- height: $(window).width()*0.739*0.5 -->
+				};
+				var chart = new google.visualization.LineChart(document.getElementById("nationwide-dynamics"));
+				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
+				formatter.format(data, 2);
+				chart.draw(data, options);
+				for(var i = 1; axisMin*i <= axisMax; i *= 10) {
+					drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax);
+					drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i);
+				}
+				drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 45.0);
+				if(idxMCO > 0) {
+					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO');
+				}
 			});
 		}
-		function drawAxisLine(chart, value) {
+		function drawLine(chart, x1, y1, x2, y2) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
-			var xLoc = layout.getXLocation(value);
+			var x1Actual = layout.getXLocation(x1);
+			var y1Actual = layout.getYLocation(y1);
+			var x2Actual = layout.getXLocation(x2);
+			var y2Actual = layout.getYLocation(y2);
+			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1));
+		}
+
+		function drawAxisLine(chart, x, text) {
+			var layout = chart.getChartLayoutInterface();
+			var chartArea = layout.getChartAreaBoundingBox();
+			var svg = chart.getContainer().getElementsByTagName('svg')[0];
+			var xLoc = layout.getXLocation(x);
 			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4));
-			svg.appendChild(createText(xLoc+10, chartArea.top + 0.1 * chartArea.height, 'MCO', '#00cccc', 18));
+			svg.appendChild(createText(xLoc+10, chartArea.top + 0.1 * chartArea.height, text, '#00cccc', 18, 0));
 		}
 		
 		function createLine(x1, y1, x2, y2, color, w) {
@@ -107,28 +193,63 @@
 			line.setAttribute('stroke-width', w);
 			return line;
 		}
-		function createText(x, y, text, color, size) {
+		function drawCircle(chart, x, y, r, text) {
+			var layout = chart.getChartLayoutInterface();
+			var chartArea = layout.getChartAreaBoundingBox();
+			var svg = chart.getContainer().getElementsByTagName('svg')[0];
+			var xLoc = layout.getXLocation(x);
+			var yLoc = layout.getYLocation(y);
+			svg.appendChild(createCircle(xLoc, yLoc, r, '#00cccc', 4));
+			svg.appendChild(createText(xLoc, yLoc+r-30, text, '#00cccc', 18, 0));
+		}
+		function createCircle(x, y, r, color, w) {
+			var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			circle.setAttribute('cx', x);
+			circle.setAttribute('cy', y);
+			circle.setAttribute('r', r);
+			circle.setAttribute('stroke', color);
+			circle.setAttribute('stroke-width', w);
+			circle.setAttribute('fill', color);
+			return circle;
+		}
+		
+		function drawText(chart, x, y, text, angleInMesh) {
+			var layout = chart.getChartLayoutInterface();
+			var chartArea = layout.getChartAreaBoundingBox();
+			var svg = chart.getContainer().getElementsByTagName('svg')[0];
+			var xLoc = layout.getXLocation(x);
+			var yLoc = layout.getYLocation(y);
+			angle = 180.0 / Math.PI * Math.atan((layout.getYLocation(1.0+y)-yLoc)/(layout.getXLocation(1.0+x)-xLoc)*Math.tan(Math.PI/180.0*angleInMesh));
+			svg.appendChild(createText(xLoc-10, yLoc-10, text, '#F08080', 14, angle));
+		}
+		function createText(x, y, text, color, size, angle) {
 			var svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 			var svgText = document.createTextNode(text);
 			svgElement.setAttribute('x', x);
 			svgElement.setAttribute('y', y);
 			svgElement.setAttribute('fill', color);
 			svgElement.setAttribute('font-size', size);
+			if( angle != 0) {
+				svgElement.setAttribute('transform', 'rotate(' + angle.toString() + ', ' + x.toString() + ', ' + y.toString() + ')');
+			}
 			svgElement.appendChild(svgText);
 			return svgElement;
 		}
     </script>
 </head>
 <body>
-<h1>Wuhan virus (COVID-19) statics in Malaysia</h1>
-<div class="svg-container">
-	<div><img id="malaysia-map" src="Blank_malaysia_map_interactive.svg"/></div>
-	<div>
-		<button id="linearlogbutton" style="min-width: 384px; height: 18px" onclick="switchLinearLog();">Linear/Log</button>
-		<!-- <button id="linearlogbutton" style="min-width: 384px;" onclick="switchLinearLog();">Linear/Log</button> -->
-		<!-- <button style="width: 50%; height: 5%;" onclick="switchLinearLog();">Linear/Log</button> -->
-		<div id="graph"></div>
+<h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
+<div id="wrapper1">
+	<div id="nationwide-daily-wrapper">
+		<button id="linearlogbutton" onclick="switchLinearLog();">Switch linear/log axis</button>
+		<div id="nationwide-daily"></div>
 	</div>
+	<div id="nationwide-dynamics"></div>
+</div>
+<br>
+<div class="svg-container">
+	<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
+	<div><img id="malaysia-map" src="Blank_malaysia_map_interactive.svg"/></div>
 </div>
 </body>
 
