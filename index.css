@@ -18,3 +18,11 @@
   width: 50%;
   height: auto;
 }
+
+#linearlogbutton {
+	min-width: 384px;
+	width: 50%;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}

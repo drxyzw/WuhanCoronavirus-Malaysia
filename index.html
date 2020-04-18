@@ -7,6 +7,7 @@
 	<script src="./jquery.csv.min.js"></script>
     <!-- <script type="text/javascript">	google.charts.load('current', {packages:['line']});</script> -->
     <script type="text/javascript">
+		var logScale = true;
 		<!-- google.charts.load('current', {packages:['line']}); -->
 		<!-- google.charts.setOnLoadCallback(drawChart); -->
 		google.charts.load('current', {'packages':['corechart']});
@@ -27,12 +28,22 @@
 			drawChart();
 			<!-- $(window).resize(drawChart); -->
 		});
+		function switchLinearLog() {
+			logScale = !logScale;
+			drawChart();
+		}
 		function drawChart() {
 			$.get("./data/dailyTotal.csv", function(csvString) {
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
 				for(var i = 0; i < arrayData.length; ++i) {
 					arrayData[i][0] = new Date(arrayData[i][0]);
 				}
+				<!-- for(var i = 1; i < arrayData.length; ++i) { -->
+					<!-- arrayData[i][1] = 10; -->
+					<!-- arrayData[i][2] = 100; -->
+					<!-- arrayData[i][3] = 1000;					 -->
+					<!-- arrayData[i][4] = 10000;					 -->
+				<!-- } -->
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
@@ -51,21 +62,22 @@
 						format: 'dd-MMM'
 					},
 					vAxis: {
-						scaleType: 'log'
+						minorGridlines: { count:0 },
+						scaleType: logScale ? 'log' : 'null',
+						viewWindow: {
+							min: 10
+						}
 					},
 					legend: {
 						position: 'top',
 						maxLines: 3
 					},
-					vAxis: {
-						minorGridlines: { count:0 },
-						minValue: new Date("01/01/2020")
-					},
 					backgroundColor: {
 						fill: 'honeydew'
 					},
 					witdh: '100%',
-					height: $(window).width()*0.739*0.5
+					height: $(window).width()*0.739*0.5-24
+					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("graph"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -82,7 +94,7 @@
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(value);
 			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4));
-			svg.appendChild(createText(xLoc+10, chartArea.top + 0.2 * chartArea.height, 'MCO', '#00cccc', 18));
+			svg.appendChild(createText(xLoc+10, chartArea.top + 0.1 * chartArea.height, 'MCO', '#00cccc', 18));
 		}
 		
 		function createLine(x1, y1, x2, y2, color, w) {
@@ -111,7 +123,12 @@
 <h1>Wuhan virus (COVID-19) statics in Malaysia</h1>
 <div class="svg-container">
 	<div><img id="malaysia-map" src="Blank_malaysia_map_interactive.svg"/></div>
-    <div id="graph"></div>
+	<div>
+		<button id="linearlogbutton" style="min-width: 384px; height: 18px" onclick="switchLinearLog();">Linear/Log</button>
+		<!-- <button id="linearlogbutton" style="min-width: 384px;" onclick="switchLinearLog();">Linear/Log</button> -->
+		<!-- <button style="width: 50%; height: 5%;" onclick="switchLinearLog();">Linear/Log</button> -->
+		<div id="graph"></div>
+	</div>
 </div>
 </body>
 
