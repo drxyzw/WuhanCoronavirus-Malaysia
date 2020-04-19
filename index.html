@@ -18,6 +18,7 @@
 		function drawChartFirst() {
 			drawChartDailyTotal();
 			drawChartDailyTotalDynamics();
+			drawChartDailyByStates();
 			<!-- drawChartDailyTotal(); -->
 		}
 		function switchLinearLog() {
@@ -72,7 +73,59 @@
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 0);
 				chart.draw(data, options);
-				<!-- drawAxisLine(chart, MCO, 'MCO'); -->
+				drawAxisLine(chart, MCO, 'MCO');
+			});
+				
+		}
+		function drawChartDailyByStates() {
+			$.get("./data/totalInfectedByStates.csv", function(csvString) {
+				<!-- bystates-plot -->
+				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+				for(var i = 1; i < arrayData.length; ++i) {
+					arrayData[i][0] = new Date(arrayData[i][0]);
+				}
+				var data = new google.visualization.arrayToDataTable(arrayData);
+				var options =
+				{
+					title: 'Daily by states',
+					titleTextStyle : {
+						fontSize: 20
+					},
+					chartArea: {
+						left: '15%',
+						top: '10%',
+						width: '60%',
+						height: '80%'
+					},
+					hAxis: {
+						title: "Date",
+						minorGridlines: { count:0 },
+						format: 'dd-MMM'
+					},
+					vAxis: {
+						title: "Confirmed cases",
+						minorGridlines: { count:0 },
+						scaleType: logScale ? 'log' : 'null',
+						viewWindow: {
+							min: 10
+						}
+					},
+					legend: {
+						position: 'right',
+						textStyle: {fontSize: 10}
+					},
+					backgroundColor: {
+						fill: 'FFFAFA'
+					},
+					<!-- witdh: '100%', -->
+					<!-- height: $(window).width()*0.741*0.5-25 -->
+					<!-- height: $(window).width()*0.739*0.5 -->
+				};
+				var chart = new google.visualization.LineChart(document.getElementById("bystates-daily"));
+				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
+				formatter.format(data, 0);
+				chart.draw(data, options);
+				drawAxisLine(chart, MCO, 'MCO');
 			});
 				
 		}
@@ -241,15 +294,14 @@
 <h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
 <div id="wrapper1">
 	<div id="nationwide-daily-wrapper">
-		<button id="linearlogbutton" onclick="switchLinearLog();">Switch linear/log axis</button>
+		<button id="linearlogbutton" onclick="switchLinearLog();">Click to switch linear/log axis</button>
 		<div id="nationwide-daily"></div>
 	</div>
 	<div id="nationwide-dynamics"></div>
 </div>
-<br>
-<div class="svg-container">
+<div class="wrapper2">
 	<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
-	<div><img id="malaysia-map" src="Blank_malaysia_map_interactive.svg"/></div>
+	<div id="bystates-daily"></div>
 </div>
 </body>
 
