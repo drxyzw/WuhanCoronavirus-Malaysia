@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
 from datetime import datetime
+import numpy as np
+from numpy import savetxt
 
 def cell2CumulNewCases(inStr):
     criterion = re.compile("^[0-9]+$")
@@ -199,5 +201,35 @@ with open('../../data/newDailyInfectedByStates.csv', 'w') as csvfile:
         for j in range(len(newDailyCases[0])-1):
             csvfile.write(str(newDailyCases[i][j]) + ',')
         csvfile.write(str(newDailyCases[i][len(newDailyCases[0])-1]) + '\n')
+
+# dynamics talbe by states (x=cumulative cases, y1, y2, .... = new cases per day for each states, z = date just for tooltip)
+dynamicsTableHeader = []
+dynamicsTableHeader.append("Total cases")
+for j in range(1, len(columns)):
+    dynamicsTableHeader.append(columns[j])
+dynamicsTableHeader.append(columns[0])
+dynamicTableNp = []
+cumulCasesInt = []
+for i in range(len(cumulCases)):
+    for j in range(1, len(columns)):
+        dynamicsTableRow = []
+        cumulCase = cumulCases[i][j-1] #cumulCase axis is always integer, so no problem in vstack
+        if cumulCase > 0:
+            newCase = str(newDailyCases[i][j-1])
+            dynamicsTableRow.append(cumulCase)
+            dynamicsTableRowData = [''] * len(cumulCases[i]) # new cases is None or integer
+            dynamicsTableRow.extend(dynamicsTableRowData)
+            dynamicsTableRow[j] = newCase
+            dynamicsTableRow.append(datesStr[i])
+            if len(dynamicTableNp) == 0:
+                dynamicTableNp = np.array(dynamicsTableRow)
+                cumulCasesInt = [cumulCase]
+            else:
+                dynamicTableNp = np.vstack((dynamicTableNp, dynamicsTableRow))
+                cumulCasesInt.append(cumulCase)
+dynamicTableNp = dynamicTableNp[np.argsort(cumulCasesInt)]
+#dynamicTableNp = dynamicTableNp[np.argsort(dynamicTableNp[:,0])]
+dynamicTableNp = np.vstack((dynamicsTableHeader, dynamicTableNp))
+savetxt('../../data/byStateDynamics.csv', dynamicTableNp, delimiter = ',', fmt = '%s')
 
 print("Finished")

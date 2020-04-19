@@ -19,6 +19,7 @@
 			drawChartDailyTotal();
 			drawChartDailyTotalDynamics();
 			drawChartDailyByStates();
+			drawChartDailyDynamicsByStates();
 			<!-- drawChartDailyTotal(); -->
 		}
 		function switchLinearLog() {
@@ -121,7 +122,7 @@
 					<!-- height: $(window).width()*0.741*0.5-25 -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 				};
-				var chart = new google.visualization.LineChart(document.getElementById("bystates-daily"));
+				var chart = new google.visualization.LineChart(document.getElementById("bystate-daily"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 0);
 				chart.draw(data, options);
@@ -135,7 +136,6 @@
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
 				var idxMCO = 0;
 				for(var i = 1; i < arrayData.length; ++i) {
-					<!-- arrayData[i][2] = 1000; -->
 					arrayData[i][2] = new Date(arrayData[i][2]);
 					if(arrayData[i][2].getYear() == MCO.getYear() && arrayData[i][2].getMonth() == MCO.getMonth() && arrayData[i][2].getDate() == MCO.getDate()) {
 						idxMCO = i;
@@ -214,6 +214,101 @@
 				if(idxMCO > 0) {
 					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO');
 				}
+			});
+		}
+		function drawChartDailyDynamicsByStates() {
+			<!-- byState-dynamics -->
+			$.get("./data/byStateDynamics.csv", function(csvString) {
+				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+				<!-- idxMCOs = the first and last indices are not used -->
+				var idxMCOs = new Array(arrayData[0].length);
+				for(var j = 0; j < idxMCOs.length; ++j) {
+					idxMCOs[j] = -1;
+				}
+				for(var i = 1; i < arrayData.length; ++i) {
+					arrayData[i][17] = new Date(arrayData[i][17]);
+					if(arrayData[i][17].getYear() == MCO.getYear() && arrayData[i][17].getMonth() == MCO.getMonth() && arrayData[i][17].getDate() == MCO.getDate()) {
+						for(var j = 1; j < idxMCOs.length - 1; ++j) {
+							if(arrayData[i][j] != null) {
+								idxMCOs[j] = i;
+							}
+						}
+					}
+				}
+				<!-- for(var i = 1; i < arrayData.length; ++i) { -->
+					<!-- for(var j = 1; j < idxMCOs.length - 1; ++j) { -->
+						<!-- if(arrayData[i][j] == null) arrayData[i][j] = -1 -->
+					<!-- } -->
+				<!-- } -->
+				<!-- var max = arrayData[arrayData.length-1][0]; -->
+				<!-- var axisMax = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0))); -->
+				var axisMin = 10.0;
+				<!-- var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10)); -->
+				var data = new google.visualization.arrayToDataTable(arrayData);
+				for(var j = 0; j < arrayData[0].length - 1; ++j) {
+					data.setColumnProperty(j, 'type', 'number');
+				}
+				data.setColumnProperty(17, 'role', 'tooltip');
+				var options =
+				{
+					title: 'Daily Dynamics by State',
+					titleTextStyle : {
+						fontSize: 20
+					},
+					chartArea: {
+						left: '5%',
+						top: '20%',
+						width: '80%',
+						height: '70%'
+					},
+					interpolateNulls: true,
+					hAxis: {
+						title: "Confirmed cases",
+						<!-- max: axisMax, -->
+						min: axisMin,
+						minorGridlines: { count:0 },
+						scaleType: 'log',
+						viewWindow: {
+							<!-- max: axisMax, -->
+							min: axisMin,
+						},
+					},
+					vAxis: {
+						title: "Daily new cases",
+						<!-- max: axisMax, -->
+						min: axisMin,
+						minorGridlines: { count:0 },
+						scaleType: 'log',
+						viewWindow: {
+							<!-- max: axisMax, -->
+							min: axisMin,
+						},
+					},
+					legend: {
+						position: 'right',
+					},
+					backgroundColor: {
+						fill: 'honeydew'
+					},
+					<!-- tooltip: { -->
+						<!-- isHtml: true -->
+					<!-- }, -->
+					<!-- witdh: '100%', -->
+					<!-- height: $(window).width()*0.739*0.5 -->
+					<!-- height: $(window).width()*0.739*0.5 -->
+				};
+				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
+				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
+				formatter.format(data, 17);
+				chart.draw(data, options);
+				<!-- for(var i = 1; axisMin*i <= axisMax; i *= 10) { -->
+					<!-- drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax); -->
+					<!-- drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i); -->
+				<!-- } -->
+				<!-- drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 45.0); -->
+				<!-- if(idxMCO > 0) { -->
+					<!-- drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO'); -->
+				<!-- } -->
 			});
 		}
 		function drawLine(chart, x1, y1, x2, y2) {
@@ -301,7 +396,10 @@
 </div>
 <div class="wrapper2">
 	<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
-	<div id="bystates-daily"></div>
+	<div id="bystate-daily"></div>
+</div>
+<div id="wrapper3">
+	<div id="bystate-dynamics"></div>
 </div>
 </body>
 

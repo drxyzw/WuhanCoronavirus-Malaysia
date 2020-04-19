@@ -1,3 +1,5 @@
+@import url("map.css");
+
 #nationwide-daily-wrapper {
   display: block;
   /* top: auto; */
@@ -66,7 +68,7 @@
   /* height: auto; */
 }
 
-#bystates-daily {
+#bystate-daily {
   display: block;
   /* top: auto; */
   /* left: auto; */
@@ -78,5 +80,18 @@
   /* height: auto; */
   width: 430px;
   height: 323px;
+}
+
+#bystate-dynamics {
+  /* display: block; */
+  /* top: auto; */
+  /* left: auto; */
+  /* min-width: 384px; */
+  float: left;
+  /* clear: left; */
+  /* width: 50%; */
+  /* height: auto; */
+  width: 860px;
+  height: 646px;
 }
 
