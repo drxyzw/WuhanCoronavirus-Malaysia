@@ -95,6 +95,17 @@
   height: 646px;
 }
 
+#reference {
+  /* display: block; */
+  /* top: auto; */
+  /* left: auto; */
+  /* min-width: 384px; */
+  float: left;
+  /* clear: left; */
+  /* width: 50%; */
+  /* height: auto; */
+}
+
 /* div.google_chart svg g g g rect {  */
 	/* stroke-width:4px; fill:red;  */
 /* } */
