@@ -39,7 +39,7 @@
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
-					title: 'Total Daily',
+					title: 'Daily natoinwide total',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -55,7 +55,7 @@
 						format: 'dd-MMM'
 					},
 					vAxis: {
-						title: "Confirmed cases",
+						title: "Cases",
 						minorGridlines: { count:0 },
 						scaleType: logScale ? 'log' : 'null',
 						viewWindow: {
@@ -106,7 +106,7 @@
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
-					title: 'Daily by states',
+					title: 'Daily by state',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -122,7 +122,7 @@
 						format: 'dd-MMM'
 					},
 					vAxis: {
-						title: "Confirmed cases",
+						title: "Cases",
 						minorGridlines: { count:0 },
 						scaleType: logScale ? 'log' : 'null',
 						viewWindow: {
@@ -178,8 +178,8 @@
 				data.setColumnProperty(2, 'role', 'tooltip');
 				var options =
 				{
-					<!-- focusTarget: 'category', -->
-					title: 'Total Daily Dynamics',
+					focusTarget: 'category',
+					title: 'Nationwide total - new vs cumulative cases',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -190,7 +190,7 @@
 						height: '80%'
 					},
 					hAxis: {
-						title: "Confirmed cases",
+						title: "Cumulative cases",
 						max: axisMax,
 						min: axisMin,
 						minorGridlines: { count:0 },
@@ -287,7 +287,7 @@
 				data.setColumnProperty(17, 'role', 'tooltip');
 				var options =
 				{
-					title: 'Daily Dynamics by State',
+					title: 'By state - new vs cumulative cases',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -297,10 +297,11 @@
 						width: '70%',
 						height: '80%'
 					},
+					focusTarget: 'category',
 					interpolateNulls: true,
 					lineWidth: 1,
 					hAxis: {
-						title: "Confirmed cases",
+						title: "Cumulative cases",
 						max: axisXMax,
 						min: axisXMin,
 						minorGridlines: { count:0 },
@@ -337,12 +338,15 @@
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 17);
+				<!-- google.visualization.events.addListener(chart, 'onmouseover', function() { highlightLine(chart,data, options); }); -->
 				chart.draw(data, options);
-				<!-- for(var i = 1; axisMin*i <= axisMax; i *= 10) { -->
-					<!-- drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax); -->
-					<!-- drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i); -->
+				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {
+					drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax);
+				}
+				<!-- for(var i = 1; axisYMin*i <= axisYMax and ; i *= 10) { -->
+					<!-- drawLine(chart, axisXMin, axisYMin*i, axisYMax, axisYMax*i); -->
 				<!-- } -->
-				<!-- drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 45.0); -->
+				drawText(chart, axisYMax/3, axisYMax/3, 'exponential growth', 18, 45.0);
 				<!-- if(idxMCO > 0) { -->
 					<!-- drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO'); -->
 				<!-- } -->
@@ -358,7 +362,18 @@
 			var y2Actual = layout.getYLocation(y2);
 			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1));
 		}
-
+		function highlightLine(chart,data,options) {
+			var selectedLineWidth = 4;
+			var selectedItem = chart.getSelection()[0];
+			//reset series line width to default value
+			if(selectedItem.column != null) {
+				for(var i in options.series) {
+					options.series[i].lineWidth = 1;
+				}	
+				options.series[selectedItem.column-1].lineWidth = selectedLineWidth; //set selected line width
+				chart.draw(data, options);   //redraw
+			}
+		}
 		function drawAxisLine(chart, x, text) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
