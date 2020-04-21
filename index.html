@@ -39,7 +39,7 @@
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
 				{
-					title: 'Daily natoinwide total',
+					title: 'Daily nationwide total',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -178,7 +178,6 @@
 				data.setColumnProperty(2, 'role', 'tooltip');
 				var options =
 				{
-					focusTarget: 'category',
 					title: 'Nationwide total - new vs cumulative cases',
 					titleTextStyle : {
 						fontSize: 20
@@ -189,6 +188,7 @@
 						width: '80%',
 						height: '80%'
 					},
+					focusTarget: 'category',
 					hAxis: {
 						title: "Cumulative cases",
 						max: axisMax,
