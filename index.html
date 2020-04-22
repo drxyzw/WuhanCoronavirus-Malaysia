@@ -124,7 +124,7 @@
 					vAxis: {
 						title: "Cumulative cases",
 						minorGridlines: { count:0 },
-						scaleType: logScale ? 'log' : 'null',
+						scaleType: 'log',
 						viewWindow: {
 							min: 10
 						}
@@ -178,6 +178,7 @@
 				data.setColumnProperty(2, 'role', 'tooltip');
 				var options =
 				{
+					focusTarget: 'category',
 					title: 'Nationwide total - new vs cumulative cases',
 					titleTextStyle : {
 						fontSize: 20
@@ -188,7 +189,6 @@
 						width: '80%',
 						height: '80%'
 					},
-					focusTarget: 'category',
 					hAxis: {
 						title: "Cumulative cases",
 						max: axisMax,
@@ -218,12 +218,9 @@
 							<!-- <!-- count: nGridlines --> -->
 						<!-- } -->
 					},
-					legend: {
-						position: 'none',
-					},
 					backgroundColor: {
 						fill: 'honeydew'
-					},
+					}
 					<!-- tooltip: { -->
 						<!-- isHtml: true -->
 					<!-- }, -->
@@ -469,6 +466,8 @@ Reference:
 	<a href="">https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia</a></li>
 	<li>Covid-19: Current situation in Malaysia (updated daily)<br>
 	<a href="">https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily</a></li>
+	<li>Physicist's Video Studies When and How COVID-19 Will Peak<br>
+	<a href="">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
 </ul>
 </body>
 
