@@ -232,7 +232,7 @@
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 2);
 				chart.draw(data, options);
-				for(var i = 1; axisMin*i <= axisMax; i *= 10) {
+				for(var i = 1; axisMin*i < axisMax; i *= 10) {
 					drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax);
 					drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i);
 				}
@@ -357,7 +357,7 @@
 			var y1Actual = layout.getYLocation(y1);
 			var x2Actual = layout.getXLocation(x2);
 			var y2Actual = layout.getYLocation(y2);
-			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1));
+			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1, true));
 		}
 		function highlightLine(chart,data,options) {
 			var selectedLineWidth = 4;
@@ -376,17 +376,20 @@
 			var chartArea = layout.getChartAreaBoundingBox();
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(x);
-			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4));
+			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4, false));
 			svg.appendChild(createText(xLoc+10, chartArea.top + 0.1 * chartArea.height, text, '#00cccc', 18, 0));
 		}
 		
-		function createLine(x1, y1, x2, y2, color, w) {
+		function createLine(x1, y1, x2, y2, color, w, arrow) {
 			var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 			line.setAttribute('x1', x1);
 			line.setAttribute('y1', y1);
 			line.setAttribute('x2', x2);
 			line.setAttribute('y2', y2);
 			line.setAttribute('stroke', color);
+			if(arrow) {
+				line.setAttribute("marker-end", "url(#arrow"+color+")");
+			}
 			line.setAttribute('stroke-width', w);
 			return line;
 		}
@@ -440,6 +443,19 @@
     </script>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0px" height="0px" style="display: block;">
+	<defs>
+		<marker id="arrow#00cccc" markerWidth="10" markerHeight="10" refx="9" refy="3" orient="auto" markerUnits="strokeWidth">
+			<path d="M0,0 L0,6 L9,3 z" fill="#00cccc" />
+		</marker>
+	</defs>
+	<defs>
+		<marker id="arrow#F08080" markerWidth="10" markerHeight="10" refx="9" refy="3" orient="auto" markerUnits="strokeWidth">
+			<path d="M0,0 L0,6 L9,3 z" fill="#F08080" />
+			<!-- <path d="M0,0 L0,6 L9,3 z" fill="#F08080" /> -->
+		</marker>
+	</defs>
+</svg>
 <h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
 <div id="wrapper1">
 	<div id="nationwide-daily-wrapper">
@@ -469,5 +485,6 @@ Reference:
 	<li>Physicist's Video Studies When and How COVID-19 Will Peak<br>
 	<a href="">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
 </ul>
+</div>
 </body>
 
