@@ -8,7 +8,7 @@
     <script type="text/javascript">
 		var logScale = true;
 		var MCO = new Date(2020, 3-1, 18);
-		google.charts.load('current', {'packages':['corechart']});
+		google.charts.load('current', {'packages':['corechart', 'line']});
 		google.charts.setOnLoadCallback(drawChartFirst);
 		
 		<!-- $(window).resize(function(){ -->
@@ -163,19 +163,19 @@
 			$.get("./data/dailyTotalDynamics.csv", function(csvString) {
 				<!-- nationwide-dynamics -->
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
-				var idxMCO = 0;
+				var idxMCO = -1;
+				arrayData[0].splice(2, 0,'dummy');
 				for(var i = 1; i < arrayData.length; ++i) {
-					arrayData[i][2] = new Date(arrayData[i][2]);
-					if(arrayData[i][2].getYear() == MCO.getYear() && arrayData[i][2].getMonth() == MCO.getMonth() && arrayData[i][2].getDate() == MCO.getDate()) {
-						idxMCO = i;
-					}
+					arrayData[i].splice(2, 0, null);
+					arrayData[i][3] = new Date(arrayData[i][3]);
 				}
+				arrayData.push([arrayData[arrayData.length-1][0], arrayData[arrayData.length-1][1], -1, arrayData[arrayData.length-1][3]]);
 				var max = arrayData[arrayData.length-1][0];
 				var axisMax = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
 				var axisMin = 10.0;
 				var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10));
 				var data = new google.visualization.arrayToDataTable(arrayData);
-				data.setColumnProperty(2, 'role', 'tooltip');
+				data.setColumnProperty(3, 'role', 'tooltip');
 				var options =
 				{
 					focusTarget: 'category',
@@ -220,17 +220,14 @@
 					},
 					backgroundColor: {
 						fill: 'honeydew'
-					}
-					<!-- tooltip: { -->
-						<!-- isHtml: true -->
-					<!-- }, -->
+					},
 					<!-- witdh: '100%', -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("nationwide-dynamics"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
-				formatter.format(data, 2);
+				formatter.format(data, 3);
 				chart.draw(data, options);
 				for(var i = 1; axisMin*i < axisMax; i *= 10) {
 					drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax);
@@ -251,11 +248,11 @@
 				for(var j = 0; j < idxMCOs.length; ++j) {
 					idxMCOs[j] = -1;
 				}
-				
+				var dateColumn = 17;
 				var yMax = 0;
 				for(var i = 1; i < arrayData.length; ++i) {
-					arrayData[i][17] = new Date(arrayData[i][17]);
-					if(arrayData[i][17].getYear() == MCO.getYear() && arrayData[i][17].getMonth() == MCO.getMonth() && arrayData[i][17].getDate() == MCO.getDate()) {
+					arrayData[i][dateColumn] = new Date(arrayData[i][dateColumn]);
+					if(arrayData[i][dateColumn].getYear() == MCO.getYear() && arrayData[i][dateColumn].getMonth() == MCO.getMonth() && arrayData[i][dateColumn].getDate() == MCO.getDate()) {
 						for(var j = 1; j < idxMCOs.length - 1; ++j) {
 							if(arrayData[i][j] != null) {
 								idxMCOs[j] = i;
@@ -281,7 +278,7 @@
 				for(var j = 0; j < arrayData[0].length - 1; ++j) {
 					data.setColumnProperty(j, 'type', 'number');
 				}
-				data.setColumnProperty(17, 'role', 'tooltip');
+				data.setColumnProperty(dateColumn, 'role', 'tooltip');
 				var options =
 				{
 					title: 'By state - new vs cumulative cases',
@@ -334,7 +331,7 @@
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
-				formatter.format(data, 17);
+				formatter.format(data, dateColumn);
 				<!-- google.visualization.events.addListener(chart, 'onmouseover', function() { highlightLine(chart,data, options); }); -->
 				chart.draw(data, options);
 				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {

@@ -228,7 +228,6 @@ for i in range(len(cumulCases)):
                 dynamicTableNp = np.vstack((dynamicTableNp, dynamicsTableRow))
                 cumulCasesInt.append(cumulCase)
 dynamicTableNp = dynamicTableNp[np.argsort(cumulCasesInt)]
-#dynamicTableNp = dynamicTableNp[np.argsort(dynamicTableNp[:,0])]
 dynamicTableNp = np.vstack((dynamicsTableHeader, dynamicTableNp))
 savetxt('../../data/byStateDynamics.csv', dynamicTableNp, delimiter = ',', fmt = '%s')
 
