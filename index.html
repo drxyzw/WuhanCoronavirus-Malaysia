@@ -164,7 +164,7 @@
 				<!-- nationwide-dynamics -->
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
 				var idxMCO = -1;
-				arrayData[0].splice(2, 0,'dummy');
+				arrayData[0].splice(2, 0,'');
 				for(var i = 1; i < arrayData.length; ++i) {
 					arrayData[i].splice(2, 0, null);
 					arrayData[i][3] = new Date(arrayData[i][3]);
