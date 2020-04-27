@@ -1,0 +1,7 @@
+theme: jekyll-theme-cayman
+defaults:
+ - scope:
+     path: ""
+   values:
+     images:
+       path: ./preview.png
