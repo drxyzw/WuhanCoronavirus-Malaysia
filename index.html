@@ -357,17 +357,18 @@
 					backgroundColor: {
 						fill: 'honeydew'
 					},
+					lineWidth: 1
 					<!-- tooltip: { -->
 						<!-- isHtml: true -->
 					<!-- }, -->
 					<!-- witdh: '100%', -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 					<!-- height: $(window).width()*0.739*0.5 -->
-					series: []
+					<!-- series: [] -->
 				};
-				for(var j = 1; j < arrayData[0].length - 1; ++j) {
-					options.series.push({ lineWidth: 1 });
-				}
+				<!-- for(var j = 1; j < arrayData[0].length - 1; ++j) { -->
+					<!-- options.series.push({ lineWidth: 1 }); -->
+				<!-- } -->
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
 				<!-- google.visualization.events.addListener(chart, 'onmouseover', function(targetElement) { -->
 					<!-- if(targetElement != null) { -->
