@@ -172,7 +172,7 @@
 				arrayData.push([arrayData[arrayData.length-1][0], arrayData[arrayData.length-1][1], -1, arrayData[arrayData.length-1][3]]);
 				var max = arrayData[arrayData.length-1][0];
 				var axisMax = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
-				var axisMin = 10.0;
+				var axisMin = 5.0;
 				var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10));
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				data.setColumnProperty(3, 'role', 'tooltip');
@@ -271,8 +271,8 @@
 				var xMax = arrayData[arrayData.length-1][0];
 				var axisXMax = Math.pow(10, Math.ceil(Math.log(xMax) / Math.log(10.0)));
 				var axisYMax = Math.pow(10, Math.ceil(Math.log(yMax) / Math.log(10.0)));
-				var axisXMin = 10.0;
-				var axisYMin = 10.0;
+				var axisXMin = 1.0;
+				var axisYMin = 1.0;
 				<!-- var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10)); -->
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				for(var j = 0; j < arrayData[0].length - 1; ++j) {
@@ -281,7 +281,7 @@
 				data.setColumnProperty(dateColumn, 'role', 'tooltip');
 				var options =
 				{
-					title: 'By state - new vs cumulative cases',
+					title: 'By state - new vs cumulative cases (hover legend to highlight)',
 					titleTextStyle : {
 						fontSize: 20
 					},
@@ -293,7 +293,6 @@
 					},
 					focusTarget: 'category',
 					interpolateNulls: true,
-					lineWidth: 1,
 					hAxis: {
 						title: "Cumulative cases",
 						max: axisXMax,
@@ -328,22 +327,32 @@
 					<!-- witdh: '100%', -->
 					<!-- height: $(window).width()*0.739*0.5 -->
 					<!-- height: $(window).width()*0.739*0.5 -->
+					series: []
 				};
+				for(var j = 1; j < arrayData[0].length - 1; ++j) {
+					options.series.push({ lineWidth: 1 });
+				}
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
+				<!-- google.visualization.events.addListener(chart, 'onmouseover', function(targetElement) { -->
+					<!-- if(targetElement != null) { -->
+						<!-- if(targetElement.column != null) { -->
+						<!-- <!-- google.visualization.events.addListener(chart, "mouseover", function() { --> -->
+							<!-- highlightLine(targetElement, chart, data, options); -->
+							<!-- chart.draw(data, options);   //redraw -->
+							<!-- for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) { -->
+								<!-- drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax); -->
+							<!-- } -->
+							<!-- drawText(chart, axisYMax/3, axisYMax/3, 'exponential growth', 18, 45.0); -->
+						<!-- } -->
+					<!-- } -->
+				<!-- }); -->
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, dateColumn);
-				<!-- google.visualization.events.addListener(chart, 'onmouseover', function() { highlightLine(chart,data, options); }); -->
 				chart.draw(data, options);
 				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {
 					drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax);
 				}
-				<!-- for(var i = 1; axisYMin*i <= axisYMax and ; i *= 10) { -->
-					<!-- drawLine(chart, axisXMin, axisYMin*i, axisYMax, axisYMax*i); -->
-				<!-- } -->
-				drawText(chart, axisYMax/3, axisYMax/3, 'exponential growth', 18, 45.0);
-				<!-- if(idxMCO > 0) { -->
-					<!-- drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO'); -->
-				<!-- } -->
+				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0);
 			});
 		}
 		function drawLine(chart, x1, y1, x2, y2) {
@@ -356,17 +365,14 @@
 			var y2Actual = layout.getYLocation(y2);
 			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1, true));
 		}
-		function highlightLine(chart,data,options) {
-			var selectedLineWidth = 4;
-			var selectedItem = chart.getSelection()[0];
+		function highlightLine(targetElement, chart, data, options) {
+			var targetLineWidth = 4;
 			//reset series line width to default value
-			if(selectedItem.column != null) {
-				for(var i in options.series) {
-					options.series[i].lineWidth = 1;
-				}	
-				options.series[selectedItem.column-1].lineWidth = selectedLineWidth; //set selected line width
-				chart.draw(data, options);   //redraw
-			}
+			for(var i in options.series) {
+				options.series[i].lineWidth = 1;
+			}	
+			options.series[targetElement.column-1].lineWidth = targetLineWidth; //set selected line width
+			chart.draw(data, options);   //redraw
 		}
 		function drawAxisLine(chart, x, text) {
 			var layout = chart.getChartLayoutInterface();

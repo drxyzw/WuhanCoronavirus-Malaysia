@@ -106,10 +106,6 @@
   /* height: auto; */
 }
 
-/* div.google_chart svg g g g rect {  */
-	/* stroke-width:4px; fill:red;  */
-/* } */
-/* div.google_chart svg g g g g rect {  */
-	/* stroke-width:4px; fill:red;  */
-/* } */
-
+#bystate-dynamics div svg g g g g path { 
+	stroke-width:4px; 
+}
