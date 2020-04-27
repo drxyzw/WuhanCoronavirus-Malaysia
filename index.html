@@ -355,11 +355,11 @@
 				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {
 					drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax);
 				}
-				for(var j = 1; j < arrayData[0].length - 1; ++j) {
-					if(idxMCOs[j] > 0) {
-						drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, 'MCO');
-					}
-				}
+				<!-- for(var j = 1; j < arrayData[0].length - 1; ++j) { -->
+					<!-- if(idxMCOs[j] > 0) { -->
+						<!-- drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, 'MCO'); -->
+					<!-- } -->
+				<!-- } -->
 				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0);
 			});
 		}
