@@ -355,6 +355,11 @@
 				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {
 					drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax);
 				}
+				for(var j = 1; j < arrayData[0].length - 1; ++j) {
+					if(idxMCOs[j] > 0) {
+						drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, 'MCO');
+					}
+				}
 				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0);
 			});
 		}
@@ -368,15 +373,15 @@
 			var y2Actual = layout.getYLocation(y2);
 			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1, true));
 		}
-		function highlightLine(targetElement, chart, data, options) {
-			var targetLineWidth = 4;
-			//reset series line width to default value
-			for(var i in options.series) {
-				options.series[i].lineWidth = 1;
-			}	
-			options.series[targetElement.column-1].lineWidth = targetLineWidth; //set selected line width
-			chart.draw(data, options);   //redraw
-		}
+		<!-- function highlightLine(targetElement, chart, data, options) { -->
+			<!-- var targetLineWidth = 4; -->
+			<!-- //reset series line width to default value -->
+			<!-- for(var i in options.series) { -->
+				<!-- options.series[i].lineWidth = 1; -->
+			<!-- }	 -->
+			<!-- options.series[targetElement.column-1].lineWidth = targetLineWidth; //set selected line width -->
+			<!-- chart.draw(data, options);   //redraw -->
+		<!-- } -->
 		function drawAxisLine(chart, x, text) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
@@ -485,11 +490,11 @@ Reference:
 	<li>Official Portal Ministry of Health Malaysia COVID-19 (Media Centre)<br> 
 	<a href="http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar">http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar</a></li>
 	<li>2020 coronavirus pandemic in Malaysia<br>
-	<a href="">https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia</a></li>
+	<a href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia">https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia</a></li>
 	<li>Covid-19: Current situation in Malaysia (updated daily)<br>
-	<a href="">https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily</a></li>
+	<a href="https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily">https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily</a></li>
 	<li>Physicist's Video Studies When and How COVID-19 Will Peak<br>
-	<a href="">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
+	<a href="https://nerdist.com/article/when-how-covid-19-will-peak/">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
 </ul>
 </div>
 </body>
