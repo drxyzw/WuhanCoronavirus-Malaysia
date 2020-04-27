@@ -15,6 +15,39 @@
 			<!-- drawChartDailyTotal(); -->
 			<!-- drawChartDailyTotalDynamics(); -->
 		<!-- }); -->
+		var colors = new Array (
+			"#3366cc",
+			"#dc3912",
+			"#ff9900",
+			"#109618",
+			"#990099",
+			"#0099c6",
+			"#dd4477",
+			"#66aa00",
+			"#b82e2e",
+			"#316395",
+			"#994499",
+			"#22aa99",
+			"#aaaa11",
+			"#6633cc",
+			"#e67300",
+			"#8b0707",
+			"#651067",
+			"#329262",
+			"#5574a6",
+			"#3b3eac",
+			"#b77322",
+			"#16d620",
+			"#b91383",
+			"#f4359e",
+			"#9c5935",
+			"#a9c413",
+			"#2a778d",
+			"#668d1c",
+			"#bea413",
+			"#0c5922",
+			"#743411"
+		);
 		function drawChartFirst() {
 			drawChartDailyTotal();
 			drawChartDailyTotalDynamics();
@@ -238,7 +271,7 @@
 				}
 				drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 14, 45.0);
 				if(idxMCO > 0) {
-					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO');
+					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO', '#00cccc');
 				}
 			});
 		}
@@ -355,11 +388,11 @@
 				for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) {
 					drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax);
 				}
-				<!-- for(var j = 1; j < arrayData[0].length - 1; ++j) { -->
-					<!-- if(idxMCOs[j] > 0) { -->
-						<!-- drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, 'MCO'); -->
-					<!-- } -->
-				<!-- } -->
+				for(var j = 1; j < arrayData[0].length - 1; ++j) {
+					if(idxMCOs[j] > 0) {
+						drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, '', colors[j-1]);
+					}
+				}
 				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0);
 			});
 		}
@@ -404,14 +437,14 @@
 			line.setAttribute('stroke-width', w);
 			return line;
 		}
-		function drawCircle(chart, x, y, r, text) {
+		function drawCircle(chart, x, y, r, text, color) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(x);
 			var yLoc = layout.getYLocation(y);
-			svg.appendChild(createCircle(xLoc, yLoc, r, '#00cccc', 4));
-			svg.appendChild(createText(xLoc, yLoc+r-30, text, '#00cccc', 18, 0));
+			svg.appendChild(createCircle(xLoc, yLoc, r, color, 4));
+			svg.appendChild(createText(xLoc, yLoc+r-30, text, color, 18, 0));
 		}
 		function createCircle(x, y, r, color, w) {
 			var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
