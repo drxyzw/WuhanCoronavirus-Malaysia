@@ -13,6 +13,12 @@
   width: 430px;
   height: 323px;
 }
+#nationwide-daily-change-wrapper {
+  display: block;
+  float: left;
+  width: 430px;
+  height: 323px;
+}
 #linearlogbutton {
   display: block;
   /* top: auto; */
@@ -50,6 +56,33 @@
   /* clear: left; */
   /* width: 50%; */
   /* height: auto; */
+  width: 430px;
+  height: 323px;
+}
+
+#linearlogbuttonchange {
+  display: block;
+  left: auto;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  width: 430px;
+  height: 20px;
+  float: left;
+  clear: left;
+}
+
+#nationwide-daily-change {
+  display: block;
+  float: left;
+  clear: left;
+  width: 430px;
+  height: 303px;
+}
+
+#nationwide-latest {
+  display: block;
+  float: left;
   width: 430px;
   height: 323px;
 }

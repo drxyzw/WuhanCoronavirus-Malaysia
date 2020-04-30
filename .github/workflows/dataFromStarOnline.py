@@ -64,6 +64,23 @@ for i in range(1, len(table)):
 # save a total number file with active cases instead of new cases
 savetxt('../../data/dailyTotal.csv', table, delimiter = ',', fmt = '%s')
 
+# the latest date, total death, total recovered, active cases
+lastIdx = len(table) - 1
+latestTotalTable =np.array([['name', 'value'],
+                            [table[0][0], table[lastIdx][0]], # date
+                            [table[0][1], table[lastIdx][1]], # total
+                            [table[0][2], table[lastIdx][2]], # death
+                            [table[0][3], table[lastIdx][3]], # recovered
+                            [table[0][4], table[lastIdx][4]]]) # active
+savetxt('../../data/latestTotal.csv', latestTotalTable, delimiter = ',', fmt = '%s')
+
+# Date, total change of cases, death, recovered, active cases
+tableChange =np.copy(table)
+for i in range(2, len(table)):
+    for j in range(1, len(table[0])):
+        tableChange[i][j] = str(int(table[i][j]) - int(table[i-1][j]))
+savetxt('../../data/dailyTotalChange.csv', tableChange, delimiter = ',', fmt = '%s')
+
 # dynamics table (x=cumulative cases, y = new cases per day, z = date just for tooltip)
 dynamicsTableOriginal = np.append(tableHeaderNp, tableBodyNp, axis = 0)
 dynamicsTable = []
