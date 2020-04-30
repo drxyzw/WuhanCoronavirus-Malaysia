@@ -1,66 +1,13 @@
 @import url("map.css");
 
-#nationwide-daily-wrapper {
-  display: block;
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
-  float: left;
-  /* clear: left; */
-  /* float: right; */
-  /* width: 50%; */
-  /* height: auto; */
-  width: 430px;
-  height: 323px;
-}
-#nationwide-daily-change-wrapper {
+.group-wrapper {
   display: block;
   float: left;
   width: 430px;
   height: 323px;
 }
-#linearlogbutton {
-  display: block;
-  /* top: auto; */
-  left: auto;
-	/* min-width: 384px; */
-	border: 0;
-	margin: 0;
-	padding: 0;
-  width: 430px;
-  height: 20px;
-  float: left;
-  clear: left;
-}
 
-#nationwide-daily {
-  display: block;
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
-  float: left;
-  /* clear: left; */
-  /* float: right; */
-  /* width: 50%; */
-  /* height: auto; */
-  width: 430px;
-  height: 303px;
-}
-
-#nationwide-dynamics {
-  /* display: block; */
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
-  float: left;
-  /* clear: left; */
-  /* width: 50%; */
-  /* height: auto; */
-  width: 430px;
-  height: 323px;
-}
-
-#linearlogbuttonchange {
+#linearlogbutton, #linearlogbuttonchange {
   display: block;
   left: auto;
   border: 0;
@@ -72,12 +19,30 @@
   clear: left;
 }
 
-#nationwide-daily-change {
+#nationwide-daily, #nationwide-daily-change {
   display: block;
   float: left;
-  clear: left;
   width: 430px;
   height: 303px;
+}
+
+#bystate-daily {
+  display: block;
+  float: left;
+  width: 430px;
+  height: 323px;
+}
+
+#nationwide-dynamics {
+  float: left;
+  width: 430px;
+  height: 323px;
+}
+
+#bystate-dynamics {
+  float: left;
+  width: 860px;
+  height: 646px;
 }
 
 #nationwide-latest {
@@ -90,53 +55,13 @@
 #malaysia-map {
   display: block;
   background: aliceblue;
-  /* display: block; */
-  /* top: auto; */
-  /* left: auto; */
   float: left;
-  /* min-width: 384px; */
   width: 430px;
   height: 323px;
-  /* width: 50%; */
-  /* height: auto; */
-}
-
-#bystate-daily {
-  display: block;
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
-  float: left;
-  /* clear: left; */
-  /* float: right; */
-  /* width: 50%; */
-  /* height: auto; */
-  width: 430px;
-  height: 323px;
-}
-
-#bystate-dynamics {
-  /* display: block; */
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
-  float: left;
-  /* clear: left; */
-  /* width: 50%; */
-  /* height: auto; */
-  width: 860px;
-  height: 646px;
 }
 
 #reference {
-  /* display: block; */
-  /* top: auto; */
-  /* left: auto; */
-  /* min-width: 384px; */
   float: left;
-  /* clear: left; */
-  /* width: 50%; */
-  /* height: auto; */
 }
 
 #bystate-dynamics div svg g g g g path { 

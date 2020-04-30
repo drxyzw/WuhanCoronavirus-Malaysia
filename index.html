@@ -12,10 +12,6 @@
 		google.charts.load('current', {'packages':['corechart', 'line']});
 		google.charts.setOnLoadCallback(drawChartFirst);
 		
-		<!-- $(window).resize(function(){ -->
-			<!-- drawChartDailyTotal(); -->
-			<!-- drawChartDailyTotalDynamics(); -->
-		<!-- }); -->
 		var colors = new Array (
 			"#3366cc",
 			"#dc3912",
@@ -56,7 +52,6 @@
 			drawChartLatestTotal();
 			drawChartDailyByStates();
 			drawChartDailyDynamicsByStates();
-			<!-- drawChartDailyTotal(); -->
 		}
 		function switchLinearLog() {
 			logScale = !logScale;
@@ -105,9 +100,6 @@
 					backgroundColor: {
 						fill: 'FFFAFA'
 					},
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.741*0.5-25 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("nationwide-daily"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -177,9 +169,6 @@
 					backgroundColor: {
 						fill: 'FFFAFA'
 					},
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.741*0.5-25 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("nationwide-daily-change"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -222,48 +211,13 @@
 						width: '70%',
 						height: '70%'
 					},
-					<!-- hAxis: { -->
-						<!-- title: "Date", -->
-						<!-- minorGridlines: { count:0 }, -->
-						<!-- format: 'dd-MMM' -->
-					<!-- }, -->
-					<!-- vAxis: { -->
-						<!-- title: "Cases", -->
-						<!-- minorGridlines: { count:0 }, -->
-						<!-- scaleType: logScale ? 'log' : 'null', -->
-						<!-- viewWindow: { -->
-							<!-- min: axisMin -->
-						<!-- } -->
-					<!-- }, -->
-					<!-- legend: { -->
-						<!-- position: 'top', -->
-						<!-- maxLines: 3 -->
-					<!-- }, -->
 					backgroundColor: {
 						fill: 'aliceblue'
 					},
 					colors: [colors[1], colors[2], colors[3]]
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.741*0.5-25 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.PieChart(document.getElementById("nationwide-latest"));
-				<!-- var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'}); -->
-				<!-- formatter.format(data, 0); -->
 				chart.draw(data, options);
-				<!-- drawAxisLine(chart, MCO, 'MCO'); -->
-				
-				<!-- if(logScale) { -->
-					<!-- var tDouble = Math.log(axisMax/axisMin)/Math.log(2.0); -->
-					<!-- for(var d = 2; d <=8; d = d + 3) { -->
-						<!-- var anchorDate = new Date(arrayData[1][0]); -->
-						<!-- anchorDate.setDate(anchorDate.getDate() + tDouble*d); -->
-						<!-- var textDate = new Date(arrayData[1][0]); -->
-						<!-- textDate.setDate(textDate.getDate() + tDouble*d - 4*d); -->
-						<!-- drawLine(chart, arrayData[1][0], axisMin, anchorDate, axisMax); -->
-						<!-- drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0); -->
-					<!-- } -->
-				<!-- } -->
 			});
 		}
 		function drawChartDailyByStates() {
@@ -311,9 +265,6 @@
 					backgroundColor: {
 						fill: 'FFFAFA'
 					},
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.741*0.5-25 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-daily"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -327,7 +278,6 @@
 						anchorDate.setDate(anchorDate.getDate() + tDouble*d);
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 4*d);
-						<!-- var max = chart.getOption('vAxis.viewWindow.max'); -->
 						drawLine(chart, arrayData[1][0], axisMin, anchorDate, axisMax);
 						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
@@ -377,9 +327,6 @@
 							max: axisMax,
 							min: axisMin,
 						},
-						<!-- gridlines: { -->
-							<!-- count: 3, -->
-						<!-- } -->
 					},
 					vAxis: {
 						title: "Daily new cases",
@@ -391,17 +338,10 @@
 							max: axisMax,
 							min: axisMin,
 						},
-						<!-- gridlines: { -->
-							<!-- count: 3, -->
-							<!-- <!-- count: nGridlines --> -->
-						<!-- } -->
 					},
 					backgroundColor: {
 						fill: 'honeydew'
 					},
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.739*0.5 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("nationwide-dynamics"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -441,17 +381,11 @@
 						}
 					}
 				}
-				<!-- for(var i = 1; i < arrayData.length; ++i) { -->
-					<!-- for(var j = 1; j < idxMCOs.length - 1; ++j) { -->
-						<!-- if(arrayData[i][j] == null) arrayData[i][j] = -1 -->
-					<!-- } -->
-				<!-- } -->
 				var xMax = arrayData[arrayData.length-1][0];
 				var axisXMax = Math.pow(10, Math.ceil(Math.log(xMax) / Math.log(10.0)));
 				var axisYMax = Math.pow(10, Math.ceil(Math.log(yMax) / Math.log(10.0)));
 				var axisXMin = 1.0;
 				var axisYMin = 1.0;
-				<!-- var nGridlines = Math.round(Math.log(axisMax/10.0) / Math.log(10)); -->
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				for(var j = 0; j < arrayData[0].length - 1; ++j) {
 					data.setColumnProperty(j, 'type', 'number');
@@ -500,31 +434,8 @@
 						fill: 'honeydew'
 					},
 					lineWidth: 1
-					<!-- tooltip: { -->
-						<!-- isHtml: true -->
-					<!-- }, -->
-					<!-- witdh: '100%', -->
-					<!-- height: $(window).width()*0.739*0.5 -->
-					<!-- height: $(window).width()*0.739*0.5 -->
-					<!-- series: [] -->
 				};
-				<!-- for(var j = 1; j < arrayData[0].length - 1; ++j) { -->
-					<!-- options.series.push({ lineWidth: 1 }); -->
-				<!-- } -->
 				var chart = new google.visualization.LineChart(document.getElementById("bystate-dynamics"));
-				<!-- google.visualization.events.addListener(chart, 'onmouseover', function(targetElement) { -->
-					<!-- if(targetElement != null) { -->
-						<!-- if(targetElement.column != null) { -->
-						<!-- <!-- google.visualization.events.addListener(chart, "mouseover", function() { --> -->
-							<!-- highlightLine(targetElement, chart, data, options); -->
-							<!-- chart.draw(data, options);   //redraw -->
-							<!-- for(var i = 1; axisXMin*i <= axisXMax && axisYMax*i <= axisXMax; i *= 10) { -->
-								<!-- drawLine(chart, axisXMin*i, axisXMin, axisYMax*i, axisYMax); -->
-							<!-- } -->
-							<!-- drawText(chart, axisYMax/3, axisYMax/3, 'exponential growth', 18, 45.0); -->
-						<!-- } -->
-					<!-- } -->
-				<!-- }); -->
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, dateColumn);
 				chart.draw(data, options);
@@ -550,15 +461,6 @@
 			var y2Actual = layout.getYLocation(y2);
 			svg.appendChild(createLine(x1Actual, y1Actual, x2Actual, y2Actual, '#F08080', 1, true));
 		}
-		<!-- function highlightLine(targetElement, chart, data, options) { -->
-			<!-- var targetLineWidth = 4; -->
-			<!-- //reset series line width to default value -->
-			<!-- for(var i in options.series) { -->
-				<!-- options.series[i].lineWidth = 1; -->
-			<!-- }	 -->
-			<!-- options.series[targetElement.column-1].lineWidth = targetLineWidth; //set selected line width -->
-			<!-- chart.draw(data, options);   //redraw -->
-		<!-- } -->
 		function drawAxisLine(chart, x, text, textOffsetX = 0, textOffsetY = 0) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
@@ -640,21 +542,20 @@
 	<defs>
 		<marker id="arrow#F08080" markerWidth="10" markerHeight="10" refx="9" refy="3" orient="auto" markerUnits="strokeWidth">
 			<path d="M0,0 L0,6 L9,3 z" fill="#F08080" />
-			<!-- <path d="M0,0 L0,6 L9,3 z" fill="#F08080" /> -->
 		</marker>
 	</defs>
 </svg>
 <h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
 <div id="wrapper1">
-	<div id="nationwide-daily-wrapper">
-		<button id="linearlogbutton" onclick="switchLinearLog();">Switch linear/log axis</button>
+	<div id="nationwide-daily-wrapper" class="group-wrapper">
+		<button id="linearlogbutton" class-="upper-chart-button" onclick="switchLinearLog();">Switch linear/log axis</button>
 		<div id="nationwide-daily"></div>
 	</div>
 	<div id="nationwide-dynamics"></div>
 </div>
 <div id="wrapper2">
-	<div id="nationwide-daily-change-wrapper">
-		<button id="linearlogbuttonchange" onclick="switchLinearLogChange();">Switch linear/mirror log axis</button>
+	<div id="nationwide-daily-change-wrapper" class="group-wrapper">
+		<button id="linearlogbuttonchange" class-="upper-chart-button" onclick="switchLinearLogChange();">Switch linear/mirror log axis</button>
 		<div id="nationwide-daily-change"></div>
 	</div>
 	<div id="nationwide-latest"></div>
