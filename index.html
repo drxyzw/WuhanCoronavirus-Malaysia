@@ -123,7 +123,7 @@
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 4*d);
 						drawLine(chart, arrayData[1][0], axisMin, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0);
+						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 				}
 			});
@@ -196,7 +196,7 @@
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 6*d);
 						drawLine(chart, arrayData[1][0], guideLineStart, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/(4.0*Math.pow(1.4,d)), 'Double every ' + d.toString() + ' days', 8, 0);
+						drawText(chart, textDate, axisMax/(4.0*Math.pow(1.4,d)), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 				}
 			});
@@ -329,7 +329,7 @@
 						textDate.setDate(textDate.getDate() + tDouble*d - 4*d);
 						<!-- var max = chart.getOption('vAxis.viewWindow.max'); -->
 						drawLine(chart, arrayData[1][0], axisMin, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0);
+						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 			});
 				
@@ -411,7 +411,7 @@
 					drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax);
 					drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i);
 				}
-				drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 14, 45.0);
+				drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 14, 45.0, '#F08080');
 				if(idxMCO > 0) {
 					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO', '#00cccc');
 				}
@@ -536,7 +536,8 @@
 						drawCircle(chart, arrayData[idxMCOs[j]][0], arrayData[idxMCOs[j]][j], 5, '', colors[j-1]);
 					}
 				}
-				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0);
+				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0, '#F08080');
+				drawText(chart, axisYMax*0.015, axisYMax*0.6, 'Circle = MCO', 18, 0.0, '#00cccc');
 			});
 		}
 		function drawLine(chart, x1, y1, x2, y2) {
@@ -600,7 +601,7 @@
 			return circle;
 		}
 		
-		function drawText(chart, x, y, text, size, angleOnMesh) {
+		function drawText(chart, x, y, text, size, angleOnMesh, color) {
 			var layout = chart.getChartLayoutInterface();
 			var chartArea = layout.getChartAreaBoundingBox();
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
@@ -608,10 +609,10 @@
 			var yLoc = layout.getYLocation(y);
 			if( angleOnMesh != 0.0) {
 				angle = 180.0 / Math.PI * Math.atan((layout.getYLocation(1.0+y)-yLoc)/(layout.getXLocation(1.0+x)-xLoc)*Math.tan(Math.PI/180.0*angleOnMesh));
-				svg.appendChild(createText(xLoc-10, yLoc-10, text, '#F08080', size, angle));
+				svg.appendChild(createText(xLoc-10, yLoc-10, text, color, size, angle));
 			}
 			else {
-				svg.appendChild(createText(xLoc-10, yLoc-10, text, '#F08080', size, 0.0));
+				svg.appendChild(createText(xLoc-10, yLoc-10, text, color, size, 0.0));
 			}
 		}
 		function createText(x, y, text, color, size, angle) {
