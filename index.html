@@ -45,6 +45,18 @@
 			"#0c5922",
 			"#743411"
 		);
+		function openTab(tabName, elmnt) {
+			var tabcontent, tablinks;
+			tabcontent = document.getElementsByClassName("tabcontent");
+			for(var i = 0; i < tabcontent.length; ++i) {
+				tabcontent[i].style.display = 'none';
+			}
+			tablinks = document.getElementsByClassName("tablink");
+			for(var i = 0; i < tablinks.length; ++i) {
+				tablinks[i].style.backgroundcolor = "";
+			}
+			document.getElementById(tabName).style.display = "block";
+		}
 		function drawChartFirst() {
 			drawChartDailyTotal();
 			drawChartDailyTotalDynamics();
@@ -52,6 +64,7 @@
 			drawChartLatestTotal();
 			drawChartDailyByStates();
 			drawChartDailyDynamicsByStates();
+			document.getElementById("defaultOpen").click();
 		}
 		function switchLinearLog() {
 			logScale = !logScale;
@@ -546,41 +559,50 @@
 	</defs>
 </svg>
 <h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
-<div id="wrapper1">
-	<div id="nationwide-daily-wrapper" class="group-wrapper">
-		<button id="linearlogbutton" class-="upper-chart-button" onclick="switchLinearLog();">Switch linear/log axis</button>
-		<div id="nationwide-daily"></div>
+<button class="tablink" onclick="openTab('CaseNumberAnalysis', this)" id="defaultOpen">Case number analysis</button>
+<button class="tablink" onclick="openTab('RtAnalysis', this)">R(t) analysis</button>
+
+<div id="CaseNumberAnalysis" class="tabcontent">
+	<div id="wrapper1">
+		<div id="nationwide-daily-wrapper" class="group-wrapper">
+			<button id="linearlogbutton" class-="upper-chart-button" onclick="switchLinearLog();">Switch linear/log axis</button>
+			<div id="nationwide-daily"></div>
+		</div>
+		<div id="nationwide-dynamics"></div>
 	</div>
-	<div id="nationwide-dynamics"></div>
-</div>
-<div id="wrapper2">
-	<div id="nationwide-daily-change-wrapper" class="group-wrapper">
-		<button id="linearlogbuttonchange" class-="upper-chart-button" onclick="switchLinearLogChange();">Switch linear/mirror log axis</button>
-		<div id="nationwide-daily-change"></div>
+	<div id="wrapper2">
+		<div id="nationwide-daily-change-wrapper" class="group-wrapper">
+			<button id="linearlogbuttonchange" class-="upper-chart-button" onclick="switchLinearLogChange();">Switch linear/mirror log axis</button>
+			<div id="nationwide-daily-change"></div>
+		</div>
+		<div id="nationwide-latest"></div>
 	</div>
-	<div id="nationwide-latest"></div>
+	<div id="wrapper3">
+		<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
+		<div id="bystate-daily"></div>
+	</div>
+	<div id="wrapper4">
+		<div id="bystate-dynamics"></div>
+	</div>
+	<br>
+	<br>
+	<div id="reference">
+		Reference:
+		<ul>
+			<li>Official Portal Ministry of Health Malaysia COVID-19 (Media Centre)<br> 
+			<a href="http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar">http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar</a></li>
+			<li>2020 coronavirus pandemic in Malaysia<br>
+			<a href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia">https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia</a></li>
+			<li>Covid-19: Current situation in Malaysia (updated daily)<br>
+			<a href="https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily">https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily</a></li>
+			<li>Physicist's Video Studies When and How COVID-19 Will Peak<br>
+			<a href="https://nerdist.com/article/when-how-covid-19-will-peak/">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
+		</ul>
+	</div>
 </div>
-<div id="wrapper3">
-	<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
-	<div id="bystate-daily"></div>
+
+<div id="RtAnalysis" class="tabcontent">
 </div>
-<div id="wrapper4">
-	<div id="bystate-dynamics"></div>
-</div>
-<br>
-<br>
-<div id="reference">
-Reference:
-<ul>
-	<li>Official Portal Ministry of Health Malaysia COVID-19 (Media Centre)<br> 
-	<a href="http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar">http://www.moh.gov.my/index.php/pages/view/2019-ncov-wuhan-kenyataan-akhbar</a></li>
-	<li>2020 coronavirus pandemic in Malaysia<br>
-	<a href="https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia">https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia</a></li>
-	<li>Covid-19: Current situation in Malaysia (updated daily)<br>
-	<a href="https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily">https://www.thestar.com.my/news/nation/2020/03/23/covid-19-current-situation-in-malaysia-updated-daily</a></li>
-	<li>Physicist's Video Studies When and How COVID-19 Will Peak<br>
-	<a href="https://nerdist.com/article/when-how-covid-19-will-peak/">https://nerdist.com/article/when-how-covid-19-will-peak/</a></li>
-</ul>
-</div>
+
 </body>
 
