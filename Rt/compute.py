@@ -296,7 +296,22 @@ def get_posteriors(sr, sigma=0.15):
         #data = sps.poisson.pmf(sr[1:].values, lam),
         index = r_t_range,
         columns = sr.index[1:])
-    
+
+    #nStd = 3.;
+    #for i in range(1, L):
+    #    sr0 = sr[1:][-i]
+    #    onset_range = np.linspace(max(0.0, sr0 - nStd*stds[i-1]), sr0 + nStd*stds[i-1], 30)
+    #    likelihoods_to_be_integrated = pd.DataFrame(
+    #        data = sps.gamma(a=onset_range+1., scale=1., loc=0.).pdf(x=lam[:,-i][:,None]),
+    #        index = r_t_range,
+    #        columns = onset_range)
+    #    normal_dist = sps.norm(loc=sr0,
+    #                          scale=stds[i-1]
+    #                         ).pdf(onset_range[:, None]) 
+    #    likelihood_i = likelihoods_to_be_integrated @ normal_dist
+    #    likelihoods[state_name].iloc[:-i] = likelihood_i
+
+
     # (3) Create the Gaussian Matrix
     process_matrix = sps.norm(loc=r_t_range,
                               scale=sigma
@@ -516,17 +531,54 @@ for state_name, cases in states_to_process.groupby(level='state'):
     # L: delay limit, min(L; cumulative(p_delay(0 to L)) > threshould = 0.9)
     # onset(t) = sum(tau = t to t+L) confirmed(tau) p_delay(tau-t)
     # = sum(tau = t to T) confirmed(tau) p_delay(tau-t)
-    #  + sum(tau = T to t+L) confirmed(tau) p_delay(tau-t)
-    # = sum(tau = t to T) confirmed(tau) p_delay(tau-t)
-    #  + sum(tau = T to t+L) confirmed(T) p_delay(tau-t)
-    #  + sum(tau = T to t+L) (confirmed(tau)-confirmed(T)) p_delay(tau-t)
-    # Because (confirmed(tau: T to t+L) -confirmed(T)) is uncertain
-    # variance = sum(tau = T to t+L) std^2(tau-T) p_delay(tau-t)
-    #L = np.argmax(np.cumsum(p_delay) > 0.9)
-    #no_need_adjust = adjusted[:-L]
-    #stds = []
-    #for lag in range(1, L):
-    #    stds.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
+    #  + sum(tau = T+1 to t+L) confirmed(tau) p_delay(tau-t)
+    # onset(t-1) = sum(tau = t-1 to t+L) confirmed(tau) p_delay(tau-t+1)
+    # = sum(tau = t-1 to T) confirmed(tau) p_delay(tau-t+1)
+    #  + sum(tau = T+1 to t+L-1) confirmed(tau) p_delay(tau-t+1)
+    # Here d = T-t = 0, 1, 2,..., L ==> T = t + d
+    # We approx confirmed(tau>T)=confirmed(T)
+    # onset(t) = sum(tau = t to t+d) confirmed(tau) p_delay(tau-t)
+    #  + sum(tau = t+d+1 to t+L) confirmed(t+d) p_delay(tau-t)
+    # = sum(tau = 0 to d) confirmed(tau+t) p_delay(tau)
+    # + confirmed(t+d) sum(tau = d+1 to L) p_delay(tau)
+    # onset(t-1) = sum(tau = 0 to d+1) confirmed(tau+t-1) p_delay(tau)
+    # + confirmed(t+d) sum(tau = d+2 to L) p_delay(tau)
+
+    # onset(t)/onset(t-1) = gamma * (R-1)
+    # So, we directly estimate the uncertainty on R due to future confirmed cases
+    L = np.argmax(np.cumsum(p_delay) > 0.9)
+    no_need_adjust = adjusted[:-L].values
+
+    trunc_cases = cases[np.argmax(cases > 0):]
+    stds_case_ratios = []
+    onset_est = []
+    for d in range(L):
+        case_ratios = []
+        for t in range(1, len(trunc_cases)-d):
+            current_date = trunc_cases.index[t][trunc_cases.index.names.index("date")]
+            previous_date = trunc_cases.index[t-1][trunc_cases.index.names.index("date")]
+            current_case = 0.
+            for tau in range(0, d+1):
+                current_case += trunc_cases[tau+t] * p_delay[tau]
+            current_case_est = current_case
+            for tau in range(d+1,min(L+1, len(trunc_cases)-t)):
+                current_case += trunc_cases[tau+t] * p_delay[tau]
+                current_case_est += trunc_cases[t+d] * p_delay[tau]
+            prev_cases = 0.
+            for tau in range(0, d+2):
+                prev_cases += trunc_cases[tau+t-1] * p_delay[tau]
+            prev_cases_est = prev_cases
+            for tau in range(d+2, min(L+1, len(trunc_cases)-t+1)):
+                prev_cases += trunc_cases[tau+t-1] * p_delay[tau]
+                prev_cases_est += trunc_cases[t+d] * p_delay[tau]
+            onset_est.append(current_case)
+            if prev_cases > 0 and prev_cases_est > 0:
+                case_ratios.append(current_case_est/prev_cases_est - current_case/prev_cases)
+        stds_case_ratios.append(np.std(case_ratios))
+
+    stds_case_ratios /= GAMMA
+    # modify posteriors to include the uncertainty due to future confirmed cases
+
 
     result = {}
     
