@@ -1,0 +1,1489 @@
+state,date,cases
+Johor,2020-01-25,1
+Johor,2020-01-26,1
+Johor,2020-01-27,1
+Johor,2020-01-28,2
+Johor,2020-01-29,2
+Johor,2020-01-30,3
+Johor,2020-01-31,3
+Johor,2020-02-01,3
+Johor,2020-02-02,3
+Johor,2020-02-03,3
+Johor,2020-02-04,3
+Johor,2020-02-05,3
+Johor,2020-02-06,4
+Johor,2020-02-07,4
+Johor,2020-02-08,4
+Johor,2020-02-09,4
+Johor,2020-02-10,4
+Johor,2020-02-11,4
+Johor,2020-02-12,4
+Johor,2020-02-13,4
+Johor,2020-02-14,4
+Johor,2020-02-15,4
+Johor,2020-02-16,4
+Johor,2020-02-17,4
+Johor,2020-02-18,4
+Johor,2020-02-19,4
+Johor,2020-02-20,4
+Johor,2020-02-21,4
+Johor,2020-02-22,4
+Johor,2020-02-23,4
+Johor,2020-02-24,4
+Johor,2020-02-25,4
+Johor,2020-02-26,4
+Johor,2020-02-27,4
+Johor,2020-02-28,4
+Johor,2020-02-29,4
+Johor,2020-03-01,4
+Johor,2020-03-02,4
+Johor,2020-03-03,4
+Johor,2020-03-04,5
+Johor,2020-03-05,7
+Johor,2020-03-06,8
+Johor,2020-03-07,10
+Johor,2020-03-08,12
+Johor,2020-03-09,13
+Johor,2020-03-10,15
+Johor,2020-03-11,16
+Johor,2020-03-12,18
+Johor,2020-03-13,20
+Johor,2020-03-14,22
+Johor,2020-03-15,37
+Johor,2020-03-16,52
+Johor,2020-03-17,77
+Johor,2020-03-18,88
+Johor,2020-03-19,101
+Johor,2020-03-20,114
+Johor,2020-03-21,129
+Johor,2020-03-22,145
+Johor,2020-03-23,158
+Johor,2020-03-24,162
+Johor,2020-03-25,196
+Johor,2020-03-26,239
+Johor,2020-03-27,259
+Johor,2020-03-28,285
+Johor,2020-03-29,309
+Johor,2020-03-30,333
+Johor,2020-03-31,349
+Johor,2020-04-01,368
+Johor,2020-04-02,395
+Johor,2020-04-03,416
+Johor,2020-04-04,422
+Johor,2020-04-05,438
+Johor,2020-04-06,468
+Johor,2020-04-07,478
+Johor,2020-04-08,496
+Johor,2020-04-09,503
+Johor,2020-04-10,523
+Johor,2020-04-11,544
+Johor,2020-04-12,558
+Johor,2020-04-13,579
+Johor,2020-04-14,587
+Johor,2020-04-15,601
+Johor,2020-04-16,614
+Johor,2020-04-17,623
+Johor,2020-04-18,639
+Johor,2020-04-19,642
+Johor,2020-04-20,644
+Johor,2020-04-21,645
+Johor,2020-04-22,648
+Johor,2020-04-23,651
+Johor,2020-04-24,655
+Johor,2020-04-25,655
+Johor,2020-04-26,659
+Johor,2020-04-27,659
+Johor,2020-04-28,660
+Johor,2020-04-29,660
+Johor,2020-04-30,663
+Johor,2020-05-01,666
+Johor,2020-05-02,667
+Johor,2020-05-03,667
+Johor,2020-05-04,667
+Johor,2020-05-05,667
+Johor,2020-05-06,667
+Johor,2020-05-07,667
+Johor,2020-05-08,667
+Johor,2020-05-09,667
+Johor,2020-05-10,667
+Johor,2020-05-11,667
+Johor,2020-05-12,667
+Johor,2020-05-13,667
+Johor,2020-05-14,668
+Johor,2020-05-15,668
+Johor,2020-05-16,668
+Johor,2020-05-17,668
+Johor,2020-05-18,668
+Kedah,2020-01-26,0
+Kedah,2020-01-27,0
+Kedah,2020-01-28,1
+Kedah,2020-01-29,1
+Kedah,2020-01-30,1
+Kedah,2020-01-31,1
+Kedah,2020-02-01,1
+Kedah,2020-02-02,1
+Kedah,2020-02-03,1
+Kedah,2020-02-04,1
+Kedah,2020-02-05,2
+Kedah,2020-02-06,2
+Kedah,2020-02-07,2
+Kedah,2020-02-08,2
+Kedah,2020-02-09,2
+Kedah,2020-02-10,2
+Kedah,2020-02-11,2
+Kedah,2020-02-12,2
+Kedah,2020-02-13,2
+Kedah,2020-02-14,4
+Kedah,2020-02-15,4
+Kedah,2020-02-16,4
+Kedah,2020-02-17,4
+Kedah,2020-02-18,4
+Kedah,2020-02-19,4
+Kedah,2020-02-20,4
+Kedah,2020-02-21,4
+Kedah,2020-02-22,4
+Kedah,2020-02-23,4
+Kedah,2020-02-24,4
+Kedah,2020-02-25,4
+Kedah,2020-02-26,4
+Kedah,2020-02-27,4
+Kedah,2020-02-28,4
+Kedah,2020-02-29,4
+Kedah,2020-03-01,4
+Kedah,2020-03-02,4
+Kedah,2020-03-03,4
+Kedah,2020-03-04,4
+Kedah,2020-03-05,4
+Kedah,2020-03-06,4
+Kedah,2020-03-07,4
+Kedah,2020-03-08,4
+Kedah,2020-03-09,4
+Kedah,2020-03-10,4
+Kedah,2020-03-11,4
+Kedah,2020-03-12,4
+Kedah,2020-03-13,5
+Kedah,2020-03-14,5
+Kedah,2020-03-15,18
+Kedah,2020-03-16,31
+Kedah,2020-03-17,31
+Kedah,2020-03-18,36
+Kedah,2020-03-19,40
+Kedah,2020-03-20,41
+Kedah,2020-03-21,47
+Kedah,2020-03-22,52
+Kedah,2020-03-23,59
+Kedah,2020-03-24,64
+Kedah,2020-03-25,69
+Kedah,2020-03-26,72
+Kedah,2020-03-27,73
+Kedah,2020-03-28,74
+Kedah,2020-03-29,75
+Kedah,2020-03-30,77
+Kedah,2020-03-31,77
+Kedah,2020-04-01,79
+Kedah,2020-04-02,80
+Kedah,2020-04-03,81
+Kedah,2020-04-04,81
+Kedah,2020-04-05,82
+Kedah,2020-04-06,85
+Kedah,2020-04-07,90
+Kedah,2020-04-08,91
+Kedah,2020-04-09,93
+Kedah,2020-04-10,93
+Kedah,2020-04-11,93
+Kedah,2020-04-12,93
+Kedah,2020-04-13,93
+Kedah,2020-04-14,93
+Kedah,2020-04-15,94
+Kedah,2020-04-16,94
+Kedah,2020-04-17,94
+Kedah,2020-04-18,94
+Kedah,2020-04-19,94
+Kedah,2020-04-20,94
+Kedah,2020-04-21,94
+Kedah,2020-04-22,95
+Kedah,2020-04-23,95
+Kedah,2020-04-24,95
+Kedah,2020-04-25,95
+Kedah,2020-04-26,95
+Kedah,2020-04-27,95
+Kedah,2020-04-28,95
+Kedah,2020-04-29,95
+Kedah,2020-04-30,95
+Kedah,2020-05-01,95
+Kedah,2020-05-02,95
+Kedah,2020-05-03,95
+Kedah,2020-05-04,95
+Kedah,2020-05-05,95
+Kedah,2020-05-06,95
+Kedah,2020-05-07,95
+Kedah,2020-05-08,95
+Kedah,2020-05-09,95
+Kedah,2020-05-10,95
+Kedah,2020-05-11,95
+Kedah,2020-05-12,95
+Kedah,2020-05-13,95
+Kedah,2020-05-14,95
+Kedah,2020-05-15,95
+Kedah,2020-05-16,95
+Kedah,2020-05-17,95
+Kedah,2020-05-18,95
+Kelantan,2020-03-04,0
+Kelantan,2020-03-05,0
+Kelantan,2020-03-06,0
+Kelantan,2020-03-07,1
+Kelantan,2020-03-08,1
+Kelantan,2020-03-09,1
+Kelantan,2020-03-10,2
+Kelantan,2020-03-11,2
+Kelantan,2020-03-12,2
+Kelantan,2020-03-13,3
+Kelantan,2020-03-14,3
+Kelantan,2020-03-15,10
+Kelantan,2020-03-16,18
+Kelantan,2020-03-17,25
+Kelantan,2020-03-18,30
+Kelantan,2020-03-19,44
+Kelantan,2020-03-20,51
+Kelantan,2020-03-21,61
+Kelantan,2020-03-22,63
+Kelantan,2020-03-23,71
+Kelantan,2020-03-24,78
+Kelantan,2020-03-25,84
+Kelantan,2020-03-26,94
+Kelantan,2020-03-27,98
+Kelantan,2020-03-28,108
+Kelantan,2020-03-29,123
+Kelantan,2020-03-30,127
+Kelantan,2020-03-31,131
+Kelantan,2020-04-01,134
+Kelantan,2020-04-02,137
+Kelantan,2020-04-03,137
+Kelantan,2020-04-04,139
+Kelantan,2020-04-05,141
+Kelantan,2020-04-06,142
+Kelantan,2020-04-07,147
+Kelantan,2020-04-08,147
+Kelantan,2020-04-09,148
+Kelantan,2020-04-10,149
+Kelantan,2020-04-11,151
+Kelantan,2020-04-12,152
+Kelantan,2020-04-13,154
+Kelantan,2020-04-14,154
+Kelantan,2020-04-15,154
+Kelantan,2020-04-16,155
+Kelantan,2020-04-17,155
+Kelantan,2020-04-18,155
+Kelantan,2020-04-19,155
+Kelantan,2020-04-20,155
+Kelantan,2020-04-21,155
+Kelantan,2020-04-22,155
+Kelantan,2020-04-23,155
+Kelantan,2020-04-24,155
+Kelantan,2020-04-25,155
+Kelantan,2020-04-26,155
+Kelantan,2020-04-27,155
+Kelantan,2020-04-28,155
+Kelantan,2020-04-29,155
+Kelantan,2020-04-30,155
+Kelantan,2020-05-01,155
+Kelantan,2020-05-02,155
+Kelantan,2020-05-03,155
+Kelantan,2020-05-04,155
+Kelantan,2020-05-05,155
+Kelantan,2020-05-06,155
+Kelantan,2020-05-07,155
+Kelantan,2020-05-08,155
+Kelantan,2020-05-09,155
+Kelantan,2020-05-10,155
+Kelantan,2020-05-11,155
+Kelantan,2020-05-12,155
+Kelantan,2020-05-13,155
+Kelantan,2020-05-14,155
+Kelantan,2020-05-15,155
+Kelantan,2020-05-16,155
+Kelantan,2020-05-17,155
+Kelantan,2020-05-18,155
+Malacca,2020-03-04,0
+Malacca,2020-03-05,0
+Malacca,2020-03-06,0
+Malacca,2020-03-07,0
+Malacca,2020-03-08,0
+Malacca,2020-03-09,0
+Malacca,2020-03-10,0
+Malacca,2020-03-11,0
+Malacca,2020-03-12,0
+Malacca,2020-03-13,1
+Malacca,2020-03-14,6
+Malacca,2020-03-15,10
+Malacca,2020-03-16,14
+Malacca,2020-03-17,17
+Malacca,2020-03-18,18
+Malacca,2020-03-19,20
+Malacca,2020-03-20,22
+Malacca,2020-03-21,22
+Malacca,2020-03-22,23
+Malacca,2020-03-23,25
+Malacca,2020-03-24,31
+Malacca,2020-03-25,33
+Malacca,2020-03-26,33
+Malacca,2020-03-27,33
+Malacca,2020-03-28,42
+Malacca,2020-03-29,43
+Malacca,2020-03-30,50
+Malacca,2020-03-31,52
+Malacca,2020-04-01,63
+Malacca,2020-04-02,70
+Malacca,2020-04-03,73
+Malacca,2020-04-04,75
+Malacca,2020-04-05,89
+Malacca,2020-04-06,99
+Malacca,2020-04-07,103
+Malacca,2020-04-08,116
+Malacca,2020-04-09,119
+Malacca,2020-04-10,133
+Malacca,2020-04-11,141
+Malacca,2020-04-12,144
+Malacca,2020-04-13,144
+Malacca,2020-04-14,147
+Malacca,2020-04-15,147
+Malacca,2020-04-16,147
+Malacca,2020-04-17,148
+Malacca,2020-04-18,148
+Malacca,2020-04-19,185
+Malacca,2020-04-20,187
+Malacca,2020-04-21,188
+Malacca,2020-04-22,189
+Malacca,2020-04-23,189
+Malacca,2020-04-24,192
+Malacca,2020-04-25,192
+Malacca,2020-04-26,193
+Malacca,2020-04-27,193
+Malacca,2020-04-28,193
+Malacca,2020-04-29,193
+Malacca,2020-04-30,198
+Malacca,2020-05-01,199
+Malacca,2020-05-02,201
+Malacca,2020-05-03,204
+Malacca,2020-05-04,207
+Malacca,2020-05-05,207
+Malacca,2020-05-06,208
+Malacca,2020-05-07,209
+Malacca,2020-05-08,209
+Malacca,2020-05-09,210
+Malacca,2020-05-10,210
+Malacca,2020-05-11,211
+Malacca,2020-05-12,211
+Malacca,2020-05-13,213
+Malacca,2020-05-14,214
+Malacca,2020-05-15,215
+Malacca,2020-05-16,215
+Malacca,2020-05-17,215
+Malacca,2020-05-18,215
+Negeri Sembilan,2020-02-04,1
+Negeri Sembilan,2020-02-05,2
+Negeri Sembilan,2020-02-06,2
+Negeri Sembilan,2020-02-07,2
+Negeri Sembilan,2020-02-08,2
+Negeri Sembilan,2020-02-09,2
+Negeri Sembilan,2020-02-10,2
+Negeri Sembilan,2020-02-11,2
+Negeri Sembilan,2020-02-12,2
+Negeri Sembilan,2020-02-13,2
+Negeri Sembilan,2020-02-14,2
+Negeri Sembilan,2020-02-15,2
+Negeri Sembilan,2020-02-16,2
+Negeri Sembilan,2020-02-17,2
+Negeri Sembilan,2020-02-18,2
+Negeri Sembilan,2020-02-19,2
+Negeri Sembilan,2020-02-20,2
+Negeri Sembilan,2020-02-21,2
+Negeri Sembilan,2020-02-22,2
+Negeri Sembilan,2020-02-23,2
+Negeri Sembilan,2020-02-24,2
+Negeri Sembilan,2020-02-25,2
+Negeri Sembilan,2020-02-26,2
+Negeri Sembilan,2020-02-27,2
+Negeri Sembilan,2020-02-28,2
+Negeri Sembilan,2020-02-29,2
+Negeri Sembilan,2020-03-01,2
+Negeri Sembilan,2020-03-02,2
+Negeri Sembilan,2020-03-03,2
+Negeri Sembilan,2020-03-04,2
+Negeri Sembilan,2020-03-05,3
+Negeri Sembilan,2020-03-06,4
+Negeri Sembilan,2020-03-07,5
+Negeri Sembilan,2020-03-08,6
+Negeri Sembilan,2020-03-09,7
+Negeri Sembilan,2020-03-10,8
+Negeri Sembilan,2020-03-11,9
+Negeri Sembilan,2020-03-12,10
+Negeri Sembilan,2020-03-13,11
+Negeri Sembilan,2020-03-14,19
+Negeri Sembilan,2020-03-15,30
+Negeri Sembilan,2020-03-16,42
+Negeri Sembilan,2020-03-17,45
+Negeri Sembilan,2020-03-18,45
+Negeri Sembilan,2020-03-19,55
+Negeri Sembilan,2020-03-20,65
+Negeri Sembilan,2020-03-21,70
+Negeri Sembilan,2020-03-22,78
+Negeri Sembilan,2020-03-23,94
+Negeri Sembilan,2020-03-24,109
+Negeri Sembilan,2020-03-25,123
+Negeri Sembilan,2020-03-26,132
+Negeri Sembilan,2020-03-27,138
+Negeri Sembilan,2020-03-28,153
+Negeri Sembilan,2020-03-29,162
+Negeri Sembilan,2020-03-30,172
+Negeri Sembilan,2020-03-31,181
+Negeri Sembilan,2020-04-01,189
+Negeri Sembilan,2020-04-02,207
+Negeri Sembilan,2020-04-03,211
+Negeri Sembilan,2020-04-04,220
+Negeri Sembilan,2020-04-05,231
+Negeri Sembilan,2020-04-06,239
+Negeri Sembilan,2020-04-07,261
+Negeri Sembilan,2020-04-08,270
+Negeri Sembilan,2020-04-09,281
+Negeri Sembilan,2020-04-10,292
+Negeri Sembilan,2020-04-11,309
+Negeri Sembilan,2020-04-12,318
+Negeri Sembilan,2020-04-13,360
+Negeri Sembilan,2020-04-14,362
+Negeri Sembilan,2020-04-15,363
+Negeri Sembilan,2020-04-16,389
+Negeri Sembilan,2020-04-17,402
+Negeri Sembilan,2020-04-18,405
+Negeri Sembilan,2020-04-19,405
+Negeri Sembilan,2020-04-20,408
+Negeri Sembilan,2020-04-21,409
+Negeri Sembilan,2020-04-22,411
+Negeri Sembilan,2020-04-23,431
+Negeri Sembilan,2020-04-24,433
+Negeri Sembilan,2020-04-25,433
+Negeri Sembilan,2020-04-26,434
+Negeri Sembilan,2020-04-27,435
+Negeri Sembilan,2020-04-28,436
+Negeri Sembilan,2020-04-29,508
+Negeri Sembilan,2020-04-30,513
+Negeri Sembilan,2020-05-01,513
+Negeri Sembilan,2020-05-02,521
+Negeri Sembilan,2020-05-03,592
+Negeri Sembilan,2020-05-04,598
+Negeri Sembilan,2020-05-05,598
+Negeri Sembilan,2020-05-06,600
+Negeri Sembilan,2020-05-07,600
+Negeri Sembilan,2020-05-08,653
+Negeri Sembilan,2020-05-09,681
+Negeri Sembilan,2020-05-10,726
+Negeri Sembilan,2020-05-11,742
+Negeri Sembilan,2020-05-12,742
+Negeri Sembilan,2020-05-13,764
+Negeri Sembilan,2020-05-14,775
+Negeri Sembilan,2020-05-15,776
+Negeri Sembilan,2020-05-16,776
+Negeri Sembilan,2020-05-17,776
+Negeri Sembilan,2020-05-18,776
+Pahang,2020-03-04,0
+Pahang,2020-03-05,0
+Pahang,2020-03-06,0
+Pahang,2020-03-07,0
+Pahang,2020-03-08,1
+Pahang,2020-03-09,1
+Pahang,2020-03-10,1
+Pahang,2020-03-11,1
+Pahang,2020-03-12,1
+Pahang,2020-03-13,2
+Pahang,2020-03-14,2
+Pahang,2020-03-15,10
+Pahang,2020-03-16,19
+Pahang,2020-03-17,28
+Pahang,2020-03-18,29
+Pahang,2020-03-19,32
+Pahang,2020-03-20,36
+Pahang,2020-03-21,37
+Pahang,2020-03-22,40
+Pahang,2020-03-23,56
+Pahang,2020-03-24,56
+Pahang,2020-03-25,64
+Pahang,2020-03-26,66
+Pahang,2020-03-27,70
+Pahang,2020-03-28,84
+Pahang,2020-03-29,96
+Pahang,2020-03-30,99
+Pahang,2020-03-31,102
+Pahang,2020-04-01,111
+Pahang,2020-04-02,114
+Pahang,2020-04-03,127
+Pahang,2020-04-04,151
+Pahang,2020-04-05,158
+Pahang,2020-04-06,161
+Pahang,2020-04-07,166
+Pahang,2020-04-08,169
+Pahang,2020-04-09,183
+Pahang,2020-04-10,187
+Pahang,2020-04-11,214
+Pahang,2020-04-12,225
+Pahang,2020-04-13,225
+Pahang,2020-04-14,236
+Pahang,2020-04-15,253
+Pahang,2020-04-16,261
+Pahang,2020-04-17,262
+Pahang,2020-04-18,264
+Pahang,2020-04-19,269
+Pahang,2020-04-20,271
+Pahang,2020-04-21,279
+Pahang,2020-04-22,285
+Pahang,2020-04-23,286
+Pahang,2020-04-24,287
+Pahang,2020-04-25,288
+Pahang,2020-04-26,288
+Pahang,2020-04-27,288
+Pahang,2020-04-28,288
+Pahang,2020-04-29,293
+Pahang,2020-04-30,294
+Pahang,2020-05-01,297
+Pahang,2020-05-02,305
+Pahang,2020-05-03,305
+Pahang,2020-05-04,305
+Pahang,2020-05-05,305
+Pahang,2020-05-06,305
+Pahang,2020-05-07,305
+Pahang,2020-05-08,306
+Pahang,2020-05-09,306
+Pahang,2020-05-10,308
+Pahang,2020-05-11,312
+Pahang,2020-05-12,312
+Pahang,2020-05-13,315
+Pahang,2020-05-14,323
+Pahang,2020-05-15,328
+Pahang,2020-05-16,335
+Pahang,2020-05-17,336
+Pahang,2020-05-18,336
+Penang,2020-03-04,0
+Penang,2020-03-05,1
+Penang,2020-03-06,2
+Penang,2020-03-07,2
+Penang,2020-03-08,3
+Penang,2020-03-09,4
+Penang,2020-03-10,4
+Penang,2020-03-11,5
+Penang,2020-03-12,6
+Penang,2020-03-13,7
+Penang,2020-03-14,7
+Penang,2020-03-15,11
+Penang,2020-03-16,15
+Penang,2020-03-17,23
+Penang,2020-03-18,30
+Penang,2020-03-19,32
+Penang,2020-03-20,37
+Penang,2020-03-21,50
+Penang,2020-03-22,58
+Penang,2020-03-23,66
+Penang,2020-03-24,68
+Penang,2020-03-25,70
+Penang,2020-03-26,74
+Penang,2020-03-27,80
+Penang,2020-03-28,86
+Penang,2020-03-29,87
+Penang,2020-03-30,88
+Penang,2020-03-31,94
+Penang,2020-04-01,96
+Penang,2020-04-02,98
+Penang,2020-04-03,98
+Penang,2020-04-04,99
+Penang,2020-04-05,101
+Penang,2020-04-06,101
+Penang,2020-04-07,102
+Penang,2020-04-08,108
+Penang,2020-04-09,108
+Penang,2020-04-10,109
+Penang,2020-04-11,114
+Penang,2020-04-12,116
+Penang,2020-04-13,116
+Penang,2020-04-14,119
+Penang,2020-04-15,119
+Penang,2020-04-16,119
+Penang,2020-04-17,119
+Penang,2020-04-18,119
+Penang,2020-04-19,119
+Penang,2020-04-20,119
+Penang,2020-04-21,119
+Penang,2020-04-22,119
+Penang,2020-04-23,119
+Penang,2020-04-24,119
+Penang,2020-04-25,119
+Penang,2020-04-26,121
+Penang,2020-04-27,121
+Penang,2020-04-28,121
+Penang,2020-04-29,121
+Penang,2020-04-30,121
+Penang,2020-05-01,121
+Penang,2020-05-02,121
+Penang,2020-05-03,121
+Penang,2020-05-04,121
+Penang,2020-05-05,121
+Penang,2020-05-06,121
+Penang,2020-05-07,121
+Penang,2020-05-08,121
+Penang,2020-05-09,121
+Penang,2020-05-10,121
+Penang,2020-05-11,121
+Penang,2020-05-12,121
+Penang,2020-05-13,121
+Penang,2020-05-14,121
+Penang,2020-05-15,121
+Penang,2020-05-16,121
+Penang,2020-05-17,121
+Penang,2020-05-18,121
+Perak,2020-03-04,0
+Perak,2020-03-05,0
+Perak,2020-03-06,0
+Perak,2020-03-07,0
+Perak,2020-03-08,1
+Perak,2020-03-09,1
+Perak,2020-03-10,1
+Perak,2020-03-11,1
+Perak,2020-03-12,1
+Perak,2020-03-13,2
+Perak,2020-03-14,2
+Perak,2020-03-15,10
+Perak,2020-03-16,18
+Perak,2020-03-17,23
+Perak,2020-03-18,28
+Perak,2020-03-19,35
+Perak,2020-03-20,45
+Perak,2020-03-21,55
+Perak,2020-03-22,66
+Perak,2020-03-23,81
+Perak,2020-03-24,98
+Perak,2020-03-25,128
+Perak,2020-03-26,151
+Perak,2020-03-27,159
+Perak,2020-03-28,165
+Perak,2020-03-29,176
+Perak,2020-03-30,184
+Perak,2020-03-31,189
+Perak,2020-04-01,194
+Perak,2020-04-02,200
+Perak,2020-04-03,205
+Perak,2020-04-04,207
+Perak,2020-04-05,213
+Perak,2020-04-06,219
+Perak,2020-04-07,233
+Perak,2020-04-08,237
+Perak,2020-04-09,241
+Perak,2020-04-10,242
+Perak,2020-04-11,243
+Perak,2020-04-12,244
+Perak,2020-04-13,247
+Perak,2020-04-14,250
+Perak,2020-04-15,250
+Perak,2020-04-16,251
+Perak,2020-04-17,252
+Perak,2020-04-18,252
+Perak,2020-04-19,252
+Perak,2020-04-20,252
+Perak,2020-04-21,252
+Perak,2020-04-22,252
+Perak,2020-04-23,252
+Perak,2020-04-24,252
+Perak,2020-04-25,252
+Perak,2020-04-26,252
+Perak,2020-04-27,253
+Perak,2020-04-28,253
+Perak,2020-04-29,253
+Perak,2020-04-30,253
+Perak,2020-05-01,253
+Perak,2020-05-02,253
+Perak,2020-05-03,253
+Perak,2020-05-04,253
+Perak,2020-05-05,253
+Perak,2020-05-06,253
+Perak,2020-05-07,253
+Perak,2020-05-08,253
+Perak,2020-05-09,253
+Perak,2020-05-10,255
+Perak,2020-05-11,255
+Perak,2020-05-12,255
+Perak,2020-05-13,255
+Perak,2020-05-14,255
+Perak,2020-05-15,255
+Perak,2020-05-16,255
+Perak,2020-05-17,255
+Perak,2020-05-18,255
+Perlis,2020-03-04,0
+Perlis,2020-03-05,0
+Perlis,2020-03-06,0
+Perlis,2020-03-07,0
+Perlis,2020-03-08,0
+Perlis,2020-03-09,0
+Perlis,2020-03-10,0
+Perlis,2020-03-11,0
+Perlis,2020-03-12,0
+Perlis,2020-03-13,1
+Perlis,2020-03-14,2
+Perlis,2020-03-15,5
+Perlis,2020-03-16,8
+Perlis,2020-03-17,8
+Perlis,2020-03-18,8
+Perlis,2020-03-19,9
+Perlis,2020-03-20,9
+Perlis,2020-03-21,9
+Perlis,2020-03-22,9
+Perlis,2020-03-23,9
+Perlis,2020-03-24,9
+Perlis,2020-03-25,10
+Perlis,2020-03-26,10
+Perlis,2020-03-27,10
+Perlis,2020-03-28,10
+Perlis,2020-03-29,10
+Perlis,2020-03-30,11
+Perlis,2020-03-31,12
+Perlis,2020-04-01,12
+Perlis,2020-04-02,12
+Perlis,2020-04-03,12
+Perlis,2020-04-04,12
+Perlis,2020-04-05,13
+Perlis,2020-04-06,13
+Perlis,2020-04-07,17
+Perlis,2020-04-08,17
+Perlis,2020-04-09,17
+Perlis,2020-04-10,17
+Perlis,2020-04-11,17
+Perlis,2020-04-12,17
+Perlis,2020-04-13,17
+Perlis,2020-04-14,18
+Perlis,2020-04-15,18
+Perlis,2020-04-16,18
+Perlis,2020-04-17,18
+Perlis,2020-04-18,18
+Perlis,2020-04-19,18
+Perlis,2020-04-20,18
+Perlis,2020-04-21,18
+Perlis,2020-04-22,18
+Perlis,2020-04-23,18
+Perlis,2020-04-24,18
+Perlis,2020-04-25,18
+Perlis,2020-04-26,18
+Perlis,2020-04-27,18
+Perlis,2020-04-28,18
+Perlis,2020-04-29,18
+Perlis,2020-04-30,18
+Perlis,2020-05-01,18
+Perlis,2020-05-02,18
+Perlis,2020-05-03,18
+Perlis,2020-05-04,18
+Perlis,2020-05-05,18
+Perlis,2020-05-06,18
+Perlis,2020-05-07,18
+Perlis,2020-05-08,18
+Perlis,2020-05-09,18
+Perlis,2020-05-10,18
+Perlis,2020-05-11,18
+Perlis,2020-05-12,18
+Perlis,2020-05-13,18
+Perlis,2020-05-14,18
+Perlis,2020-05-15,18
+Perlis,2020-05-16,18
+Perlis,2020-05-17,18
+Perlis,2020-05-18,18
+Sabah,2020-03-04,1
+Sabah,2020-03-05,3
+Sabah,2020-03-06,4
+Sabah,2020-03-07,6
+Sabah,2020-03-08,7
+Sabah,2020-03-09,9
+Sabah,2020-03-10,10
+Sabah,2020-03-11,12
+Sabah,2020-03-12,13
+Sabah,2020-03-13,15
+Sabah,2020-03-14,26
+Sabah,2020-03-15,41
+Sabah,2020-03-16,57
+Sabah,2020-03-17,82
+Sabah,2020-03-18,103
+Sabah,2020-03-19,112
+Sabah,2020-03-20,119
+Sabah,2020-03-21,136
+Sabah,2020-03-22,158
+Sabah,2020-03-23,169
+Sabah,2020-03-24,170
+Sabah,2020-03-25,170
+Sabah,2020-03-26,172
+Sabah,2020-03-27,182
+Sabah,2020-03-28,197
+Sabah,2020-03-29,197
+Sabah,2020-03-30,201
+Sabah,2020-03-31,206
+Sabah,2020-04-01,209
+Sabah,2020-04-02,210
+Sabah,2020-04-03,215
+Sabah,2020-04-04,225
+Sabah,2020-04-05,238
+Sabah,2020-04-06,240
+Sabah,2020-04-07,241
+Sabah,2020-04-08,248
+Sabah,2020-04-09,248
+Sabah,2020-04-10,250
+Sabah,2020-04-11,260
+Sabah,2020-04-12,266
+Sabah,2020-04-13,280
+Sabah,2020-04-14,285
+Sabah,2020-04-15,285
+Sabah,2020-04-16,288
+Sabah,2020-04-17,293
+Sabah,2020-04-18,303
+Sabah,2020-04-19,306
+Sabah,2020-04-20,308
+Sabah,2020-04-21,308
+Sabah,2020-04-22,308
+Sabah,2020-04-23,309
+Sabah,2020-04-24,311
+Sabah,2020-04-25,311
+Sabah,2020-04-26,311
+Sabah,2020-04-27,312
+Sabah,2020-04-28,313
+Sabah,2020-04-29,315
+Sabah,2020-04-30,315
+Sabah,2020-05-01,315
+Sabah,2020-05-02,315
+Sabah,2020-05-03,316
+Sabah,2020-05-04,316
+Sabah,2020-05-05,316
+Sabah,2020-05-06,316
+Sabah,2020-05-07,317
+Sabah,2020-05-08,317
+Sabah,2020-05-09,317
+Sabah,2020-05-10,317
+Sabah,2020-05-11,327
+Sabah,2020-05-12,328
+Sabah,2020-05-13,330
+Sabah,2020-05-14,330
+Sabah,2020-05-15,330
+Sabah,2020-05-16,331
+Sabah,2020-05-17,331
+Sabah,2020-05-18,331
+Sarawak,2020-03-14,6
+Sarawak,2020-03-15,13
+Sarawak,2020-03-16,21
+Sarawak,2020-03-17,29
+Sarawak,2020-03-18,49
+Sarawak,2020-03-19,51
+Sarawak,2020-03-20,58
+Sarawak,2020-03-21,68
+Sarawak,2020-03-22,76
+Sarawak,2020-03-23,78
+Sarawak,2020-03-24,83
+Sarawak,2020-03-25,85
+Sarawak,2020-03-26,95
+Sarawak,2020-03-27,110
+Sarawak,2020-03-28,118
+Sarawak,2020-03-29,129
+Sarawak,2020-03-30,135
+Sarawak,2020-03-31,156
+Sarawak,2020-04-01,188
+Sarawak,2020-04-02,211
+Sarawak,2020-04-03,239
+Sarawak,2020-04-04,246
+Sarawak,2020-04-05,261
+Sarawak,2020-04-06,273
+Sarawak,2020-04-07,288
+Sarawak,2020-04-08,306
+Sarawak,2020-04-09,312
+Sarawak,2020-04-10,327
+Sarawak,2020-04-11,334
+Sarawak,2020-04-12,342
+Sarawak,2020-04-13,348
+Sarawak,2020-04-14,363
+Sarawak,2020-04-15,371
+Sarawak,2020-04-16,387
+Sarawak,2020-04-17,397
+Sarawak,2020-04-18,403
+Sarawak,2020-04-19,408
+Sarawak,2020-04-20,414
+Sarawak,2020-04-21,436
+Sarawak,2020-04-22,455
+Sarawak,2020-04-23,459
+Sarawak,2020-04-24,468
+Sarawak,2020-04-25,478
+Sarawak,2020-04-26,485
+Sarawak,2020-04-27,488
+Sarawak,2020-04-28,496
+Sarawak,2020-04-29,502
+Sarawak,2020-04-30,507
+Sarawak,2020-05-01,509
+Sarawak,2020-05-02,518
+Sarawak,2020-05-03,523
+Sarawak,2020-05-04,523
+Sarawak,2020-05-05,525
+Sarawak,2020-05-06,536
+Sarawak,2020-05-07,537
+Sarawak,2020-05-08,538
+Sarawak,2020-05-09,542
+Sarawak,2020-05-10,543
+Sarawak,2020-05-11,543
+Sarawak,2020-05-12,543
+Sarawak,2020-05-13,544
+Sarawak,2020-05-14,544
+Sarawak,2020-05-15,544
+Sarawak,2020-05-16,544
+Sarawak,2020-05-17,544
+Sarawak,2020-05-18,544
+Selangor,2020-01-25,3
+Selangor,2020-01-26,3
+Selangor,2020-01-27,3
+Selangor,2020-01-28,4
+Selangor,2020-01-29,4
+Selangor,2020-01-30,4
+Selangor,2020-01-31,4
+Selangor,2020-02-01,4
+Selangor,2020-02-02,4
+Selangor,2020-02-03,5
+Selangor,2020-02-04,5
+Selangor,2020-02-05,5
+Selangor,2020-02-06,5
+Selangor,2020-02-07,5
+Selangor,2020-02-08,6
+Selangor,2020-02-09,7
+Selangor,2020-02-10,7
+Selangor,2020-02-11,7
+Selangor,2020-02-12,7
+Selangor,2020-02-13,7
+Selangor,2020-02-14,7
+Selangor,2020-02-15,8
+Selangor,2020-02-16,8
+Selangor,2020-02-17,8
+Selangor,2020-02-18,8
+Selangor,2020-02-19,8
+Selangor,2020-02-20,8
+Selangor,2020-02-21,8
+Selangor,2020-02-22,8
+Selangor,2020-02-23,8
+Selangor,2020-02-24,8
+Selangor,2020-02-25,8
+Selangor,2020-02-26,8
+Selangor,2020-02-27,8
+Selangor,2020-02-28,9
+Selangor,2020-02-29,10
+Selangor,2020-03-01,12
+Selangor,2020-03-02,14
+Selangor,2020-03-03,17
+Selangor,2020-03-04,24
+Selangor,2020-03-05,31
+Selangor,2020-03-06,38
+Selangor,2020-03-07,45
+Selangor,2020-03-08,52
+Selangor,2020-03-09,59
+Selangor,2020-03-10,66
+Selangor,2020-03-11,73
+Selangor,2020-03-12,80
+Selangor,2020-03-13,87
+Selangor,2020-03-14,92
+Selangor,2020-03-15,118
+Selangor,2020-03-16,144
+Selangor,2020-03-17,161
+Selangor,2020-03-18,192
+Selangor,2020-03-19,223
+Selangor,2020-03-20,263
+Selangor,2020-03-21,292
+Selangor,2020-03-22,309
+Selangor,2020-03-23,354
+Selangor,2020-03-24,381
+Selangor,2020-03-25,435
+Selangor,2020-03-26,510
+Selangor,2020-03-27,546
+Selangor,2020-03-28,579
+Selangor,2020-03-29,612
+Selangor,2020-03-30,672
+Selangor,2020-03-31,704
+Selangor,2020-04-01,726
+Selangor,2020-04-02,800
+Selangor,2020-04-03,863
+Selangor,2020-04-04,890
+Selangor,2020-04-05,943
+Selangor,2020-04-06,970
+Selangor,2020-04-07,1020
+Selangor,2020-04-08,1078
+Selangor,2020-04-09,1118
+Selangor,2020-04-10,1148
+Selangor,2020-04-11,1183
+Selangor,2020-04-12,1236
+Selangor,2020-04-13,1249
+Selangor,2020-04-14,1299
+Selangor,2020-04-15,1316
+Selangor,2020-04-16,1329
+Selangor,2020-04-17,1338
+Selangor,2020-04-18,1340
+Selangor,2020-04-19,1343
+Selangor,2020-04-20,1345
+Selangor,2020-04-21,1356
+Selangor,2020-04-22,1357
+Selangor,2020-04-23,1369
+Selangor,2020-04-24,1387
+Selangor,2020-04-25,1388
+Selangor,2020-04-26,1394
+Selangor,2020-04-27,1398
+Selangor,2020-04-28,1403
+Selangor,2020-04-29,1404
+Selangor,2020-04-30,1431
+Selangor,2020-05-01,1455
+Selangor,2020-05-02,1518
+Selangor,2020-05-03,1529
+Selangor,2020-05-04,1550
+Selangor,2020-05-05,1555
+Selangor,2020-05-06,1564
+Selangor,2020-05-07,1580
+Selangor,2020-05-08,1586
+Selangor,2020-05-09,1596
+Selangor,2020-05-10,1604
+Selangor,2020-05-11,1607
+Selangor,2020-05-12,1610
+Selangor,2020-05-13,1612
+Selangor,2020-05-14,1613
+Selangor,2020-05-15,1627
+Selangor,2020-05-16,1628
+Selangor,2020-05-17,1636
+Selangor,2020-05-18,1644
+Terengganu,2020-03-15,2
+Terengganu,2020-03-16,4
+Terengganu,2020-03-17,7
+Terengganu,2020-03-18,10
+Terengganu,2020-03-19,11
+Terengganu,2020-03-20,20
+Terengganu,2020-03-21,27
+Terengganu,2020-03-22,32
+Terengganu,2020-03-23,38
+Terengganu,2020-03-24,38
+Terengganu,2020-03-25,38
+Terengganu,2020-03-26,39
+Terengganu,2020-03-27,41
+Terengganu,2020-03-28,45
+Terengganu,2020-03-29,47
+Terengganu,2020-03-30,47
+Terengganu,2020-03-31,47
+Terengganu,2020-04-01,48
+Terengganu,2020-04-02,50
+Terengganu,2020-04-03,68
+Terengganu,2020-04-04,74
+Terengganu,2020-04-05,84
+Terengganu,2020-04-06,90
+Terengganu,2020-04-07,90
+Terengganu,2020-04-08,93
+Terengganu,2020-04-09,98
+Terengganu,2020-04-10,101
+Terengganu,2020-04-11,102
+Terengganu,2020-04-12,102
+Terengganu,2020-04-13,106
+Terengganu,2020-04-14,106
+Terengganu,2020-04-15,106
+Terengganu,2020-04-16,108
+Terengganu,2020-04-17,108
+Terengganu,2020-04-18,109
+Terengganu,2020-04-19,109
+Terengganu,2020-04-20,109
+Terengganu,2020-04-21,109
+Terengganu,2020-04-22,109
+Terengganu,2020-04-23,110
+Terengganu,2020-04-24,110
+Terengganu,2020-04-25,110
+Terengganu,2020-04-26,110
+Terengganu,2020-04-27,110
+Terengganu,2020-04-28,110
+Terengganu,2020-04-29,110
+Terengganu,2020-04-30,110
+Terengganu,2020-05-01,110
+Terengganu,2020-05-02,110
+Terengganu,2020-05-03,110
+Terengganu,2020-05-04,110
+Terengganu,2020-05-05,110
+Terengganu,2020-05-06,110
+Terengganu,2020-05-07,110
+Terengganu,2020-05-08,110
+Terengganu,2020-05-09,110
+Terengganu,2020-05-10,110
+Terengganu,2020-05-11,110
+Terengganu,2020-05-12,110
+Terengganu,2020-05-13,110
+Terengganu,2020-05-14,110
+Terengganu,2020-05-15,110
+Terengganu,2020-05-16,110
+Terengganu,2020-05-17,110
+Terengganu,2020-05-18,110
+Kuala Lumpur,2020-01-31,0
+Kuala Lumpur,2020-02-01,0
+Kuala Lumpur,2020-02-02,0
+Kuala Lumpur,2020-02-03,1
+Kuala Lumpur,2020-02-04,1
+Kuala Lumpur,2020-02-05,2
+Kuala Lumpur,2020-02-06,2
+Kuala Lumpur,2020-02-07,3
+Kuala Lumpur,2020-02-08,3
+Kuala Lumpur,2020-02-09,3
+Kuala Lumpur,2020-02-10,3
+Kuala Lumpur,2020-02-11,3
+Kuala Lumpur,2020-02-12,3
+Kuala Lumpur,2020-02-13,4
+Kuala Lumpur,2020-02-14,4
+Kuala Lumpur,2020-02-15,4
+Kuala Lumpur,2020-02-16,4
+Kuala Lumpur,2020-02-17,4
+Kuala Lumpur,2020-02-18,4
+Kuala Lumpur,2020-02-19,4
+Kuala Lumpur,2020-02-20,4
+Kuala Lumpur,2020-02-21,4
+Kuala Lumpur,2020-02-22,4
+Kuala Lumpur,2020-02-23,4
+Kuala Lumpur,2020-02-24,4
+Kuala Lumpur,2020-02-25,4
+Kuala Lumpur,2020-02-26,4
+Kuala Lumpur,2020-02-27,5
+Kuala Lumpur,2020-02-28,6
+Kuala Lumpur,2020-02-29,6
+Kuala Lumpur,2020-03-01,7
+Kuala Lumpur,2020-03-02,8
+Kuala Lumpur,2020-03-03,9
+Kuala Lumpur,2020-03-04,12
+Kuala Lumpur,2020-03-05,15
+Kuala Lumpur,2020-03-06,18
+Kuala Lumpur,2020-03-07,21
+Kuala Lumpur,2020-03-08,24
+Kuala Lumpur,2020-03-09,27
+Kuala Lumpur,2020-03-10,30
+Kuala Lumpur,2020-03-11,33
+Kuala Lumpur,2020-03-12,36
+Kuala Lumpur,2020-03-13,40
+Kuala Lumpur,2020-03-14,43
+Kuala Lumpur,2020-03-15,72
+Kuala Lumpur,2020-03-16,102
+Kuala Lumpur,2020-03-17,108
+Kuala Lumpur,2020-03-18,114
+Kuala Lumpur,2020-03-19,123
+Kuala Lumpur,2020-03-20,139
+Kuala Lumpur,2020-03-21,166
+Kuala Lumpur,2020-03-22,183
+Kuala Lumpur,2020-03-23,242
+Kuala Lumpur,2020-03-24,257
+Kuala Lumpur,2020-03-25,270
+Kuala Lumpur,2020-03-26,321
+Kuala Lumpur,2020-03-27,337
+Kuala Lumpur,2020-03-28,344
+Kuala Lumpur,2020-03-29,372
+Kuala Lumpur,2020-03-30,396
+Kuala Lumpur,2020-03-31,430
+Kuala Lumpur,2020-04-01,455
+Kuala Lumpur,2020-04-02,488
+Kuala Lumpur,2020-04-03,543
+Kuala Lumpur,2020-04-04,595
+Kuala Lumpur,2020-04-05,622
+Kuala Lumpur,2020-04-06,640
+Kuala Lumpur,2020-04-07,671
+Kuala Lumpur,2020-04-08,685
+Kuala Lumpur,2020-04-09,699
+Kuala Lumpur,2020-04-10,713
+Kuala Lumpur,2020-04-11,759
+Kuala Lumpur,2020-04-12,803
+Kuala Lumpur,2020-04-13,830
+Kuala Lumpur,2020-04-14,899
+Kuala Lumpur,2020-04-15,926
+Kuala Lumpur,2020-04-16,952
+Kuala Lumpur,2020-04-17,971
+Kuala Lumpur,2020-04-18,985
+Kuala Lumpur,2020-04-19,1004
+Kuala Lumpur,2020-04-20,1008
+Kuala Lumpur,2020-04-21,1021
+Kuala Lumpur,2020-04-22,1037
+Kuala Lumpur,2020-04-23,1066
+Kuala Lumpur,2020-04-24,1115
+Kuala Lumpur,2020-04-25,1154
+Kuala Lumpur,2020-04-26,1170
+Kuala Lumpur,2020-04-27,1200
+Kuala Lumpur,2020-04-28,1214
+Kuala Lumpur,2020-04-29,1222
+Kuala Lumpur,2020-04-30,1232
+Kuala Lumpur,2020-05-01,1264
+Kuala Lumpur,2020-05-02,1278
+Kuala Lumpur,2020-05-03,1308
+Kuala Lumpur,2020-05-04,1333
+Kuala Lumpur,2020-05-05,1356
+Kuala Lumpur,2020-05-06,1378
+Kuala Lumpur,2020-05-07,1398
+Kuala Lumpur,2020-05-08,1404
+Kuala Lumpur,2020-05-09,1414
+Kuala Lumpur,2020-05-10,1423
+Kuala Lumpur,2020-05-11,1458
+Kuala Lumpur,2020-05-12,1470
+Kuala Lumpur,2020-05-13,1475
+Kuala Lumpur,2020-05-14,1493
+Kuala Lumpur,2020-05-15,1508
+Kuala Lumpur,2020-05-16,1515
+Kuala Lumpur,2020-05-17,1528
+Kuala Lumpur,2020-05-18,1566
+Putrajaya,2020-03-04,0
+Putrajaya,2020-03-05,0
+Putrajaya,2020-03-06,0
+Putrajaya,2020-03-07,0
+Putrajaya,2020-03-08,0
+Putrajaya,2020-03-09,0
+Putrajaya,2020-03-10,0
+Putrajaya,2020-03-11,0
+Putrajaya,2020-03-12,0
+Putrajaya,2020-03-13,1
+Putrajaya,2020-03-14,1
+Putrajaya,2020-03-15,2
+Putrajaya,2020-03-16,3
+Putrajaya,2020-03-17,4
+Putrajaya,2020-03-18,4
+Putrajaya,2020-03-19,6
+Putrajaya,2020-03-20,6
+Putrajaya,2020-03-21,9
+Putrajaya,2020-03-22,9
+Putrajaya,2020-03-23,13
+Putrajaya,2020-03-24,15
+Putrajaya,2020-03-25,16
+Putrajaya,2020-03-26,18
+Putrajaya,2020-03-27,20
+Putrajaya,2020-03-28,20
+Putrajaya,2020-03-29,22
+Putrajaya,2020-03-30,24
+Putrajaya,2020-03-31,26
+Putrajaya,2020-04-01,26
+Putrajaya,2020-04-02,34
+Putrajaya,2020-04-03,35
+Putrajaya,2020-04-04,36
+Putrajaya,2020-04-05,37
+Putrajaya,2020-04-06,41
+Putrajaya,2020-04-07,43
+Putrajaya,2020-04-08,45
+Putrajaya,2020-04-09,47
+Putrajaya,2020-04-10,49
+Putrajaya,2020-04-11,51
+Putrajaya,2020-04-12,52
+Putrajaya,2020-04-13,54
+Putrajaya,2020-04-14,54
+Putrajaya,2020-04-15,54
+Putrajaya,2020-04-16,55
+Putrajaya,2020-04-17,55
+Putrajaya,2020-04-18,55
+Putrajaya,2020-04-19,64
+Putrajaya,2020-04-20,77
+Putrajaya,2020-04-21,77
+Putrajaya,2020-04-22,78
+Putrajaya,2020-04-23,78
+Putrajaya,2020-04-24,78
+Putrajaya,2020-04-25,78
+Putrajaya,2020-04-26,79
+Putrajaya,2020-04-27,79
+Putrajaya,2020-04-28,80
+Putrajaya,2020-04-29,80
+Putrajaya,2020-04-30,81
+Putrajaya,2020-05-01,85
+Putrajaya,2020-05-02,85
+Putrajaya,2020-05-03,86
+Putrajaya,2020-05-04,86
+Putrajaya,2020-05-05,86
+Putrajaya,2020-05-06,86
+Putrajaya,2020-05-07,86
+Putrajaya,2020-05-08,87
+Putrajaya,2020-05-09,88
+Putrajaya,2020-05-10,88
+Putrajaya,2020-05-11,89
+Putrajaya,2020-05-12,89
+Putrajaya,2020-05-13,89
+Putrajaya,2020-05-14,89
+Putrajaya,2020-05-15,89
+Putrajaya,2020-05-16,90
+Putrajaya,2020-05-17,90
+Putrajaya,2020-05-18,91
+Labuan,2020-03-04,0
+Labuan,2020-03-05,0
+Labuan,2020-03-06,0
+Labuan,2020-03-07,0
+Labuan,2020-03-08,1
+Labuan,2020-03-09,1
+Labuan,2020-03-10,1
+Labuan,2020-03-11,1
+Labuan,2020-03-12,1
+Labuan,2020-03-13,2
+Labuan,2020-03-14,2
+Labuan,2020-03-15,3
+Labuan,2020-03-16,4
+Labuan,2020-03-17,4
+Labuan,2020-03-18,5
+Labuan,2020-03-19,5
+Labuan,2020-03-20,5
+Labuan,2020-03-21,5
+Labuan,2020-03-22,5
+Labuan,2020-03-23,5
+Labuan,2020-03-24,5
+Labuan,2020-03-25,5
+Labuan,2020-03-26,5
+Labuan,2020-03-27,5
+Labuan,2020-03-28,10
+Labuan,2020-03-29,10
+Labuan,2020-03-30,10
+Labuan,2020-03-31,10
+Labuan,2020-04-01,10
+Labuan,2020-04-02,10
+Labuan,2020-04-03,10
+Labuan,2020-04-04,11
+Labuan,2020-04-05,11
+Labuan,2020-04-06,12
+Labuan,2020-04-07,13
+Labuan,2020-04-08,13
+Labuan,2020-04-09,13
+Labuan,2020-04-10,13
+Labuan,2020-04-11,15
+Labuan,2020-04-12,15
+Labuan,2020-04-13,15
+Labuan,2020-04-14,15
+Labuan,2020-04-15,15
+Labuan,2020-04-16,15
+Labuan,2020-04-17,16
+Labuan,2020-04-18,16
+Labuan,2020-04-19,16
+Labuan,2020-04-20,16
+Labuan,2020-04-21,16
+Labuan,2020-04-22,16
+Labuan,2020-04-23,16
+Labuan,2020-04-24,16
+Labuan,2020-04-25,16
+Labuan,2020-04-26,16
+Labuan,2020-04-27,16
+Labuan,2020-04-28,16
+Labuan,2020-04-29,16
+Labuan,2020-04-30,16
+Labuan,2020-05-01,16
+Labuan,2020-05-02,16
+Labuan,2020-05-03,16
+Labuan,2020-05-04,16
+Labuan,2020-05-05,16
+Labuan,2020-05-06,16
+Labuan,2020-05-07,16
+Labuan,2020-05-08,16
+Labuan,2020-05-09,16
+Labuan,2020-05-10,16
+Labuan,2020-05-11,16
+Labuan,2020-05-12,16
+Labuan,2020-05-13,16
+Labuan,2020-05-14,16
+Labuan,2020-05-15,16
+Labuan,2020-05-16,16
+Labuan,2020-05-17,16
+Labuan,2020-05-18,16
+Malaysia,2020-01-25,4
+Malaysia,2020-01-26,4
+Malaysia,2020-01-27,4
+Malaysia,2020-01-28,7
+Malaysia,2020-01-29,7
+Malaysia,2020-01-30,8
+Malaysia,2020-01-31,8
+Malaysia,2020-02-1,8
+Malaysia,2020-02-2,8
+Malaysia,2020-02-3,8
+Malaysia,2020-02-4,10
+Malaysia,2020-02-5,12
+Malaysia,2020-02-6,14
+Malaysia,2020-02-7,15
+Malaysia,2020-02-8,16
+Malaysia,2020-02-9,17
+Malaysia,2020-02-10,18
+Malaysia,2020-02-11,18
+Malaysia,2020-02-12,18
+Malaysia,2020-02-13,19
+Malaysia,2020-02-14,19
+Malaysia,2020-02-15,21
+Malaysia,2020-02-16,22
+Malaysia,2020-02-17,22
+Malaysia,2020-02-18,22
+Malaysia,2020-02-19,22
+Malaysia,2020-02-20,22
+Malaysia,2020-02-21,22
+Malaysia,2020-02-22,22
+Malaysia,2020-02-23,22
+Malaysia,2020-02-24,22
+Malaysia,2020-02-25,22
+Malaysia,2020-02-26,22
+Malaysia,2020-02-27,23
+Malaysia,2020-02-28,25
+Malaysia,2020-02-29,25
+Malaysia,2020-03-1,29
+Malaysia,2020-03-2,29
+Malaysia,2020-03-3,36
+Malaysia,2020-03-4,50
+Malaysia,2020-03-5,55
+Malaysia,2020-03-6,83
+Malaysia,2020-03-7,93
+Malaysia,2020-03-8,99
+Malaysia,2020-03-9,117
+Malaysia,2020-03-10,129
+Malaysia,2020-03-11,149
+Malaysia,2020-03-12,158
+Malaysia,2020-03-13,197
+Malaysia,2020-03-14,238
+Malaysia,2020-03-15,428
+Malaysia,2020-03-16,553
+Malaysia,2020-03-17,673
+Malaysia,2020-03-18,790
+Malaysia,2020-03-19,900
+Malaysia,2020-03-20,1030
+Malaysia,2020-03-21,1183
+Malaysia,2020-03-22,1306
+Malaysia,2020-03-23,1518
+Malaysia,2020-03-24,1624
+Malaysia,2020-03-25,1796
+Malaysia,2020-03-26,2031
+Malaysia,2020-03-27,2161
+Malaysia,2020-03-28,2320
+Malaysia,2020-03-29,2470
+Malaysia,2020-03-30,2626
+Malaysia,2020-03-31,2766
+Malaysia,2020-04-1,2908
+Malaysia,2020-04-2,3116
+Malaysia,2020-04-3,3333
+Malaysia,2020-04-4,3483
+Malaysia,2020-04-5,3662
+Malaysia,2020-04-6,3793
+Malaysia,2020-04-7,3963
+Malaysia,2020-04-8,4119
+Malaysia,2020-04-9,4228
+Malaysia,2020-04-10,4346
+Malaysia,2020-04-11,4530
+Malaysia,2020-04-12,4683
+Malaysia,2020-04-13,4817
+Malaysia,2020-04-14,4987
+Malaysia,2020-04-15,5072
+Malaysia,2020-04-16,5182
+Malaysia,2020-04-17,5251
+Malaysia,2020-04-18,5305
+Malaysia,2020-04-19,5389
+Malaysia,2020-04-20,5425
+Malaysia,2020-04-21,5482
+Malaysia,2020-04-22,5532
+Malaysia,2020-04-23,5603
+Malaysia,2020-04-24,5691
+Malaysia,2020-04-25,5742
+Malaysia,2020-04-26,5780
+Malaysia,2020-04-27,5820
+Malaysia,2020-04-28,5851
+Malaysia,2020-04-29,5945
+Malaysia,2020-04-30,6002
+Malaysia,2020-05-1,6071
+Malaysia,2020-05-2,6176
+Malaysia,2020-05-3,6298
+Malaysia,2020-05-4,6353
+Malaysia,2020-05-5,6383
+Malaysia,2020-05-6,6428
+Malaysia,2020-05-7,6467
+Malaysia,2020-05-8,6535
+Malaysia,2020-05-9,6589
+Malaysia,2020-05-10,6656
+Malaysia,2020-05-11,6726
+Malaysia,2020-05-12,6742
+Malaysia,2020-05-13,6779
+Malaysia,2020-05-14,6819
+Malaysia,2020-05-15,6855
+Malaysia,2020-05-16,6872
+Malaysia,2020-05-17,6894
+Malaysia,2020-05-18,6941

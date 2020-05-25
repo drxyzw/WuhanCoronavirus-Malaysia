@@ -9,8 +9,7 @@ import requests
 import pandas as pd
 import numpy as np
 import scipy.stats as sps
-#import theano
-#import theano.tensor as tt
+from scipy.special import factorial
 
 from matplotlib import pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -22,64 +21,21 @@ import matplotlib.ticker as ticker
 from datetime import date
 from datetime import datetime
 
-#from IPython.display import clear_output
-#from IPython.display import set_matplotlib_formats
-#set_matplotlib_formats('retina')
-#%config InlineBackend.figure_format = 'retina'
-
-FILTERED_REGION_CODES = ['AS', 'GU', 'PR', 'VI', 'MP']
+FILTERED_REGION_CODES = ['']
+#FILTERED_REGION_CODES = ['Kedah']
 
 # Load case file
-url = 'https://covidtracking.com/api/v1/states/daily.csv'
-#url = 'data/daily.csv'
+url = 'data/casesForRt.csv'
 states = pd.read_csv(url,
-                     usecols=['date', 'state', 'positive'],                     parse_dates=['date'],
+                     usecols=['date', 'state', 'cases'],
+                     parse_dates=['date'],
                      index_col=['state', 'date'],
                      squeeze=True).sort_index()
 
-# Note: GU/AS/VI do not have enough data for this model to run
-# Note: PR had -384 change recently in total count so unable to model
-#states = states.drop(['MP', 'GU', 'AS', 'PR', 'VI'])
-states = states.drop(['MT', 'MP', 'GU', 'AS', 'PR', 'VI', 'OH'])
-
-revert_to_confirmed_base = True
-
-# Errors in Covidtracking.com
-states.loc[('WA','2020-04-21')] = 12512
-states.loc[('WA','2020-04-22')] = 12753 
-states.loc[('WA','2020-04-23')] = 12753 + 190
-
-states.loc[('VA', '2020-04-22')] = 10266
-states.loc[('VA', '2020-04-23')] = 10988
-
-states.loc[('PA', '2020-04-22')] = 35684
-states.loc[('PA', '2020-04-23')] = 37053
-
-#states.loc[('MA', '2020-04-20')] = 39643
-
-states.loc[('CT', '2020-04-18')] = 17550
-states.loc[('CT', '2020-04-19')] = 17962
-
-states.loc[('HI', '2020-04-22')] = 586
-
-states.loc[('RI', '2020-03-07')] = 3
-
-# Integrity check
-#This is not needed because we're doing backtesting.
-## Make sure that all the states have current data
-#today = datetime.combine(date.today(), datetime.min.time())
-#last_updated = states.reset_index('date').groupby('state')['date'].max()
-#is_current = last_updated < today
-#
-#try:
-#    assert is_current.sum() == 0
-#except AssertionError:
-#    print("Not all states have updated")
-#    display(last_updated[is_current])
+revert_to_confirmed_base = False
 
 # Ensure all case diffs are greater than zero
 for state, grp in states.groupby('state'):
-    #new_cases = grp.positive.diff().dropna()
     new_cases = grp.diff().dropna()
     is_positive = new_cases.ge(0)
     
@@ -88,13 +44,6 @@ for state, grp in states.groupby('state'):
     except AssertionError:
         print(f"Warning: {state} has date with negative case counts")
         print(new_cases[~is_positive])
-        #display(new_cases[~is_positive])
-        
-# Let's make sure that states have added cases
-idx = pd.IndexSlice
-#assert not states.loc[idx[:, '2020-04-22':'2020-04-23'], 'positive'].groupby('state').diff().dropna().eq(0).any()
-assert not states.loc[idx[:, '2020-04-22':'2020-04-23']].groupby('state').diff().dropna().eq(0).any()
-
 
 #Download from web - already done, so no need
 #def download_file(url, local_filename):
@@ -123,70 +72,71 @@ assert not states.loc[idx[:, '2020-04-22':'2020-04-23']].groupby('state').diff()
 #    print('Already downloaded CSV')
 #
 
-#Parse & Clean Patient Info
-# Load the patient CSV
-patients = pd.read_csv(
-    'data/linelist.csv',
-    parse_dates=False,
-    usecols=[
-        'date_confirmation',
-        'date_onset_symptoms'],
-    low_memory=False)
+#No need to load huge file and create onse-confirmation distribution
+###Parse & Clean Patient Info
+## Load the patient CSV
+#patients = pd.read_csv(
+#    'data/linelist.csv',
+#    parse_dates=False,
+#    usecols=[
+#        'date_confirmation',
+#        'date_onset_symptoms'],
+#    low_memory=False)
 
-patients.columns = ['Onset', 'Confirmed']
+#patients.columns = ['Onset', 'Confirmed']
 
-# There's an errant reversed date
-patients = patients.replace('01.31.2020', '31.01.2020')
+## Only keep if both values are present
+#patients = patients.dropna()
 
-# Only keep if both values are present
-patients = patients.dropna()
+## Must have strings that look like individual dates
+## "2020.03.09" is 10 chars long
+#is_ten_char = lambda x: x.str.len().eq(10)
+#patients = patients[is_ten_char(patients.Confirmed) & 
+#                    is_ten_char(patients.Onset)]
 
-# Must have strings that look like individual dates
-# "2020.03.09" is 10 chars long
-is_ten_char = lambda x: x.str.len().eq(10)
-patients = patients[is_ten_char(patients.Confirmed) & 
-                    is_ten_char(patients.Onset)]
+## Convert both to datetimes
+#patients.Confirmed = pd.to_datetime(
+#    patients.Confirmed)
+#    #patients.Confirmed, format='%Y-%m-%d')
+#patients.Onset = pd.to_datetime(
+#    patients.Onset)
+#    #patients.Onset, format='%Y-%m-%d')
 
-# Convert both to datetimes
-patients.Confirmed = pd.to_datetime(
-    patients.Confirmed, format='%d.%m.%Y')
-patients.Onset = pd.to_datetime(
-    patients.Onset, format='%d.%m.%Y')
-
-# Only keep records where confirmed > onset
-patients = patients[patients.Confirmed >= patients.Onset]
+## Only keep records where confirmed > onset
+#patients = patients[patients.Confirmed >= patients.Onset]
 
 
-#Show Relationship between Onset of Symptoms and Confirmation
-ax = patients.plot.scatter(
-    title='Onset vs. Confirmed Dates - COVID19',
-    x='Onset',
-    y='Confirmed',
-    alpha=.1,
-    lw=0,
-    s=10,
-    figsize=(6,6))
+##Show Relationship between Onset of Symptoms and Confirmation
+#ax = patients.plot.scatter(
+#    title='Onset vs. Confirmed Dates - COVID19',
+#    x='Onset',
+#    y='Confirmed',
+#    alpha=.1,
+#    lw=0,
+#    s=10,
+#    figsize=(6,6))
 
-formatter = mdates.DateFormatter('%m/%d')
-locator = mdates.WeekdayLocator(interval=2)
+#formatter = mdates.DateFormatter('%m/%d')
+#locator = mdates.WeekdayLocator(interval=2)
 
-for axis in [ax.xaxis, ax.yaxis]:
-    axis.set_major_formatter(formatter)
-    axis.set_major_locator(locator)
+#for axis in [ax.xaxis, ax.yaxis]:
+#    axis.set_major_formatter(formatter)
+#    axis.set_major_locator(locator)
 
-#plt.show()
+##plt.show()
 
-#Calculate the Probability Distribution of Delay
-# Calculate the delta in days between onset and confirmation
-delay = (patients.Confirmed - patients.Onset).dt.days
+##Calculate the Probability Distribution of Delay
+## Calculate the delta in days between onset and confirmation
+#delay = (patients.Confirmed - patients.Onset).dt.days
 
-# Convert samples to an empirical distribution
-p_delay = delay.value_counts().sort_index()
-new_range = np.arange(0, p_delay.index.max()+1)
-p_delay = p_delay.reindex(new_range, fill_value=0)
-p_delay /= p_delay.sum()
+## Convert samples to an empirical distribution
+#p_delay = delay.value_counts().sort_index()
+#new_range = np.arange(0, p_delay.index.max()+1)
+#p_delay = p_delay.reindex(new_range, fill_value=0)
+#p_delay /= p_delay.sum()
 
-# Show our work
+p_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
+# Show our workp
 fig, axes = plt.subplots(ncols=2, figsize=(9,3))
 p_delay.plot(title='P(Delay)', ax=axes[0])
 p_delay.cumsum().plot(title='P(Delay <= x)', ax=axes[1])
@@ -194,11 +144,11 @@ for ax in axes:
     ax.set_xlabel('days')
 #plt.show()
 
-#Select State Data
-state_name = 'CA'
-
-confirmed = states.xs(state_name).rename(f"{state_name} cases").diff().dropna()
-confirmed.tail()
+##Select State Data
+#state_name = 'Putrajaya'
+#
+#confirmed = states.xs(state_name).rename(f"{state_name} cases").diff().dropna()
+#confirmed.tail()
 
 def confirmed_to_onset(confirmed, p_delay):
     if revert_to_confirmed_base:
@@ -226,7 +176,7 @@ def confirmed_to_onset(confirmed, p_delay):
         return onset
 
 
-onset = confirmed_to_onset(confirmed, p_delay)
+#onset = confirmed_to_onset(confirmed, p_delay)
 
 def adjust_onset_for_right_censorship(onset, p_delay):
     if revert_to_confirmed_base:
@@ -251,34 +201,34 @@ def adjust_onset_for_right_censorship(onset, p_delay):
         return adjusted, cumulative_p_delay
 
 
-adjusted, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
+#adjusted, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
 
-fig, ax = plt.subplots(figsize=(5,3))
+#fig, ax = plt.subplots(figsize=(5,3))
 
-confirmed.plot(
-    ax=ax,
-    label='Confirmed',
-    title=state_name,
-    c='k',
-    alpha=.25,
-    lw=1)
+#confirmed.plot(
+#    ax=ax,
+#    label='Confirmed',
+#    title=state_name,
+#    c='k',
+#    alpha=.25,
+#    lw=1)
 
-onset.plot(
-    ax=ax,
-    label='Onset',
-    c='k',
-    lw=1)
+#onset.plot(
+#    ax=ax,
+#    label='Onset',
+#    c='k',
+#    lw=1)
 
-adjusted.plot(
-    ax=ax,
-    label='Adjusted Onset',
-    c='k',
-    linestyle='--',
-    lw=1)
+#adjusted.plot(
+#    ax=ax,
+#    label='Adjusted Onset',
+#    c='k',
+#    linestyle='--',
+#    lw=1)
 
-ax.legend();
+#ax.legend();
 
-#plt.show()
+##plt.show()
 
 
 def prepare_cases_old(new_cases, cutoff=25):
@@ -289,7 +239,8 @@ def prepare_cases_old(new_cases, cutoff=25):
         min_periods=1,
         center=True).mean(std=2).round()
     
-    idx_start = np.searchsorted(smoothed, cutoff)
+    idx_start = np.argmax(smoothed >= cutoff)
+    #idx_start = np.searchsorted(smoothed, cutoff)
     
     smoothed = smoothed.iloc[idx_start:]
     original = new_cases.loc[smoothed.index]
@@ -302,7 +253,10 @@ def prepare_cases(new_cases, cutoff=25):
     #idx_start = np.searchsorted(new_cases, cutoff)
     #new_cases = new_cases.iloc[idx_start:]
     #truncated = new_cases.loc[new_cases.index]
-    idx_start = np.searchsorted(new_cases, cutoff)
+    idx_start = np.argmax(new_cases >= cutoff)
+    if idx_start == 0 and new_cases[0] < cutoff:
+        return []
+#    idx_start = np.searchsorted(new_cases, cutoff)
     new_cases = new_cases.iloc[idx_start:]
     truncated = new_cases.loc[new_cases.index]
     if truncated.index.names == [None]: # only if time series has single index
@@ -310,10 +264,10 @@ def prepare_cases(new_cases, cutoff=25):
 
     return truncated
 
-if revert_to_confirmed_base:
-    original, adjusted = prepare_cases_old(adjusted)
-else:
-    adjusted = prepare_cases(adjusted)
+#if revert_to_confirmed_base:
+#    original, adjusted = prepare_cases_old(adjusted, cutoff=10)
+#else:
+#    adjusted = prepare_cases(adjusted, cutoff=2)
 
 
 
@@ -329,16 +283,17 @@ GAMMA = 1/7
 #Function for Calculating the Posteriors
 
 def get_posteriors(sr, sigma=0.15):
-    # (0) Round adjusted cases for poisson distribution
-    sr = sr.round()
+    ## (0) Round adjusted cases for poisson distribution
+    #sr = sr.round()
 
     # (1) Calculate Lambda
-    lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1))
+    lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
 
     
     # (2) Calculate each day's likelihood
     likelihoods = pd.DataFrame(
-        data = sps.poisson.pmf(sr[1:].values, lam),
+        data = sps.gamma(a=sr[1:]+1., scale=1., loc=0.).pdf(x=lam),
+        #data = sps.poisson.pmf(sr[1:].values, lam),
         index = r_t_range,
         columns = sr.index[1:])
     
@@ -379,6 +334,12 @@ def get_posteriors(sr, sigma=0.15):
         #(5c) Calcluate the denominator of Bayes' Rule P(k)
         denominator = np.sum(numerator)
         
+        #when sr[i-1] = 0 (then lam(sr[i-1], r_t_range) = 0, so denominator = 0
+        #Then we take limit of sr[i] -> +0
+        if sr[previous_day] == 0.0:
+            numerator = 1. / factorial(sr[current_day]) * np.exp(GAMMA * (r_t_range - 1.) * sr[current_day]) * current_prior
+            denominator = np.sum(numerator)
+
         # Execute full Bayes' Rule
         posteriors[current_day] = numerator/denominator
         
@@ -387,20 +348,20 @@ def get_posteriors(sr, sigma=0.15):
     
     return posteriors, log_likelihood
 
-# Note that we're fixing sigma to a value just for the example
-posteriors, log_likelihood = get_posteriors(adjusted, sigma=.25)
+## Note that we're fixing sigma to a value just for the example
+#posteriors, log_likelihood = get_posteriors(adjusted, sigma=.25)
 
 
-#Result
-ax = posteriors.plot(title=f'{state_name} - Daily Posterior for $R_t$',
-           legend=False, 
-           lw=1,
-           c='k',
-           alpha=.3,
-           xlim=(0.4,6))
+##Result
+#ax = posteriors.plot(title=f'{state_name} - Daily Posterior for $R_t$',
+#           legend=False, 
+#           lw=1,
+#           c='k',
+#           alpha=.3,
+#           xlim=(0.4,6))
 
-ax.set_xlabel('$R_t$');
-#plt.show()
+#ax.set_xlabel('$R_t$');
+##plt.show()
 
 def highest_density_interval(pmf, p=.9, debug=False):
     # If we pass a DataFrame, just call this recursively on the columns
@@ -427,15 +388,15 @@ def highest_density_interval(pmf, p=.9, debug=False):
                             f'High_{p*100:.0f}'])
 
 
-# Note that this takes a while to execute - it's not the most efficient algorithm
-hdis = highest_density_interval(posteriors, p=.9)
+## Note that this takes a while to execute - it's not the most efficient algorithm
+#hdis = highest_density_interval(posteriors, p=.9)
 
-most_likely = posteriors.idxmax().rename('ML')
+#most_likely = posteriors.idxmax().rename('ML')
 
-# Look into why you shift -1
-result = pd.concat([most_likely, hdis], axis=1)
+## Look into why you shift -1
+#result = pd.concat([most_likely, hdis], axis=1)
 
-result.tail()
+#result.tail()
 
 def plot_rt(result, ax, state_name):
     
@@ -502,22 +463,22 @@ def plot_rt(result, ax, state_name):
     ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
     ax.margins(0)
     ax.set_ylim(0.0, 5.0)
-    ax.set_xlim(pd.Timestamp('2020-03-01'), result.index.get_level_values('date')[-1]+pd.Timedelta(days=1))
+    ax.set_xlim(pd.Timestamp('2020-02-01'), result.index.get_level_values('date')[-1]+pd.Timedelta(days=1))
     fig.set_facecolor('w')
 
     
-fig, ax = plt.subplots(figsize=(600/72,400/72))
+#fig, ax = plt.subplots(figsize=(600/72,400/72))
 
-plot_rt(result, ax, state_name)
-ax.set_title(f'Real-time $R_t$ for {state_name}')
-ax.xaxis.set_major_locator(mdates.WeekdayLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+#plot_rt(result, ax, state_name)
+#ax.set_title(f'Real-time $R_t$ for {state_name}')
+#ax.xaxis.set_major_locator(mdates.WeekdayLocator())
+#ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
 
-#plt.show()
+##plt.show()
 
 #Choose an optimum sigma
-#sigmas = np.linspace(1/200, 0.1, 20)
-sigmas = np.linspace(1/20, 1, 20)
+sigmas = np.linspace(1/200, 0.1, 20)
+#sigmas = np.linspace(1/20, 1, 20)
 
 targets = ~states.index.get_level_values('state').isin(FILTERED_REGION_CODES)
 states_to_process = states.loc[targets]
@@ -525,26 +486,48 @@ states_to_process = states.loc[targets]
 results = {}
 
 for state_name, cases in states_to_process.groupby(level='state'):
-    if state_name != 'CA':
-        continue
+    #if state_name != 'Johor':
+    #    continue
     
     print(state_name)
     cases = cases.diff().dropna()
     onset = confirmed_to_onset(cases, p_delay)
     adjusted, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
     if revert_to_confirmed_base:
-        original, adjusted = prepare_cases_old(adjusted, cutoff=25)
+        original, trimmed = prepare_cases_old(adjusted, cutoff=10)
     else:
-        adjusted = prepare_cases(adjusted, cutoff=25)
+        trimmed = prepare_cases(adjusted, cutoff=10)
     #adjusted = prepare_cases(adjusted, cutoff=25)
     
-    if len(adjusted) == 0:
+    if len(trimmed) == 0:
         if revert_to_confirmed_base:
-            original, adjusted = prepare_cases_old(adjusted, cutoff=10)
+            original, trimmed = prepare_cases_old(adjusted, cutoff=2)
         else:
-            adjusted = prepare_cases(adjusted, cutoff=10)
+            trimmed = prepare_cases(adjusted, cutoff=2)
+        if len(trimmed) == 0:
+            print(state_name + ": too few cases for statistics")
+            continue
+    adjusted = trimmed
     #adjusted = prepare_cases(adjusted, cutoff=10)
-    
+
+    # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute recent onset cases
+    # t: target date
+    # T: latest date
+    # L: delay limit, min(L; cumulative(p_delay(0 to L)) > threshould = 0.9)
+    # onset(t) = sum(tau = t to t+L) confirmed(tau) p_delay(tau-t)
+    # = sum(tau = t to T) confirmed(tau) p_delay(tau-t)
+    #  + sum(tau = T to t+L) confirmed(tau) p_delay(tau-t)
+    # = sum(tau = t to T) confirmed(tau) p_delay(tau-t)
+    #  + sum(tau = T to t+L) confirmed(T) p_delay(tau-t)
+    #  + sum(tau = T to t+L) (confirmed(tau)-confirmed(T)) p_delay(tau-t)
+    # Because (confirmed(tau: T to t+L) -confirmed(T)) is uncertain
+    # variance = sum(tau = T to t+L) std^2(tau-T) p_delay(tau-t)
+    #L = np.argmax(np.cumsum(p_delay) > 0.9)
+    #no_need_adjust = adjusted[:-L]
+    #stds = []
+    #for lag in range(1, L):
+    #    stds.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
+
     result = {}
     
     # Holds all posteriors with every given value of sigma
@@ -602,7 +585,7 @@ for state_name, result in results.items():
 
 print('Done.')
 
-#Plot All US States
+#States
 ncols = 4
 nrows = int(np.ceil(len(results) / ncols))
 
