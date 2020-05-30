@@ -136,12 +136,12 @@ for state, grp in states.groupby('state'):
 #p_delay /= p_delay.sum()
 
 p_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
-# Show our workp
-fig, axes = plt.subplots(ncols=2, figsize=(9,3))
-p_delay.plot(title='P(Delay)', ax=axes[0])
-p_delay.cumsum().plot(title='P(Delay <= x)', ax=axes[1])
-for ax in axes:
-    ax.set_xlabel('days')
+## Show our workp
+#fig, axes = plt.subplots(ncols=2, figsize=(9,3))
+#p_delay.plot(title='P(Delay)', ax=axes[0])
+#p_delay.cumsum().plot(title='P(Delay <= x)', ax=axes[1])
+#for ax in axes:
+#    ax.set_xlabel('days')
 #plt.show()
 
 ##Select State Data
@@ -493,17 +493,18 @@ def plot_rt(result, ax, state_name):
 
 #Choose an optimum sigma
 sigmas = np.linspace(1/200, 0.1, 20)
-#sigmas = np.linspace(1/20, 1, 20)
 
 targets = ~states.index.get_level_values('state').isin(FILTERED_REGION_CODES)
 states_to_process = states.loc[targets]
 
 results = {}
+adjustedCases = {}
 
 for state_name, cases in states_to_process.groupby(level='state'):
     #if state_name != 'Johor':
+    #if state_name != 'Malaysia' and state_name != 'Johor':
     #    continue
-    
+
     print(state_name)
     cases = cases.diff().dropna()
     onset = confirmed_to_onset(cases, p_delay)
@@ -512,7 +513,6 @@ for state_name, cases in states_to_process.groupby(level='state'):
         original, trimmed = prepare_cases_old(adjusted, cutoff=10)
     else:
         trimmed = prepare_cases(adjusted, cutoff=10)
-    #adjusted = prepare_cases(adjusted, cutoff=25)
     
     if len(trimmed) == 0:
         if revert_to_confirmed_base:
@@ -523,65 +523,25 @@ for state_name, cases in states_to_process.groupby(level='state'):
             print(state_name + ": too few cases for statistics")
             continue
     adjusted = trimmed
-    #adjusted = prepare_cases(adjusted, cutoff=10)
+    adjustedCases[state_name] = adjusted
 
     # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute recent onset cases
     # t: target date
     # T: latest date
-    # L: delay limit, min(L; cumulative(p_delay(0 to L)) > threshould = 0.9)
-    # onset(t) = sum(tau = t to t+L) confirmed(tau) p_delay(tau-t)
-    # = sum(tau = t to T) confirmed(tau) p_delay(tau-t)
-    #  + sum(tau = T+1 to t+L) confirmed(tau) p_delay(tau-t)
-    # onset(t-1) = sum(tau = t-1 to t+L) confirmed(tau) p_delay(tau-t+1)
-    # = sum(tau = t-1 to T) confirmed(tau) p_delay(tau-t+1)
-    #  + sum(tau = T+1 to t+L-1) confirmed(tau) p_delay(tau-t+1)
-    # Here d = T-t = 0, 1, 2,..., L ==> T = t + d
-    # We approx confirmed(tau>T)=confirmed(T)
-    # onset(t) = sum(tau = t to t+d) confirmed(tau) p_delay(tau-t)
-    #  + sum(tau = t+d+1 to t+L) confirmed(t+d) p_delay(tau-t)
-    # = sum(tau = 0 to d) confirmed(tau+t) p_delay(tau)
-    # + confirmed(t+d) sum(tau = d+1 to L) p_delay(tau)
-    # onset(t-1) = sum(tau = 0 to d+1) confirmed(tau+t-1) p_delay(tau)
-    # + confirmed(t+d) sum(tau = d+2 to L) p_delay(tau)
-
-    # onset(t)/onset(t-1) = gamma * (R-1)
-    # So, we directly estimate the uncertainty on R due to future confirmed cases
-    L = np.argmax(np.cumsum(p_delay) > 0.9)
+    # L: delay limit, min(L; cumulative(p_delay(0 to L)) > threshould)
+    P_DELAY_THRESHOLD = 0.99
+    L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
     no_need_adjust = adjusted[:-L].values
-
-    trunc_cases = cases[np.argmax(cases > 0):]
-    stds_case_ratios = []
-    onset_est = []
-    for d in range(L):
-        case_ratios = []
-        for t in range(1, len(trunc_cases)-d):
-            current_date = trunc_cases.index[t][trunc_cases.index.names.index("date")]
-            previous_date = trunc_cases.index[t-1][trunc_cases.index.names.index("date")]
-            current_case = 0.
-            for tau in range(0, d+1):
-                current_case += trunc_cases[tau+t] * p_delay[tau]
-            current_case_est = current_case
-            for tau in range(d+1,min(L+1, len(trunc_cases)-t)):
-                current_case += trunc_cases[tau+t] * p_delay[tau]
-                current_case_est += trunc_cases[t+d] * p_delay[tau]
-            prev_cases = 0.
-            for tau in range(0, d+2):
-                prev_cases += trunc_cases[tau+t-1] * p_delay[tau]
-            prev_cases_est = prev_cases
-            for tau in range(d+2, min(L+1, len(trunc_cases)-t+1)):
-                prev_cases += trunc_cases[tau+t-1] * p_delay[tau]
-                prev_cases_est += trunc_cases[t+d] * p_delay[tau]
-            onset_est.append(current_case)
-            if prev_cases > 0 and prev_cases_est > 0:
-                case_ratios.append(current_case_est/prev_cases_est - current_case/prev_cases)
-        stds_case_ratios.append(np.std(case_ratios))
-
-    stds_case_ratios /= GAMMA
-    # modify posteriors to include the uncertainty due to future confirmed cases
-
+    stdCases = []
+    for lag in range(1, L):
+        stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
 
     result = {}
-    
+
+    # store std from uncertainty of future confirmed cases for later adjustment
+    result['std_future_cases'] = stdCases
+    #result['std_future_rt'] = stds_case_ratios
+
     # Holds all posteriors with every given value of sigma
     result['posteriors'] = []
     
@@ -619,6 +579,93 @@ ax.set_title(f"Maximum Likelihood value for $\sigma$ = {sigma:.2f}");
 ax.plot(sigmas, total_log_likelihoods)
 ax.axvline(sigma, color='k', linestyle=":")
 
+def posteriors_get_max_point(posteriors):
+    max_rts = posteriors.idxmax().rename('ML')
+    indexes = posteriors.index
+    for t in range(len(max_rts)):
+        posterior = posteriors.iloc[:, t]
+        max_rt = max_rts[t]
+        max_index = indexes.get_loc(max_rt)
+        max_post = posterior.iloc[max_index]
+
+        if(max_index == 0 or max_index == len(indexes) - 1):
+            max_rts[t] = max_rt
+            continue
+
+        max_rt_m1 = indexes[max_index - 1]
+        max_post_m1 = posterior.iloc[max_index - 1]
+        max_rt_p1 = indexes[max_index + 1]
+        max_post_p1 = posterior.iloc[max_index + 1]
+
+        if max_post_m1 < max_post_p1: # true maximum is between max_rt and max_rt_p1
+            max_rt_p2 = indexes[max_index + 2]
+            max_post_p2 = posterior.iloc[max_index + 2]
+            d1 = (max_post - max_post_m1) / (max_rt - max_rt_m1)
+            s1 = - d1 * max_rt + max_post
+            d2 = (max_post_p2 - max_post_p1) / (max_rt_p2 - max_rt_p1)
+            s2 = - d2 * max_rt_p2 + max_post_p2
+        else: # true maximum is between max_rt and max_rt_m1
+            max_rt_m2 = indexes[max_index - 2]
+            max_post_m2 = posterior.iloc[max_index - 2]
+            d1 = (max_post - max_post_p1) / (max_rt - max_rt_p1)
+            s1 = - d1 * max_rt + max_post
+            d2 = (max_post_m2 - max_post_m1) / (max_rt_m2 - max_rt_m1)
+            s2 = - d2 * max_rt_m2 + max_post_m2
+        rt = (s2 - s1)/(d1 - d2)
+        max_rts[t] = rt
+    return max_rts
+
+# modify posteriors to include the uncertainty due to future confirmed cases
+for state_name, result in results.items():
+    posteriors = result['posteriors'][max_likelihood_index]
+    most_likely = posteriors_get_max_point(posteriors)
+    #stds_future_rt = result['std_future_rt']
+
+    # simulate Rt with bump on future confirmed case
+    L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
+    most_likely_bumpeds = []
+    adjusted0 = adjustedCases[state_name]
+    bump_size = 5.0
+    for d in range(1, L):
+        if len(adjusted0) - len(p_delay) + d > 0:
+            p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len(p_delay) + d)))
+        else:
+            p_delay_values = np.resize(p_delay.values[d:], (1, len(adjusted0)))[0]
+        bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
+        bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, sigma=sigma)
+        most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
+        most_likely_change = (most_likely_bumped - most_likely) / bump_size
+        most_likely_bumpeds.append(most_likely_change)
+
+    stdCases = result['std_future_cases']
+    stdRts = 0. * most_likely
+    for d in range(1, L):
+        stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+    stdRts = np.sqrt(stdRts)[::-1]
+    #stdRts.to_csv("stdRts.csv")
+
+    # modify posteriors
+    for d in range(len(stdCases)):
+        if stdRts[d] < 0.001:
+            continue
+        normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
+        normal_dist /= normal_dist.sum(axis=0)
+        normal_dist /= normal_dist.sum(axis=1)[:,None]
+        posterior_to_be_modified = posteriors.iloc[:,-d-1]
+        posterior_modified = posterior_to_be_modified @ normal_dist
+        posteriors.iloc[:,-d-1] = posterior_modified
+
+        #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + ".csv"
+        #posterior_to_be_modified.to_csv(posteriorsfilename_before)
+        #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + "_after.csv"
+        #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
+        #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + "_normal_dist.csv"
+        #np.savetxt(normalfilename, normal_dist, delimiter=",")
+
+
+    result['posteriors'][max_likelihood_index] = posteriors 
+
+
 #Compile Final Results
 final_results = None
 
@@ -633,22 +680,13 @@ for state_name, result in results.items():
         final_results = result
     else:
         final_results = pd.concat([final_results, result])
-    #clear_output(wait=True)
 
-print('Done.')
+print('Done final result.')
 
-#States
-ncols = 4
-nrows = int(np.ceil(len(results) / ncols))
-
-fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(15, nrows*3))
-
-for i, (state_name, result) in enumerate(final_results.groupby('state')):
-    plot_rt(result.iloc[1:], axes.flat[i], state_name)
-
-fig.tight_layout()
-fig.set_facecolor('w')
-
+#Save final result to csv files
+for state_name, final_result in final_results.groupby("state"):
+    final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
+print('Saved final result.')
 
 
 
