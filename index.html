@@ -45,17 +45,17 @@
 			"#0c5922",
 			"#743411"
 		);
-		function openTab(tabName, elmnt) {
+		function openBootstrapTab(tabName, elmnt) {
 			var tabcontent, tablinks;
 			tabcontent = document.getElementsByClassName("tabcontent");
 			for(var i = 0; i < tabcontent.length; ++i) {
-				tabcontent[i].style.display = 'none';
+				tabcontent[i].setAttribute("style","height:0; overflow-y: hidden;");
 			}
 			tablinks = document.getElementsByClassName("tablink");
 			for(var i = 0; i < tablinks.length; ++i) {
 				tablinks[i].style.backgroundcolor = "";
 			}
-			document.getElementById(tabName).style.display = "block";
+			document.getElementById(tabName).setAttribute("style","height:100%; overflow-y:visible;");
 		}
 		function drawChartFirst() {
 			drawChartDailyTotal();
@@ -64,6 +64,25 @@
 			drawChartLatestTotal();
 			drawChartDailyByStates();
 			drawChartDailyDynamicsByStates();
+			
+			drawRtChart("Malaysia");
+			drawRtChart("Johor");
+			drawRtChart("Kedah");
+			drawRtChart("Kelantan");
+			drawRtChart("Malacca");
+			drawRtChart("Negeri Sembilan");
+			drawRtChart("Pahang");
+			drawRtChart("Penang");
+			drawRtChart("Perak");
+			drawRtChart("Perlis");
+			drawRtChart("Sabah");
+			drawRtChart("Sarawak");
+			drawRtChart("Selangor");
+			drawRtChart("Terengganu");
+			drawRtChart("Kuala Lumpur");
+			drawRtChart("Putrajaya");
+			drawRtChart("Labuan");
+			
 			document.getElementById("defaultOpen").click();
 		}
 		function switchLinearLog() {
@@ -543,6 +562,65 @@
 			svgElement.appendChild(svgText);
 			return svgElement;
 		}
+
+
+		function drawRtChart(areaName) {
+			$.get("./Rt/data/" + areaName + ".csv", function(csvString) {
+				<!-- Rt-plot -->
+				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
+				for(var i = 1; i < arrayData.length; ++i) {
+					arrayData[i][0] = new Date(arrayData[i][0]);
+				}
+				var data = new google.visualization.arrayToDataTable(arrayData);
+				data.setColumnLabel(1, 'Rt');
+				data.setColumnProperty(2, 'role', 'interval');
+				data.setColumnProperty(3, 'role', 'interval');
+				data.setColumnProperty(4, 'role', 'interval');
+				data.setColumnProperty(5, 'role', 'interval');
+				var options =
+				{
+					title: "Rt - " + areaName + " (CI: 90%, 50%)",
+					titleTextStyle : {
+						fontSize: 20
+					},
+					chartArea: {
+						left: '15%',
+						top: '10%',
+						width: '80%',
+						height: '80%'
+					},
+					hAxis: {
+						title: "Date",
+						minorGridlines: { count:0 },
+						format: 'dd-MMM',
+						viewWindow: {
+							min: new Date(2020, 3-1, 1),
+						},
+					},
+					vAxis: {
+						minorGridlines: { count:0 },
+						viewWindow: {
+							max: 4.0,
+							min: 0.0,
+						},
+					},
+					legend: {
+						position: 'none',
+					},
+					backgroundColor: {
+						fill: 'FFFAFA'
+					},
+					intervals: {'style':'area'},
+					width: '100%',
+					height: '100%'
+				};
+				var chart = new google.visualization.LineChart(document.getElementById("Rt-" + areaName));
+				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
+				formatter.format(data, 0);
+				chart.draw(data, options);
+				drawAxisLine(chart, MCO, 'MCO');
+			});				
+		}
     </script>
 </head>
 <body>
@@ -559,8 +637,8 @@
 	</defs>
 </svg>
 <h1>Wuhan virus (COVID-19) statistics in Malaysia</h1>
-<button class="tablink" onclick="openTab('CaseNumberAnalysis', this)" id="defaultOpen">Case number analysis</button>
-<button class="tablink" onclick="openTab('RtAnalysis', this)">R(t) analysis</button>
+<button class="tablink" onclick="openBootstrapTab('CaseNumberAnalysis', this)" id="defaultOpen">Case number analysis</button>
+<button class="tablink" onclick="openBootstrapTab('RtAnalysis', this)">R(t) analysis</button>
 
 <div id="CaseNumberAnalysis" class="tabcontent">
 	<div id="wrapper1">
@@ -602,10 +680,42 @@
 </div>
 
 <div id="RtAnalysis" class="tabcontent">
-<br>
-<br>
-<br>
-<div style="float: left">Coming in a few days</div>
+	<div id="Rt-wrapper1">
+		<div><img id="malaysia-map" style="width:430; height=323;" src="Blank_malaysia_map_interactive.svg"/></div>
+		<div id="Rt-Malaysia" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper2">
+		<div id="Rt-Johor" class="Rt-chart"></div>
+		<div id="Rt-Kedah" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper3">
+		<div id="Rt-Kelantan" class="Rt-chart"></div>
+		<div id="Rt-Malacca" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper4">
+		<div id="Rt-Negeri Sembilan" class="Rt-chart"></div>
+		<div id="Rt-Pahang" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper5">
+		<div id="Rt-Penang" class="Rt-chart"></div>
+		<div id="Rt-Perak" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper6">
+		<div id="Rt-Perlis" class="Rt-chart"></div>
+		<div id="Rt-Sabah" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper7">
+		<div id="Rt-Sarawak" class="Rt-chart"></div>
+		<div id="Rt-Selangor" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper8">
+		<div id="Rt-Terengganu" class="Rt-chart"></div>
+		<div id="Rt-Kuala Lumpur" class="Rt-chart"></div>
+	</div>
+	<div id="Rt-wrapper9">
+		<div id="Rt-Putrajaya" class="Rt-chart"></div>
+		<div id="Rt-Labuan" class="Rt-chart"></div>
+	</div>
 </div>
 
 </body>

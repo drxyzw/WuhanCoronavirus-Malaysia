@@ -106,7 +106,13 @@ body, html {
 }
 
 .tabcontent {
-	/* color: white; */
-	display: none;
+	display: block;
 	height: 100%;
+}
+
+.Rt-chart {
+	display: block;
+	float: left;
+	width: 430px;
+	height: 323px;
 }
