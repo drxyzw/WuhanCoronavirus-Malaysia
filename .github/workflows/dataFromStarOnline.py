@@ -36,13 +36,21 @@ for lineBytes in urllib.request.urlopen(url):
 tableHeader = parseFlourishTable(columnNames)
 tableHeaderNp = np.array(tableHeader)
 tableBody = parseFlourishTable(body)
-# convert date DD/MMM to DD/MM/YYYY format
+# 1) convert date DD/MMM to DD/MM/YYYY format
+# 2) make sure that no comma containing number. it will screw up csv file.
+#  example: 3,211 in csv file could be interpolated as 3 and 211 in two columns
+locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
 	day, monthStr = dateRaw.split("-")
 	month = datetime.strptime(monthStr, '%b').month
 	dateStr = "2020-" + str(month).zfill(2) + "-" + str(day)
-	tableBody[i][0]  = dateStr
+	tableBody[i][0] = dateStr
+	tableBody[i][1] = str(locale.atoi(tableBody[i][1]))
+	tableBody[i][2] = str(locale.atoi(tableBody[i][2]))
+	tableBody[i][3] = str(locale.atoi(tableBody[i][3]))
+	tableBody[i][4] = str(locale.atoi(tableBody[i][4]))
+
 tableBodyNp = np.flip(np.array(tableBody), axis = 0)
 table = np.append(tableHeaderNp, tableBodyNp, axis = 0)
 
@@ -54,11 +62,10 @@ table[0][2] = table[0][3]
 table[0][3] = table[0][4]
 table[0][4] = 'Active cases'
 
-locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 for i in range(1, len(table)):
     totalDeath = table[i][3]
     totalRecovered = table[i][4]
-    activeCases = str(locale.atoi(table[i][1]) - locale.atoi(table[i][3]) - locale.atoi(table[i][4]))
+    activeCases = str(int(table[i][1]) - int(table[i][3]) - int(table[i][4]))
     table[i][2] = totalDeath
     table[i][3] = totalRecovered
     table[i][4] = activeCases
@@ -80,7 +87,7 @@ savetxt('../../data/latestTotal.csv', latestTotalTable, delimiter = ',', fmt = '
 tableChange =np.copy(table)
 for i in range(2, len(table)):
     for j in range(1, len(table[0])):
-        tableChange[i][j] = str(locale.atoi(table[i][j]) - locale.atoi(table[i-1][j]))
+        tableChange[i][j] = str(int(table[i][j]) - int(table[i-1][j]))
 savetxt('../../data/dailyTotalChange.csv', tableChange, delimiter = ',', fmt = '%s')
 
 # dynamics table (x=cumulative cases, y = new cases per day, z = date just for tooltip)
@@ -91,7 +98,7 @@ dynamicsTable.append(dynamicsTableHeader)
 dynamicsTableRow = [table[1][1], table[1][1], table[1][0]]
 dynamicsTable.append(dynamicsTableRow)
 for i in range(2, len(table)):
-    dynamicsTableRow = [table[i][1], locale.atoi(table[i][1]) - locale.atoi(table[i-1][1]), table[i][0]]
+    dynamicsTableRow = [table[i][1], int(table[i][1]) - int(table[i-1][1]), table[i][0]]
     dynamicsTable.append(dynamicsTableRow)
 
 savetxt('../../data/dailyTotalDynamics.csv', dynamicsTable, delimiter = ',', fmt = '%s')
