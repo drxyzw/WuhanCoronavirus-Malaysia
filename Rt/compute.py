@@ -11,12 +11,12 @@ import numpy as np
 import scipy.stats as sps
 from scipy.special import factorial
 
-from matplotlib import pyplot as plt
-from matplotlib.colors import ListedColormap
+#from matplotlib import pyplot as plt
+#from matplotlib.colors import ListedColormap
 from scipy.interpolate import interp1d
-from matplotlib.dates import date2num
-import matplotlib.dates as mdates
-import matplotlib.ticker as ticker
+#from matplotlib.dates import date2num
+#import matplotlib.dates as mdates
+#import matplotlib.ticker as ticker
 
 from datetime import date
 from datetime import datetime
@@ -573,11 +573,11 @@ max_likelihood_index = total_log_likelihoods.argmax()
 # Select the value that has the highest log likelihood
 sigma = sigmas[max_likelihood_index]
 
-# Plot it
-fig, ax = plt.subplots()
-ax.set_title(f"Maximum Likelihood value for $\sigma$ = {sigma:.2f}");
-ax.plot(sigmas, total_log_likelihoods)
-ax.axvline(sigma, color='k', linestyle=":")
+## Plot it
+#fig, ax = plt.subplots()
+#ax.set_title(f"Maximum Likelihood value for $\sigma$ = {sigma:.2f}");
+#ax.plot(sigmas, total_log_likelihoods)
+#ax.axvline(sigma, color='k', linestyle=":")
 
 def posteriors_get_max_point(posteriors):
     max_rts = posteriors.idxmax().rename('ML')
