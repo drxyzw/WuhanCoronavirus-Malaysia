@@ -35,7 +35,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Compute and save Rt both naitonwide and by-state
       run: |
-        cd ./.github/Rt/
+        cd ./Rt/
         python compute.py
     - name: Export the above results to GitHub repository
       env:
