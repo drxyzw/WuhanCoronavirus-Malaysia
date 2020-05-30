@@ -413,73 +413,73 @@ def highest_density_interval(pmf, p=.9, debug=False):
 
 #result.tail()
 
-def plot_rt(result, ax, state_name):
+#def plot_rt(result, ax, state_name):
     
-    ax.set_title(f"{state_name}")
+#    ax.set_title(f"{state_name}")
     
-    # Colors
-    ABOVE = [1,0,0]
-    MIDDLE = [1,1,1]
-    BELOW = [0,0,0]
-    cmap = ListedColormap(np.r_[
-        np.linspace(BELOW,MIDDLE,25),
-        np.linspace(MIDDLE,ABOVE,25)
-    ])
-    color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
+#    # Colors
+#    ABOVE = [1,0,0]
+#    MIDDLE = [1,1,1]
+#    BELOW = [0,0,0]
+#    cmap = ListedColormap(np.r_[
+#        np.linspace(BELOW,MIDDLE,25),
+#        np.linspace(MIDDLE,ABOVE,25)
+#    ])
+#    color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
     
-    index = result['ML'].index.get_level_values('date')
-    values = result['ML'].values
+#    index = result['ML'].index.get_level_values('date')
+#    values = result['ML'].values
     
-    # Plot dots and line
-    ax.plot(index, values, c='k', zorder=1, alpha=.25)
-    ax.scatter(index,
-               values,
-               s=40,
-               lw=.5,
-               c=cmap(color_mapped(values)),
-               edgecolors='k', zorder=2)
+#    # Plot dots and line
+#    ax.plot(index, values, c='k', zorder=1, alpha=.25)
+#    ax.scatter(index,
+#               values,
+#               s=40,
+#               lw=.5,
+#               c=cmap(color_mapped(values)),
+#               edgecolors='k', zorder=2)
     
-    # Aesthetically, extrapolate credible interval by 1 day either side
-    lowfn = interp1d(date2num(index),
-                     result['Low_90'].values,
-                     bounds_error=False,
-                     fill_value='extrapolate')
+#    # Aesthetically, extrapolate credible interval by 1 day either side
+#    lowfn = interp1d(date2num(index),
+#                     result['Low_90'].values,
+#                     bounds_error=False,
+#                     fill_value='extrapolate')
     
-    highfn = interp1d(date2num(index),
-                      result['High_90'].values,
-                      bounds_error=False,
-                      fill_value='extrapolate')
+#    highfn = interp1d(date2num(index),
+#                      result['High_90'].values,
+#                      bounds_error=False,
+#                      fill_value='extrapolate')
     
-    extended = pd.date_range(start=pd.Timestamp('2020-03-01'),
-                             end=index[-1]+pd.Timedelta(days=1))
+#    extended = pd.date_range(start=pd.Timestamp('2020-03-01'),
+#                             end=index[-1]+pd.Timedelta(days=1))
     
-    ax.fill_between(extended,
-                    lowfn(date2num(extended)),
-                    highfn(date2num(extended)),
-                    color='k',
-                    alpha=.1,
-                    lw=0,
-                    zorder=3)
+#    ax.fill_between(extended,
+#                    lowfn(date2num(extended)),
+#                    highfn(date2num(extended)),
+#                    color='k',
+#                    alpha=.1,
+#                    lw=0,
+#                    zorder=3)
 
-    ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
+#    ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
     
-    # Formatting
-    ax.xaxis.set_major_locator(mdates.MonthLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-    ax.xaxis.set_minor_locator(mdates.DayLocator())
+#    # Formatting
+#    ax.xaxis.set_major_locator(mdates.MonthLocator())
+#    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+#    ax.xaxis.set_minor_locator(mdates.DayLocator())
     
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-    ax.yaxis.tick_right()
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.margins(0)
-    ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-    ax.margins(0)
-    ax.set_ylim(0.0, 5.0)
-    ax.set_xlim(pd.Timestamp('2020-02-01'), result.index.get_level_values('date')[-1]+pd.Timedelta(days=1))
-    fig.set_facecolor('w')
+#    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+#    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
+#    ax.yaxis.tick_right()
+#    ax.spines['left'].set_visible(False)
+#    ax.spines['bottom'].set_visible(False)
+#    ax.spines['right'].set_visible(False)
+#    ax.margins(0)
+#    ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
+#    ax.margins(0)
+#    ax.set_ylim(0.0, 5.0)
+#    ax.set_xlim(pd.Timestamp('2020-02-01'), result.index.get_level_values('date')[-1]+pd.Timedelta(days=1))
+#    fig.set_facecolor('w')
 
     
 #fig, ax = plt.subplots(figsize=(600/72,400/72))
