@@ -48,4 +48,4 @@ for i in range(iFirstCase, nNationwide):
     df_cases.loc[i_df] = ['Malaysia', datesNationwide[i], nationwideCases[i]]
     i_df += 1
 
-df_cases.to_csv("../rt/data/casesForRt.csv", index=False)
+df_cases.to_csv("../Rt/data/casesForRt.csv", index=False)
