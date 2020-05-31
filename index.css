@@ -78,6 +78,9 @@
   float: left;
 }
 
+#referenceRt {
+  float: left;
+}
 #bystate-dynamics div svg g g g g path { 
 	stroke-width:4px; 
 }

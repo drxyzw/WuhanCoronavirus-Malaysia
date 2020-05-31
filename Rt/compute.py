@@ -493,6 +493,8 @@ def highest_density_interval(pmf, p=.9, debug=False):
 
 #Choose an optimum sigma
 sigmas = np.linspace(1/200, 0.1, 20)
+#sigmas = []
+#sigmas.append(0.065)
 
 targets = ~states.index.get_level_values('state').isin(FILTERED_REGION_CODES)
 states_to_process = states.loc[targets]
@@ -502,7 +504,7 @@ adjustedCases = {}
 
 for state_name, cases in states_to_process.groupby(level='state'):
     #if state_name != 'Johor':
-    #if state_name != 'Malaysia' and state_name != 'Johor':
+    #if state_name != 'Malaysia':
     #    continue
 
     print(state_name)
@@ -572,6 +574,7 @@ max_likelihood_index = total_log_likelihoods.argmax()
 
 # Select the value that has the highest log likelihood
 sigma = sigmas[max_likelihood_index]
+print("optimum sigma: " + str(sigma))
 
 ## Plot it
 #fig, ax = plt.subplots()
@@ -625,7 +628,8 @@ for state_name, result in results.items():
     L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
     most_likely_bumpeds = []
     adjusted0 = adjustedCases[state_name]
-    bump_size = 1.0
+    stdCases = result['std_future_cases']
+    bump_size = max(stdCases)
     for d in range(1, L):
         if len(adjusted0) - len(p_delay) + d > 0:
             p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len(p_delay) + d)))
@@ -637,12 +641,11 @@ for state_name, result in results.items():
         most_likely_change = (most_likely_bumped - most_likely) / bump_size
         most_likely_bumpeds.append(most_likely_change)
 
-    stdCases = result['std_future_cases']
     stdRts = 0. * most_likely
     for d in range(1, L):
         stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
     stdRts = np.sqrt(stdRts)[::-1]
-    #stdRts.to_csv("stdRts.csv")
+#    stdRts.to_csv("stdRts.csv")
 
     # modify posteriors
     for d in range(len(stdCases)):
