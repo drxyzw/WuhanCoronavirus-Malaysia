@@ -74,13 +74,12 @@
   height: 323px;
 }
 
-#reference {
-  float: left;
+.reference {
+	display: block;
+	width: 100%;
+    float: left;
 }
 
-#referenceRt {
-  float: left;
-}
 #bystate-dynamics div svg g g g g path { 
 	stroke-width:4px; 
 }
