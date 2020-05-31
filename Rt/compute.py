@@ -625,7 +625,7 @@ for state_name, result in results.items():
     L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
     most_likely_bumpeds = []
     adjusted0 = adjustedCases[state_name]
-    bump_size = 5.0
+    bump_size = 1.0
     for d in range(1, L):
         if len(adjusted0) - len(p_delay) + d > 0:
             p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len(p_delay) + d)))
