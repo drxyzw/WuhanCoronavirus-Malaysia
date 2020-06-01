@@ -632,6 +632,7 @@ for state_name, result in results.items():
     # if series is not long enough to compute stdCases (thus Null),
     # the series is too short and not statistically meaningful to calculate stdCases
     # So we do not make adjustment for uncertaity of future cases modulation
+    # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is already large
     stdCases = result['std_future_cases']
     if stdCases:
         bump_size = max(stdCases)
