@@ -43,7 +43,13 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
 	day, monthStr = dateRaw.split("-")
-	month = datetime.strptime(monthStr, '%b').month
+	try:
+		month = datetime.strptime(monthStr, '%b').month
+	except ValueError:
+		try:
+			month = datetime.strptime(monthStr, '%B').month
+		except ValueError:
+			raise ValueError("Cannot parse month string: " + monthStr)
 	dateStr = "2020-" + str(month).zfill(2) + "-" + str(day)
 	tableBody[i][0] = dateStr
 	tableBody[i][1] = str(locale.atoi(tableBody[i][1]))
