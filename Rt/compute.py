@@ -535,8 +535,9 @@ for state_name, cases in states_to_process.groupby(level='state'):
     L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
     no_need_adjust = adjusted[:-L].values
     stdCases = []
-    for lag in range(1, L):
-        stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
+    if len(no_need_adjust) >= L:
+        for lag in range(1, L):
+            stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
 
     result = {}
 
@@ -628,43 +629,46 @@ for state_name, result in results.items():
     L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
     most_likely_bumpeds = []
     adjusted0 = adjustedCases[state_name]
+    # if series is not long enough to compute stdCases (thus Null),
+    # the series is too short and not statistically meaningful to calculate stdCases
+    # So we do not make adjustment for uncertaity of future cases modulation
     stdCases = result['std_future_cases']
-    bump_size = max(stdCases)
-    for d in range(1, L):
-        if len(adjusted0) - len(p_delay) + d > 0:
-            p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len(p_delay) + d)))
-        else:
-            p_delay_values = np.resize(p_delay.values[d:], (1, len(adjusted0)))[0]
-        bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
-        bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, sigma=sigma)
-        most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
-        most_likely_change = (most_likely_bumped - most_likely) / bump_size
-        most_likely_bumpeds.append(most_likely_change)
-
-    stdRts = 0. * most_likely
-    for d in range(1, L):
-        stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
-    stdRts = np.sqrt(stdRts)[::-1]
-#    stdRts.to_csv("stdRts.csv")
-
-    # modify posteriors
-    for d in range(len(stdCases)):
-        if stdRts[d] < 0.001:
-            continue
-        normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
-        normal_dist /= normal_dist.sum(axis=0)
-        normal_dist /= normal_dist.sum(axis=1)[:,None]
-        posterior_to_be_modified = posteriors.iloc[:,-d-1]
-        posterior_modified = posterior_to_be_modified @ normal_dist
-        posteriors.iloc[:,-d-1] = posterior_modified
-
-        #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + ".csv"
-        #posterior_to_be_modified.to_csv(posteriorsfilename_before)
-        #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + "_after.csv"
-        #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
-        #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime('%Y-%m-%d') + "_normal_dist.csv"
-        #np.savetxt(normalfilename, normal_dist, delimiter=",")
-
+    if stdCases:
+        bump_size = max(stdCases)
+        for d in range(1, L):
+            if len(adjusted0) - len(p_delay) + d > 0:
+                p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len  (p_delay) + d)))
+            else:
+                p_delay_values = np.resize(p_delay.values[d:], (1, len(adjusted0)))[0]
+            bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of    d-day later
+            bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, sigma=sigma)
+            most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
+            most_likely_change = (most_likely_bumped - most_likely) / bump_size
+            most_likely_bumpeds.append(most_likely_change)
+    
+        stdRts = 0. * most_likely
+        for d in range(1, L):
+            stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+        stdRts = np.sqrt(stdRts)[::-1]
+    #    stdRts.to_csv("stdRts.csv")
+    
+        # modify posteriors
+        for d in range(len(stdCases)):
+            if stdRts[d] < 0.001:
+                continue
+            normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
+            normal_dist /= normal_dist.sum(axis=0)
+            normal_dist /= normal_dist.sum(axis=1)[:,None]
+            posterior_to_be_modified = posteriors.iloc[:,-d-1]
+            posterior_modified = posterior_to_be_modified @ normal_dist
+            posteriors.iloc[:,-d-1] = posterior_modified
+    
+            #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name   [1].strftime('%Y-%m-%d') + ".csv"
+            #posterior_to_be_modified.to_csv(posteriorsfilename_before)
+            #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name    [1].strftime('%Y-%m-%d') + "_after.csv"
+            #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
+            #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime  ('%Y-%m-%d') + "_normal_dist.csv"
+            #np.savetxt(normalfilename, normal_dist, delimiter=",")
 
     result['posteriors'][max_likelihood_index] = posteriors 
 
