@@ -4,8 +4,8 @@
 name: update computation
 
 on:
-  schedule:
-    - cron: 20 0/2 * * * # 20 mins, every 2 hours
+#  schedule:
+#    - cron: 20 0/2 * * * # 20 mins, every 2 hours
   push:
     branches: [ master ]
 #  pull_request:
