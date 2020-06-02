@@ -61,7 +61,7 @@ tableBodyNp = np.flip(np.array(tableBody), axis = 0)
 table = np.append(tableHeaderNp, tableBodyNp, axis = 0)
 
 # save a total number file
-savetxt('../../data/totalRaw.csv', table, delimiter = ',', fmt = '%s')
+savetxt('./data/totalRaw.csv', table, delimiter = ',', fmt = '%s')
 
 # Date, total cases, new cases, total death, total recovered --> Date, total cases, total death, total recovered, active cases
 table[0][2] = table[0][3]
@@ -77,7 +77,7 @@ for i in range(1, len(table)):
     table[i][4] = activeCases
 
 # save a total number file with active cases instead of new cases
-savetxt('../../data/dailyTotal.csv', table, delimiter = ',', fmt = '%s')
+savetxt('./data/dailyTotal.csv', table, delimiter = ',', fmt = '%s')
 
 # the latest date, total death, total recovered, active cases
 lastIdx = len(table) - 1
@@ -87,14 +87,14 @@ latestTotalTable =np.array([['name', 'value'],
                             [table[0][2], table[lastIdx][2]], # death
                             [table[0][3], table[lastIdx][3]], # recovered
                             [table[0][4], table[lastIdx][4]]]) # active
-savetxt('../../data/latestTotal.csv', latestTotalTable, delimiter = ',', fmt = '%s')
+savetxt('./data/latestTotal.csv', latestTotalTable, delimiter = ',', fmt = '%s')
 
 # Date, total change of cases, death, recovered, active cases
 tableChange =np.copy(table)
 for i in range(2, len(table)):
     for j in range(1, len(table[0])):
         tableChange[i][j] = str(int(table[i][j]) - int(table[i-1][j]))
-savetxt('../../data/dailyTotalChange.csv', tableChange, delimiter = ',', fmt = '%s')
+savetxt('./data/dailyTotalChange.csv', tableChange, delimiter = ',', fmt = '%s')
 
 # dynamics table (x=cumulative cases, y = new cases per day, z = date just for tooltip)
 dynamicsTableOriginal = np.append(tableHeaderNp, tableBodyNp, axis = 0)
@@ -107,7 +107,7 @@ for i in range(2, len(table)):
     dynamicsTableRow = [table[i][1], int(table[i][1]) - int(table[i-1][1]), table[i][0]]
     dynamicsTable.append(dynamicsTableRow)
 
-savetxt('../../data/dailyTotalDynamics.csv', dynamicsTable, delimiter = ',', fmt = '%s')
+savetxt('./data/dailyTotalDynamics.csv', dynamicsTable, delimiter = ',', fmt = '%s')
 
 print("Finished")
 

@@ -36,11 +36,11 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Get the number of infecteds by states from Wikipedia
       run: |
-        cd ./.github/workflows/
+        cd ./
         python dataFromWikipedia.py
     - name: Get the number of nationwide total from The Star Online
       run: |
-        cd ./.github/workflows/
+        cd ./
         python dataFromStarOnline.py
     - name: Export the above results to GitHub repository
       env:
