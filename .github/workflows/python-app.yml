@@ -41,7 +41,7 @@ jobs:
     - name: Compute and save Rt both naitonwide and by-state
       run: |
         cd ./Rt/
-        python compute.py
+        python computeRt.py
     - name: Export the above results to GitHub repository
       env:
         GIT_OWNER_EMAIL: ${{ secrets.GIT_OWNER_EMAIL }}
