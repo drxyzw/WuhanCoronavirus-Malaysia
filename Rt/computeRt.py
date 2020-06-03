@@ -504,26 +504,33 @@ adjustedCases = {}
 
 for state_name, cases in states_to_process.groupby(level='state'):
     #if state_name != 'Johor':
-    #if state_name != 'Malaysia':
+    #if state_name != 'Malacca':
     #    continue
 
     print(state_name)
     cases = cases.diff().dropna()
     onset = confirmed_to_onset(cases, p_delay)
     adjusted, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
-    if revert_to_confirmed_base:
-        original, trimmed = prepare_cases_old(adjusted, cutoff=10)
-    else:
-        trimmed = prepare_cases(adjusted, cutoff=10)
+    #if revert_to_confirmed_base:
+    #    original, trimmed = prepare_cases_old(adjusted, cutoff=10)
+    #else:
+    #    trimmed = prepare_cases(adjusted, cutoff=10)
     
+    #if len(trimmed) == 0:
+    #    if revert_to_confirmed_base:
+    #        original, trimmed = prepare_cases_old(adjusted, cutoff=2)
+    #    else:
+    #        trimmed = prepare_cases(adjusted, cutoff=2)
+    #    if len(trimmed) == 0:
+    #        print(state_name + ": too few cases for statistics")
+    #        continue
+    if revert_to_confirmed_base:
+        original, trimmed = prepare_cases_old(adjusted, cutoff=2)
+    else:
+        trimmed = prepare_cases(adjusted, cutoff=2)
     if len(trimmed) == 0:
-        if revert_to_confirmed_base:
-            original, trimmed = prepare_cases_old(adjusted, cutoff=2)
-        else:
-            trimmed = prepare_cases(adjusted, cutoff=2)
-        if len(trimmed) == 0:
-            print(state_name + ": too few cases for statistics")
-            continue
+        print(state_name + ": too few cases for statistics")
+        continue
     adjusted = trimmed
     adjustedCases[state_name] = adjusted
 
