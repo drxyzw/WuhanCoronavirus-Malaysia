@@ -1,7 +1,12 @@
 theme: jekyll-theme-cayman
+twitter:
+  username: hiroto_nihilist
 defaults:
- - scope:
-     path: ""
-   values:
-     images:
-       path: ./preview.png
+  - scope:
+      path: ""
+    values:
+      images:
+        path: ./preview.png
+        height: 630
+        width: 1200
+
