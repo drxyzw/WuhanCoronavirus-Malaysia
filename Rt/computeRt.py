@@ -386,18 +386,23 @@ def highest_density_interval(pmf, p=.9, debug=False):
     
     cumsum = np.cumsum(pmf.values)
     
-    # N x N matrix of total probability mass for each low, high
-    total_p = cumsum - cumsum[:, None]
+    if cumsum[0] > 1 - p:
+        low = pmf.index[0]
+        highIdx = (cumsum < p).argmin()
+        high = pmf.index[highIdx]
+    else:
+        # N x N matrix of total probability mass for each low, high
+        total_p = cumsum - cumsum[:, None]
     
-    # Return all indices with total_p > p
-    lows, highs = (total_p > p).nonzero()
-    
-    # Find the smallest range (highest density)
-    best = (highs - lows).argmin()
-    
-    low = pmf.index[lows[best]]
-    high = pmf.index[highs[best]]
-    
+        # Return all indices with total_p > p
+        lows, highs = (total_p > p).nonzero()
+        
+        # Find the smallest range (highest density)
+        best = (highs - lows).argmin()
+        
+        low = pmf.index[lows[best]]
+        high = pmf.index[highs[best]]
+        
     return pd.Series([low, high],
                      index=[f'Low_{p*100:.0f}',
                             f'High_{p*100:.0f}'])
