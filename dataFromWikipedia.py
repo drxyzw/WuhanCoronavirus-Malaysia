@@ -9,15 +9,18 @@ import numpy as np
 from numpy import savetxt
 
 def cell2CumulNewCases(inStr):
-    criterion = re.compile("^[0-9]+$")
+    withoutComma = re.compile("^[0-9]+$")
+    withComma = re.compile("^\d{1,3}(,\d{3})*(\.\d+)?$")
     if inStr == "":
         cumulCases, newCases = 0, 0
     elif type(inStr) == int:
         cumulCases, newCases = inStr, 0
-    elif criterion.fullmatch(inStr):
+    elif withoutComma.fullmatch(inStr):
         cumulCases, newCases = int(process_num(inStr)), 0
+    elif withComma.fullmatch(inStr):
+        cumulCases, newCases = int(process_num(str(inStr).replace(",",""))), 0
     else:
-        criterion = re.compile("^[0-9]+\([^\)][0-9]+\)")
+        withNewCaseInBracket = re.compile("^[0-9]+\([^\)][0-9]+\)")
         idxBra = inStr.find('(')
         idxKet = inStr.find(')')
         cumulCases = int(process_num(inStr[0:idxBra]))
