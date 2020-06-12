@@ -404,13 +404,15 @@
 				for(var i = 1; i < arrayData.length; ++i) {
 					arrayData[i][dateColumn] = new Date(arrayData[i][dateColumn]);
 					if(arrayData[i][dateColumn].getYear() == MCO.getYear() && arrayData[i][dateColumn].getMonth() == MCO.getMonth() && arrayData[i][dateColumn].getDate() == MCO.getDate()) {
-						for(var j = 1; j < idxMCOs.length - 1; ++j) {
+						for(var j = 1; j < arrayData[0].length - 1; ++j) {
 							if(arrayData[i][j] != null) {
 								idxMCOs[j] = i;
-								if(yMax < arrayData[i][j]) {
-									yMax = arrayData[i][j];
-								}
 							}
+						}
+					}
+					for(var j = 1; j < arrayData[0].length - 1; ++j) {
+						if(yMax < arrayData[i][j]) {
+							yMax = arrayData[i][j];
 						}
 					}
 				}
@@ -752,6 +754,8 @@
 <div class="reference">
 	Source code:<br>
 	<a target="_blank" href="https://github.com/drxyzw/WuhanCoronavirus-Malaysia">https://github.com/drxyzw/WuhanCoronavirus-Malaysia</a><br>
+	Cross validaiton:<br>
+	<a href="rt_USA.html">Rt in USA</a><br>	
 </div>
 </body>
 
