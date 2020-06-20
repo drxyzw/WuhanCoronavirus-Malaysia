@@ -44,7 +44,7 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
     html = urlopen(url)
 
     soup = BeautifulSoup(html, 'html.parser')
-    for caption in soup.find_all('caption'):
+    for caption in soup.find_all("caption"):
         if captionWanted in caption.get_text():
             table = caption.find_parent('table')
             print("found data by states")
@@ -72,8 +72,8 @@ def getWebTableByCaption2CSV(url, captionWanted, filename):
         writer.writerow(output_headers[0])
         writer.writerows(output_rows)
 
-
-url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Cases_by_state"
+url = "https://en.wikipedia.org/wiki/Timeline_of_the_COVID-19_pandemic_in_Malaysia#Statistics"
+#url = "https://en.wikipedia.org/wiki/2020_coronavirus_pandemic_in_Malaysia#Statistics"
 # find a table with "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 captionWanted = "Distribution of cumulative confirmed cases in various administrative regions of Malaysia"
 rawCSVFilename = './data/byStatesRaw.csv'
