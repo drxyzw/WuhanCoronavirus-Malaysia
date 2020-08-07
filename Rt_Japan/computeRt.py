@@ -77,12 +77,27 @@ checkAllDiffPositive(statesOnset_dom)
 P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
 p_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
 p_delay = p_comfirmed_delay_cum[1:] - p_comfirmed_delay_cum[:-1]
+p_delay = np.insert(p_delay, 0, 0)
 
 P_INFECTION_DELAY_T = np.linspace(0, 30, 30)
 p_infection_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_DELAY_T - 0.5)
 p_infection_delay = p_infection_delay_cum[1:] - p_infection_delay_cum[:-1]
+p_infection_delay = np.insert(p_infection_delay, 0, 0)
 
-def backprojNP(confirmed, p_delay):
+def backprojNP(confirmed, p_delay, addingExtraRows=False):
+    if p_delay[0] == 0.0:
+        p_delay[0] = 0.001
+
+    nExtraDays = 0
+    if addingExtraRows == True:
+        # for stability, append 10 extra days from last date
+        nExtraDays = 10
+        for i in range(nExtraDays):
+            newIndex = [(confirmed.index[-1][0], confirmed.index[-1][1] + timedelta(days=1))]
+            #row = pd.Series(index=newIndex, data=confirmed[-1])
+            row = pd.Series(index=newIndex, data=[0])
+            confirmed = confirmed.append(row)
+
     # in case of back projection, p_delay means onset to confirmed
 
     confirmed = confirmed[(confirmed > 0).argmax():]
@@ -120,9 +135,15 @@ def backprojNP(confirmed, p_delay):
         if len(F) < len(confirmed):
             F = np.pad(F, (len(confirmed) - len(F), 0), 'constant', constant_values = (1, 1))
         sumPart = np.convolve((confirmed / mu)[::-1], p_delay)[::-1][len(p_delay)-1:]
+        #if p_delay[0] == 0.0:
+        #    sumPart[0] = confirmed[0] / onsetRaw[0]
+
         if len(sumPart) > len(confirmed):
            sumPart = sumPart[(len(sumPart) - len(confirmed)):]
         onsetEM = onsetRaw / F * sumPart
+        #if p_delay[0] == 0.0:
+        #    n = len(onsetEM) - 1
+        #    onsetEM[n] = onsetRaw[n] * confirmed[n] / mu[n]
 
         # S step
         k = 2 # k has to be even integer
@@ -135,7 +156,10 @@ def backprojNP(confirmed, p_delay):
         l = l + 1
         storeOnsetResult.append(onsetEMS)
         onsetRaw = onsetEMS
-    return pd.Series(onsetEMS, index=index, name=confirmed.name)
+    if nExtraDays == 0:
+        return pd.Series(onsetEMS, index=index, name=confirmed.name)
+    else:
+        return pd.Series(onsetEMS[:-nExtraDays], index=index[:-nExtraDays], name=confirmed.name)
 
 def confirmed_to_onset(confirmed, p_delay, backProjection = True):
     if revert_to_confirmed_base:
@@ -145,13 +169,8 @@ def confirmed_to_onset(confirmed, p_delay, backProjection = True):
         
         # backprojNP
         if backProjection:
-            # for stability, append 10 extra days from last date
-            for i in range(10):
-                newIndex = [(confirmed.index[-1][0], confirmed.index[-1][1]+timedelta(days=1))]
-                row = pd.Series(index=newIndex, data=[0])
-                confirmed = confirmed.append(row)
             # in case of back projection, p_delay means onset to confirmed
-            onset = backprojNP(confirmed, p_delay)
+            onset = backprojNP(confirmed, p_delay, True)
         else:
             # when no back projection, p_delay means confirmed to onset
             # Reverse cases so that we convolve into the past
@@ -181,7 +200,7 @@ def onset_to_infection(onset, p_infection_delay, backProjection = True):
         # backprojNP
         if backProjection:
             # in case of back projection, p_delay means onset to confirmed
-            onset = backprojNP(onset, p_infection_delay)
+            onset = backprojNP(onset, p_infection_delay, True)
         else:
             # Reverse cases so that we convolve into the past
             convolved = np.convolve(onset[::-1].values, p_infection_delay)
@@ -203,7 +222,6 @@ def onset_to_infection(onset, p_infection_delay, backProjection = True):
         return onset
 
 
-#onset = confirmed_to_onset(confirmed, p_delay)
 def adjust_onset_for_right_censorship(onset, p_delay):
     if revert_to_confirmed_base:
         return onset, 0
@@ -298,35 +316,63 @@ r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 # https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
 # https://www.nejm.org/doi/full/10.1056/NEJMoa2001316
 #GAMMA = 1/7
-taus = np.linspace(0.1, 10.0, 20)
-#taus = [7.]
 
 #Function for Calculating the Posteriors
 def get_posteriors(sr, sr_dom, sigma=0.15):
     ## (0) Round adjusted cases for poisson distribution
     #sr = sr.round()
 
+    expectSerialIntervalOverLikelihood = False
+
     likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
     serial_interval_cumdensity = 0.
-    prevTau = 0
-    for tau in taus:
-        #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
-        serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
-        - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
-        GAMMA = 1./tau
+    prevTau = 0.
+    if expectSerialIntervalOverLikelihood:
+        taus = np.linspace(0.1, 10.0, 20)
+        #taus = [7.]
+        for tau in taus:
+            #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5,
+            #x=tau)
+            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
+            - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+            GAMMA = 1. / tau
 
-        # (1) Calculate Lambda
-        lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
-    
+            # (1) Calculate Lambda
+            lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
+        
+            # (2) Calculate each day's likelihood
+            likelihood = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
+                #data = sps.poisson.pmf(sr[1:].values, lam),
+                index = r_t_range,
+                columns = sr.index[1:])
+            likelihoods += likelihood * serial_interval_density
+            serial_interval_cumdensity += serial_interval_density
+            prevTau = tau
+
+        likelihoods /= serial_interval_cumdensity
+    else:
+        lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
+        taus = np.linspace(0., 30.0, 31)
+        #taus = [7.]
+        for i in range(1, min((int)(taus[-1])+1, len(sr))):
+            tau = taus[i]
+            #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
+            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
+            - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+            #GAMMA = 1./tau
+
+            # (1) Calculate Lambda
+            paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
+            lam += paddedSr * np.exp(r_t_range[:, None] - 1.) * serial_interval_density
+            serial_interval_cumdensity += serial_interval_density
+            prevTau = tau
+
+        lam /= serial_interval_cumdensity
         # (2) Calculate each day's likelihood
-        likelihood = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
+        likelihoods = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
             #data = sps.poisson.pmf(sr[1:].values, lam),
             index = r_t_range,
             columns = sr.index[1:])
-        likelihoods += likelihood * serial_interval_density
-        serial_interval_cumdensity += serial_interval_density
-
-    likelihoods /= serial_interval_cumdensity
  
     #nStd = 3.;
     #for i in range(1, L):
@@ -368,30 +414,36 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
     # of the data for maximum likelihood calculation.
     log_likelihood = 0.0
 
-    # (5) Iteratively apply Bayes' rule
-    for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
+    if expectSerialIntervalOverLikelihood:
+        # (5) Iteratively apply Bayes' rule
+        for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
 
-        #(5a) Calculate the new prior
-        current_prior = process_matrix @ posteriors[previous_day]
-        
-        #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
-        numerator = likelihoods[current_day] * current_prior
-        
-        #(5c) Calcluate the denominator of Bayes' Rule P(k)
-        denominator = np.sum(numerator)
-        
-        #when sr[i-1] = 0 (then lam(sr[i-1], r_t_range) = 0, so denominator = 0
-        #Then we take limit of sr[i] -> +0
-        if sr[previous_day] == 0.0:
-            numerator = 1. / factorial(sr_dom[current_day]) * np.exp(GAMMA * (r_t_range - 1.) * sr_dom[current_day]) * current_prior
+            #(5a) Calculate the new prior
+            current_prior = process_matrix @ posteriors[previous_day]
+            
+            #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
+            numerator = likelihoods[current_day] * current_prior
+            
+            #when sr[i-1] = 0 (then lam(sr[i-1], r_t_range) = 0, so denominator = 0
+            #Then we take limit of sr[i] -> +0
+            if sr[previous_day] == 0.0:
+                numerator = 1. / factorial(sr_dom[current_day]) * np.exp(GAMMA * (r_t_range - 1.) * sr_dom[current_day]) * current_prior
+
+            #(5c) Calcluate the denominator of Bayes' Rule P(k)
             denominator = np.sum(numerator)
 
-        # Execute full Bayes' Rule
-        posteriors[current_day] = numerator/denominator
+            # Execute full Bayes' Rule
+            posteriors[current_day] = numerator/denominator
         
-        # Add to the running sum of log likelihoods
-        log_likelihood += np.log(denominator)
-    
+            # Add to the running sum of log likelihoods
+            log_likelihood += np.log(denominator)
+    else:
+        for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
+            numerator = likelihoods[current_day]
+            denominator = np.sum(numerator)
+            posteriors[current_day] = numerator / denominator
+            log_likelihood += np.log(denominator)
+
     return posteriors, log_likelihood
 
 ## Note that we're fixing sigma to a value just for the example
@@ -551,19 +603,24 @@ for state_name, cases in states_to_process.groupby(level='state'):
     onsetOriginal = onset
     onset = onset + onsetFromConfirmed
     onset = onset.dropna()
-    adjustedOnset, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
+#    adjustedOnset, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
+    adjustedOnset = onset
     infected = onset_to_infection(adjustedOnset, p_infection_delay)
-    adjusted, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected, p_infection_delay)
+    adjusted = infected
+#    adjusted, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected, p_infection_delay)
 
     onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
     onsetOriginal_dom = onset_dom
     onsetFromConfirmed_dom = confirmed_to_onset(
         statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_delay)
-    onset_dom = onset_dom + onsetFromConfirmed_dom
+    #onset_dom = onset_dom + onsetFromConfirmed_dom
+    onset_dom = onset_dom + onsetFromConfirmed_dom*0
     onset_dom = onset_dom.dropna()
-    adjustedOnset_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onset_dom, p_delay)
+#    adjustedOnset_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onset_dom, p_delay)
+    adjustedOnset_dom = onset_dom
     infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_delay)
-    adjusted_dom, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_delay)
+    adjusted_dom = infected_dom
+#    adjusted_dom, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_delay)
 
     onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
     onset.to_csv(state_name + "_onset.csv")
