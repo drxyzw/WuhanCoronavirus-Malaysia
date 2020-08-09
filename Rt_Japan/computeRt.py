@@ -73,20 +73,21 @@ checkAllDiffPositive(statesConfirmedOnly)
 checkAllDiffPositive(statesConfirmedOnly_dom)
 checkAllDiffPositive(statesOnset)
 checkAllDiffPositive(statesOnset_dom)
+
+p_EPS = 0.001
 #p_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
 P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
 p_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
 p_delay = p_comfirmed_delay_cum[1:] - p_comfirmed_delay_cum[:-1]
-p_delay = np.insert(p_delay, 0, 0)
+p_delay = np.insert(p_delay, 0, p_EPS)
 
-P_INFECTION_DELAY_T = np.linspace(0, 30, 30)
+P_INFECTION_DELAY_T = np.linspace(0, 30, 31)
 p_infection_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_DELAY_T - 0.5)
 p_infection_delay = p_infection_delay_cum[1:] - p_infection_delay_cum[:-1]
-p_infection_delay = np.insert(p_infection_delay, 0, 0)
+p_infection_delay = np.insert(p_infection_delay, 0, p_EPS)
+p_infection_confirm_delay = np.convolve(p_delay, p_infection_delay)
 
 def backprojNP(confirmed, p_delay, addingExtraRows=False):
-    if p_delay[0] == 0.0:
-        p_delay[0] = 0.001
 
     nExtraDays = 0
     if addingExtraRows == True:
@@ -244,28 +245,28 @@ def adjust_onset_for_right_censorship(onset, p_delay):
         
         return adjusted, cumulative_p_delay
 
-def adjust_infection_for_right_censorship(infection, p_infection_delay):
+def adjust_infection_for_right_censorship(infection, p_delay):
     if revert_to_confirmed_base:
         return onset, 0
     else:
-        cumulative_p_infection_delay = p_infection_delay.cumsum()
+        cumulative_p_delay = p_delay.cumsum()
         
         # Calculate the additional ones needed so shapes match
-        ones_needed = len(infection) - len(cumulative_p_infection_delay)
+        ones_needed = len(infection) - len(cumulative_p_delay)
         padding_shape = (0, ones_needed)
         
         # Add ones and flip back
-        cumulative_p_infection_delay = np.pad(
-            cumulative_p_infection_delay,
+        cumulative_p_delay = np.pad(
+            cumulative_p_delay,
             padding_shape,
             constant_values=1)
-        cumulative_p_infection_delay = np.flip(cumulative_p_infection_delay)
+        cumulative_p_delay = np.flip(cumulative_p_delay)
         
         # Adjusts observed onset values to expected terminal onset values
-        adjusted = infection / cumulative_p_infection_delay
+        adjusted = infection / cumulative_p_delay
         
         # not doing right-side adjustment now
-        return infection, cumulative_p_infection_delay
+        return infection, cumulative_p_delay
         #return adjusted, cumulative_p_infection_delay
 
 def prepare_cases_old(new_cases, cutoff=25):
@@ -354,20 +355,38 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
         lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
         taus = np.linspace(0., 30.0, 31)
         #taus = [7.]
-        for i in range(1, min((int)(taus[-1])+1, len(sr))):
-            tau = taus[i]
-            #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
-            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
-            - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
-            #GAMMA = 1./tau
+        sameAsNishiuraSum = True
 
-            # (1) Calculate Lambda
-            paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
-            lam += paddedSr * np.exp(r_t_range[:, None] - 1.) * serial_interval_density
-            serial_interval_cumdensity += serial_interval_density
-            prevTau = tau
+        if sameAsNishiuraSum:
+            for i in range(1, min((int)(taus[-1])+1, len(sr))):
+                tau = taus[i]
+                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
+                - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+                #GAMMA = 1./tau
+    
+                # (1) Calculate Lambda
+                paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
+                lam += r_t_range[:, None] * paddedSr * serial_interval_density
+                serial_interval_cumdensity += serial_interval_density
+                prevTau = tau
 
-        lam /= serial_interval_cumdensity
+            lam /= serial_interval_cumdensity
+        else:
+            for i in range(1, min((int)(taus[-1])+1, len(sr))):
+                tau = taus[i]
+                #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
+                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
+                - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+                #GAMMA = 1./tau
+    
+                # (1) Calculate Lambda
+                paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
+                lam += paddedSr * np.exp(r_t_range[:, None] - 1.) * serial_interval_density
+                serial_interval_cumdensity += serial_interval_density
+                prevTau = tau
+
+            lam /= serial_interval_cumdensity
+
         # (2) Calculate each day's likelihood
         likelihoods = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
             #data = sps.poisson.pmf(sr[1:].values, lam),
@@ -606,21 +625,21 @@ for state_name, cases in states_to_process.groupby(level='state'):
 #    adjustedOnset, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
     adjustedOnset = onset
     infected = onset_to_infection(adjustedOnset, p_infection_delay)
-    adjusted = infected
-#    adjusted, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected, p_infection_delay)
+    #adjusted = infected
+    adjusted, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected, p_infection_confirm_delay)
 
     onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
     onsetOriginal_dom = onset_dom
     onsetFromConfirmed_dom = confirmed_to_onset(
         statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_delay)
     #onset_dom = onset_dom + onsetFromConfirmed_dom
-    onset_dom = onset_dom + onsetFromConfirmed_dom*0
+    onset_dom = onset_dom + onsetFromConfirmed_dom
     onset_dom = onset_dom.dropna()
-#    adjustedOnset_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onset_dom, p_delay)
     adjustedOnset_dom = onset_dom
+    #adjustedOnset_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onset_dom, p_infection_confirm_delay)
     infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_delay)
-    adjusted_dom = infected_dom
-#    adjusted_dom, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_delay)
+    #adjusted_dom = infected_dom
+    adjusted_dom, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_confirm_delay)
 
     onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
     onset.to_csv(state_name + "_onset.csv")
@@ -684,7 +703,7 @@ for state_name, cases in states_to_process.groupby(level='state'):
     result['log_likelihoods'] = []
     
     for sigma in sigmas:
-        posteriors, log_likelihood = get_posteriors(adjusted, adjusted, sigma=sigma)
+        posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
         #posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
         result['posteriors'].append(posteriors)
         result['log_likelihoods'].append(log_likelihood)
