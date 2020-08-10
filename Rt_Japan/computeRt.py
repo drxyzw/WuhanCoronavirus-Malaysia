@@ -334,8 +334,7 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
         for tau in taus:
             #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5,
             #x=tau)
-            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
-            - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
             GAMMA = 1. / tau
 
             # (1) Calculate Lambda
@@ -353,15 +352,14 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
         likelihoods /= serial_interval_cumdensity
     else:
         lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
-        taus = np.linspace(0., 30.0, 31)
+        taus = np.linspace(0., 60.0, 61)
         #taus = [7.]
         sameAsNishiuraSum = True
 
         if sameAsNishiuraSum:
             for i in range(1, min((int)(taus[-1])+1, len(sr))):
                 tau = taus[i]
-                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
-                - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
                 #GAMMA = 1./tau
     
                 # (1) Calculate Lambda
@@ -375,8 +373,7 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
             for i in range(1, min((int)(taus[-1])+1, len(sr))):
                 tau = taus[i]
                 #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
-                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau)
-                - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
+                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
                 #GAMMA = 1./tau
     
                 # (1) Calculate Lambda
