@@ -18,12 +18,13 @@ def parseFlourishTable(inputStr):
 	return matrix
 
 # start here to fetch data from a website
-url = "https://public.flourish.studio/visualisation/1641110/embed"
+url = "https://flo.uri.sh/visualisation/1641110/embed"
+page = urllib.request.Request(url, headers = {'User-Agent': 'Mozilla/5.0'})
 
 # fetch table data
 loadColumnNames = False
 loadBody = False
-for lineBytes in urllib.request.urlopen(url):
+for lineBytes in urllib.request.urlopen(page):
 	line = lineBytes.decode("utf-8")
 	if "_Flourish_data_column_names = " in line and loadColumnNames == False:
 		columnNames = line[line.find('{"rows":'):(line.find(']}}')+3)]
