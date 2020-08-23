@@ -52,6 +52,8 @@ for i in range(len(tableBody)):
 		except ValueError:
 			raise ValueError("Cannot parse month string: " + monthStr)
 	dateStr = "2020-" + str(month).zfill(2) + "-" + str(day)
+	if dateStr == "2020-08-19":
+		tableBody[i][4] = '8925'
 	tableBody[i][0] = dateStr
 	tableBody[i][1] = str(locale.atoi(tableBody[i][1]))
 	tableBody[i][2] = str(locale.atoi(tableBody[i][2]))
