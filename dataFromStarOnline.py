@@ -45,6 +45,8 @@ for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
 	day, monthStr = dateRaw.split("-")
 	try:
+		if monthStr == "Sept":
+			monthStr = "Sep"
 		month = datetime.strptime(monthStr, '%b').month
 	except ValueError:
 		try:
