@@ -278,7 +278,9 @@ r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 # Gamma is 1/serial interval
 # https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
 # https://www.nejm.org/doi/full/10.1056/NEJMoa2001316
-GAMMA = 1/7
+#GAMMA = 1/7
+taus = np.linspace(0.1, 10.0, 20)
+#taus = [7.]
 
 #Function for Calculating the Posteriors
 
@@ -286,16 +288,24 @@ def get_posteriors(sr, sigma=0.15):
     ## (0) Round adjusted cases for poisson distribution
     #sr = sr.round()
 
-    # (1) Calculate Lambda
-    lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
+    likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
+    serial_interval_cumdensity = 0.
+    for tau in taus:
+        serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
+        GAMMA = 1./tau
 
+        # (1) Calculate Lambda
+        lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
     
-    # (2) Calculate each day's likelihood
-    likelihoods = pd.DataFrame(
-        data = sps.gamma(a=sr[1:]+1., scale=1., loc=0.).pdf(x=lam),
-        #data = sps.poisson.pmf(sr[1:].values, lam),
-        index = r_t_range,
-        columns = sr.index[1:])
+        # (2) Calculate each day's likelihood
+        likelihood = pd.DataFrame(data = sps.gamma(a=sr[1:] + 1., scale=1., loc=0.).pdf(x=lam),
+            #data = sps.poisson.pmf(sr[1:].values, lam),
+            index = r_t_range,
+            columns = sr.index[1:])
+        likelihoods += likelihood * serial_interval_density
+        serial_interval_cumdensity += serial_interval_density
+
+    likelihoods /= serial_interval_cumdensity
 
     #nStd = 3.;
     #for i in range(1, L):
@@ -612,6 +622,10 @@ def posteriors_get_max_point(posteriors):
         max_post_m1 = posterior.iloc[max_index - 1]
         max_rt_p1 = indexes[max_index + 1]
         max_post_p1 = posterior.iloc[max_index + 1]
+
+        if max_index - 2 < 0 or max_index + 2 >= len(indexes):
+            max_rts[t] = max_rt
+            continue
 
         if max_post_m1 < max_post_p1: # true maximum is between max_rt and max_rt_p1
             max_rt_p2 = indexes[max_index + 2]
