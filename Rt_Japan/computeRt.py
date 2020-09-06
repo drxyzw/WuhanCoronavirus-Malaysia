@@ -75,17 +75,17 @@ checkAllDiffPositive(statesOnset)
 checkAllDiffPositive(statesOnset_dom)
 
 p_EPS = 0.001
-#p_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
+#p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
 P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
-p_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
-p_delay = p_comfirmed_delay_cum[1:] - p_comfirmed_delay_cum[:-1]
-p_delay = np.insert(p_delay, 0, p_EPS)
+p_onset_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
+p_onset_comfirmed_delay = p_onset_comfirmed_delay_cum[1:] - p_onset_comfirmed_delay_cum[:-1]
+p_onset_comfirmed_delay = np.insert(p_onset_comfirmed_delay, 0, p_EPS)
 
-P_INFECTION_DELAY_T = np.linspace(0, 30, 31)
-p_infection_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_DELAY_T - 0.5)
-p_infection_delay = p_infection_delay_cum[1:] - p_infection_delay_cum[:-1]
-p_infection_delay = np.insert(p_infection_delay, 0, p_EPS)
-p_infection_confirm_delay = np.convolve(p_delay, p_infection_delay)
+P_INFECTION_ONSET_DELAY_T = np.linspace(0, 30, 31)
+p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T - 0.5)
+p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
+p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
+p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
 
 def backprojNP(confirmed, p_delay, addingExtraRows=False):
 
@@ -162,7 +162,7 @@ def backprojNP(confirmed, p_delay, addingExtraRows=False):
     else:
         return pd.Series(onsetEMS[:-nExtraDays], index=index[:-nExtraDays], name=confirmed.name)
 
-def confirmed_to_onset(confirmed, p_delay, backProjection = True):
+def confirmed_to_onset(confirmed, p_onset_comfirmed_delay, backProjection = True):
     if revert_to_confirmed_base:
         return confirmed
     else:
@@ -170,12 +170,12 @@ def confirmed_to_onset(confirmed, p_delay, backProjection = True):
         
         # backprojNP
         if backProjection:
-            # in case of back projection, p_delay means onset to confirmed
-            onset = backprojNP(confirmed, p_delay, True)
+            # in case of back projection, p_onset_comfirmed_delay means onset to confirmed
+            onset = backprojNP(confirmed, p_onset_comfirmed_delay, True)
         else:
-            # when no back projection, p_delay means confirmed to onset
+            # when no back projection, p_onset_comfirmed_delay means confirmed to onset
             # Reverse cases so that we convolve into the past
-            convolved = np.convolve(confirmed[::-1].values, p_delay)
+            convolved = np.convolve(confirmed[::-1].values, p_onset_comfirmed_delay)
             # Calculate the new date range and index
             if confirmed.index.name == 'date':
                 end_date = confirmed.index[-1]
@@ -192,7 +192,7 @@ def confirmed_to_onset(confirmed, p_delay, backProjection = True):
         
         return onset
 
-def onset_to_infection(onset, p_infection_delay, backProjection = True):
+def onset_to_infection(onset, p_infection_onset_delay, backProjection = True):
     if revert_to_confirmed_base:
         return onset
     else:
@@ -200,11 +200,11 @@ def onset_to_infection(onset, p_infection_delay, backProjection = True):
         
         # backprojNP
         if backProjection:
-            # in case of back projection, p_delay means onset to confirmed
-            onset = backprojNP(onset, p_infection_delay, True)
+            # in case of back projection, p_infection_onset_delay means onset to confirmed
+            onset = backprojNP(onset, p_infection_onset_delay, True)
         else:
             # Reverse cases so that we convolve into the past
-            convolved = np.convolve(onset[::-1].values, p_infection_delay)
+            convolved = np.convolve(onset[::-1].values, p_infection_onset_delay)
         
             # Calculate the new date range and index
             if onset.index.name == 'date':
@@ -223,11 +223,11 @@ def onset_to_infection(onset, p_infection_delay, backProjection = True):
         return onset
 
 
-def adjust_onset_for_right_censorship(onset, p_delay):
+def adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay):
     if revert_to_confirmed_base:
         return onset, 0
     else:
-        cumulative_p_delay = p_delay.cumsum()
+        cumulative_p_delay = p_onset_comfirmed_delay.cumsum()
         
         # Calculate the additional ones needed so shapes match
         ones_needed = len(onset) - len(cumulative_p_delay)
@@ -245,11 +245,11 @@ def adjust_onset_for_right_censorship(onset, p_delay):
         
         return adjusted, cumulative_p_delay
 
-def adjust_infection_for_right_censorship(infection, p_delay):
+def adjust_infection_for_right_censorship(infection, p_infection_onset_delay):
     if revert_to_confirmed_base:
         return onset, 0
     else:
-        cumulative_p_delay = p_delay.cumsum()
+        cumulative_p_delay = p_infection_onset_delay.cumsum()
         
         # Calculate the additional ones needed so shapes match
         ones_needed = len(infection) - len(cumulative_p_delay)
@@ -267,7 +267,7 @@ def adjust_infection_for_right_censorship(infection, p_delay):
         
         # not doing right-side adjustment now
         return infection, cumulative_p_delay
-        #return adjusted, cumulative_p_infection_delay
+        #return adjusted, cumulative_p_infection_onset_delay
 
 def prepare_cases_old(new_cases, cutoff=25):
     #new_cases = cases.diff()
@@ -389,21 +389,6 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
             #data = sps.poisson.pmf(sr[1:].values, lam),
             index = r_t_range,
             columns = sr.index[1:])
- 
-    #nStd = 3.;
-    #for i in range(1, L):
-    #    sr0 = sr[1:][-i]
-    #    onset_range = np.linspace(max(0.0, sr0 - nStd*stds[i-1]), sr0 + nStd*stds[i-1], 30)
-    #    likelihoods_to_be_integrated = pd.DataFrame(
-    #        data = sps.gamma(a=onset_range+1., scale=1., loc=0.).pdf(x=lam[:,-i][:,None]),
-    #        index = r_t_range,
-    #        columns = onset_range)
-    #    normal_dist = sps.norm(loc=sr0,
-    #                          scale=stds[i-1]
-    #                         ).pdf(onset_range[:, None]) 
-    #    likelihood_i = likelihoods_to_be_integrated @ normal_dist
-    #    likelihoods[state_name].iloc[:-i] = likelihood_i
-
 
     # (3) Create the Gaussian Matrix
     process_matrix = sps.norm(loc=r_t_range,
@@ -430,7 +415,8 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
     # of the data for maximum likelihood calculation.
     log_likelihood = 0.0
 
-    if expectSerialIntervalOverLikelihood:
+    makePosterior = True
+    if makePosterior:
         # (5) Iteratively apply Bayes' rule
         for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
 
@@ -614,39 +600,40 @@ for state_name, cases in states_to_process.groupby(level='state'):
 
     print(state_name)
     #cases = cases.diff().dropna()
-    onsetFromConfirmed = confirmed_to_onset(cases, p_delay)
+    onsetFromConfirmed = confirmed_to_onset(cases, p_onset_comfirmed_delay)
     onset = statesOnset.filter(like=state_name, axis=0)
     onsetOriginal = onset
     onset = onset + onsetFromConfirmed
     onset = onset.dropna()
-#    adjustedOnset, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_delay)
+#    adjustedOnset, cumulative_p_delay = adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay)
     adjustedOnset = onset
-    infected = onset_to_infection(adjustedOnset, p_infection_delay)
+    infected = onset_to_infection(adjustedOnset, p_infection_onset_delay)
     #adjusted = infected
-    adjusted, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected, p_infection_confirm_delay)
+    adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected, p_infection_confirm_delay)
 
     onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
     onsetOriginal_dom = onset_dom
     onsetFromConfirmed_dom = confirmed_to_onset(
-        statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_delay)
+        statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay)
     #onset_dom = onset_dom + onsetFromConfirmed_dom
     onset_dom = onset_dom + onsetFromConfirmed_dom
     onset_dom = onset_dom.dropna()
     adjustedOnset_dom = onset_dom
     #adjustedOnset_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onset_dom, p_infection_confirm_delay)
-    infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_delay)
+    infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_onset_delay)
     #adjusted_dom = infected_dom
-    adjusted_dom, cumulative_p_infection_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_confirm_delay)
+    adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_confirm_delay)
 
-    onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
-    onset.to_csv(state_name + "_onset.csv")
-    infected.to_csv(state_name + "_infected.csv")
-    adjusted.to_csv(state_name + "_adjusted.csv")
-    onsetOriginal_dom.to_csv(state_name + "_onsetOriginal_dom.csv")
-    onsetFromConfirmed_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
-    onset_dom.to_csv(state_name + "_onset_dom.csv")
-    infected_dom.to_csv(state_name + "_infected_dom.csv")
-    adjusted_dom.to_csv(state_name + "_adjusted_dom.csv")
+    #onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
+    #onset.to_csv(state_name + "_onset.csv")
+    #infected.to_csv(state_name + "_infected.csv")
+    #adjusted.to_csv(state_name + "_adjusted.csv")
+    #onsetOriginal_dom.to_csv(state_name + "_onsetOriginal_dom.csv")
+    #onsetFromConfirmed_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
+    #onset_dom.to_csv(state_name + "_onset_dom.csv")
+    #infected_dom.to_csv(state_name + "_infected_dom.csv")
+    #adjusted_dom.to_csv(state_name + "_adjusted_dom.csv")
+
     #if revert_to_confirmed_base:
     #    original, trimmed = prepare_cases_old(adjusted, cutoff=10)
     #else:
@@ -678,9 +665,9 @@ for state_name, cases in states_to_process.groupby(level='state'):
     # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute recent onset cases
     # t: target date
     # T: latest date
-    # L: delay limit, min(L; cumulative(p_delay(0 to L)) > threshould)
+    # L: delay limit, min(L; cumulative(p_infection_onset_delay(0 to L)) > threshould)
     P_DELAY_THRESHOLD = 0.99
-    L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
+    L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD)
     no_need_adjust = adjusted[:-L].values
     stdCases = []
     if len(no_need_adjust) >= L:
@@ -780,7 +767,7 @@ for state_name, result in results.items():
     #stds_future_rt = result['std_future_rt']
 
     # simulate Rt with bump on future confirmed case
-    L = np.argmax(np.cumsum(p_delay) > P_DELAY_THRESHOLD)
+    L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD)
     most_likely_bumpeds = []
     adjusted0 = adjustedCases[state_name]
     # if series is not long enough to compute stdCases (thus Null),
@@ -792,11 +779,11 @@ for state_name, result in results.items():
     if 1 == 2:
         bump_size = max(stdCases)
         for d in range(1, L):
-            if len(adjusted0) - len(p_delay) + d > 0:
-                p_delay_values = np.concatenate((p_delay.values[d:], np.zeros(len(adjusted0) - len  (p_delay) + d)))
+            if len(adjusted0) - len(p_infection_onset_delay) + d > 0:
+                p_delay_values = np.concatenate((p_infection_onset_delay.values[d:], np.zeros(len(adjusted0) - len  (p_infection_onset_delay) + d)))
             else:
-                p_delay_values = np.resize(p_delay.values[d:], (1, len(adjusted0)))[0]
-            bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of    d-day later
+                p_delay_values = np.resize(p_infection_onset_delay.values[d:], (1, len(adjusted0)))[0]
+            bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
             bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, sigma=sigma)
             most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
             most_likely_change = (most_likely_bumped - most_likely) / bump_size

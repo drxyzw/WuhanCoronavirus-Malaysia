@@ -60,7 +60,7 @@ for date in (startDate + timedelta(i) for i in range(n)):
     total.append(total_i)
     imported.append(imported_i)
     domestic.append(domestic_i)
-# save confirmed data
+# save confirmed only data
 state = len(dates) * ["Japan"]
 dfIndex = pd.DataFrame({'state': state, 'date': dates})
 dfForRt_dom = pd.DataFrame(index = pd.MultiIndex.from_frame(dfIndex), data = {'cases': domestic})
