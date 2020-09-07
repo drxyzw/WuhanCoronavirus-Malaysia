@@ -84,7 +84,7 @@ p_onset_comfirmed_delay = p_onset_comfirmed_delay_cum[1:] - p_onset_comfirmed_de
 p_onset_comfirmed_delay = np.insert(p_onset_comfirmed_delay, 0, p_EPS)
 
 P_INFECTION_ONSET_DELAY_T = np.linspace(0, 30, 31)
-p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T - 0.5)
+p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T)
 p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
 p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
 p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
