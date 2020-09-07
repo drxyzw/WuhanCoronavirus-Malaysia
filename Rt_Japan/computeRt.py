@@ -13,13 +13,6 @@ from scipy.special import factorial
 import math
 import scipy.special as spsp
 
-#from matplotlib import pyplot as plt
-#from matplotlib.colors import ListedColormap
-from scipy.interpolate import interp1d
-#from matplotlib.dates import date2num
-#import matplotlib.dates as mdates
-#import matplotlib.ticker as ticker
-
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -56,9 +49,14 @@ statesOnset_dom = pd.read_csv(urlOnset_dom,
                      index_col=['state', 'date'],
                      squeeze=True).sort_index()
 
+# Configuration
+obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
 revert_to_confirmed_base = False
 rightCensorshipByDelayFunctionDevision = False
-obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
+singleTau = False
+sumStyle = "Nishiura" # "Exponential", "K-Sys"
+includePosterior = True
+
 
 # Ensure all case diffs are greater than zero
 def checkAllDiffPositive(dataToCheck):
@@ -300,26 +298,15 @@ def prepare_cases_old(new_cases, cutoff=25):
 
 def prepare_cases(new_cases, cutoff=25):
 
-    #new_cases = cases.diff()
-    #idx_start = np.searchsorted(new_cases, cutoff)
-    #new_cases = new_cases.iloc[idx_start:]
-    #truncated = new_cases.loc[new_cases.index]
     idx_start = np.argmax(new_cases >= cutoff)
     if idx_start == 0 and new_cases[0] < cutoff:
         return []
-#    idx_start = np.searchsorted(new_cases, cutoff)
     new_cases = new_cases.iloc[idx_start:]
     truncated = new_cases.loc[new_cases.index]
     if truncated.index.names == [None]: # only if time series has single index
         truncated.index.rename('date', inplace = True)
 
     return truncated
-
-#if revert_to_confirmed_base:
-#    original, adjusted = prepare_cases_old(adjusted, cutoff=10)
-#else:
-#    adjusted = prepare_cases(adjusted, cutoff=2)
-
 
 
 # We create an array for every possible value of Rt
@@ -333,75 +320,40 @@ r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 
 #Function for Calculating the Posteriors
 def get_posteriors(sr, sr_dom, sigma=0.15):
-    ## (0) Round adjusted cases for poisson distribution
-    #sr = sr.round()
-
-    expectSerialIntervalOverLikelihood = False
-
     likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
     serial_interval_cumdensity = 0.
     prevTau = 0.
-    if expectSerialIntervalOverLikelihood:
-        taus = np.linspace(0.1, 10.0, 20)
-        #taus = [7.]
-        for tau in taus:
-            #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5,
-            #x=tau)
-            serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
-            GAMMA = 1. / tau
-
-            # (1) Calculate Lambda
-            lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
-        
-            # (2) Calculate each day's likelihood
-            likelihood = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
-                #data = sps.poisson.pmf(sr[1:].values, lam),
-                index = r_t_range,
-                columns = sr.index[1:])
-            likelihoods += likelihood * serial_interval_density
-            serial_interval_cumdensity += serial_interval_density
-            prevTau = tau
-
-        likelihoods /= serial_interval_cumdensity
+    lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
+    if singleTau:
+        taus = [7.]
     else:
-        lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
         taus = np.linspace(0., 60.0, 61)
-        #taus = [7.]
-        sameAsNishiuraSum = True
 
-        if sameAsNishiuraSum:
-            for i in range(1, min((int)(taus[-1])+1, len(sr))):
-                tau = taus[i]
-                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
-                #GAMMA = 1./tau
-    
-                # (1) Calculate Lambda
-                paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
-                lam += r_t_range[:, None] * paddedSr * serial_interval_density
-                serial_interval_cumdensity += serial_interval_density
-                prevTau = tau
+    for i in range(1, min((int)(taus[-1])+1, len(sr))):
+        tau = taus[i]
+        #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
+        serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
 
-            lam /= serial_interval_cumdensity
-        else:
-            for i in range(1, min((int)(taus[-1])+1, len(sr))):
-                tau = taus[i]
-                #serial_interval_density = sps.gamma.pdf(a = 6.0, scale = 1./1.5, x=tau)
-                serial_interval_density = sps.weibull_min.cdf(c=2.305, scale=5.452, x=tau) - sps.weibull_min.cdf(c=2.305, scale=5.452, x=prevTau)
-                #GAMMA = 1./tau
-    
-                # (1) Calculate Lambda
-                paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
-                lam += paddedSr * np.exp(r_t_range[:, None] - 1.) * serial_interval_density
-                serial_interval_cumdensity += serial_interval_density
-                prevTau = tau
+        # (1) Calculate Lambda
+        if sumStyle == "Nishiura":
+            paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
+            lam += r_t_range[:, None] * paddedSr * serial_interval_density
+        elif sumStyle == "Exponential":
+            paddedSr = np.pad(sr[:-i].values, (i - 1, 0), 'constant', constant_values = (0., 0.))
+            lam += paddedSr * np.exp(r_t_range[:, None] - 1.) * serial_interval_density
+        elif sumStyle == "K-Sys":
+            GAMMA = 1. / tau
+            lam = sr[:-1].values * np.exp(GAMMA * (r_t_range[:, None] - 1.))
 
-            lam /= serial_interval_cumdensity
+        serial_interval_cumdensity += serial_interval_density
+        prevTau = tau
+    lam /= serial_interval_cumdensity
 
-        # (2) Calculate each day's likelihood
-        likelihoods = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
-            #data = sps.poisson.pmf(sr[1:].values, lam),
-            index = r_t_range,
-            columns = sr.index[1:])
+    # (2) Calculate each day's likelihood
+    likelihoods = pd.DataFrame(data = sps.gamma(a=sr_dom[1:] + 1., scale=1., loc=0.).pdf(x=lam),
+        #data = sps.poisson.pmf(sr[1:].values, lam),
+        index = r_t_range,
+        columns = sr.index[1:])
 
     # (3) Create the Gaussian Matrix
     process_matrix = sps.norm(loc=r_t_range,
@@ -428,8 +380,7 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
     # of the data for maximum likelihood calculation.
     log_likelihood = 0.0
 
-    makePosterior = True
-    if makePosterior:
+    if includePosterior:
         # (5) Iteratively apply Bayes' rule
         for previous_day, current_day in zip(sr.index[:-1], sr.index[1:]):
 
@@ -463,21 +414,6 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
 
     return posteriors, log_likelihood
 
-## Note that we're fixing sigma to a value just for the example
-#posteriors, log_likelihood = get_posteriors(adjusted, sigma=.25)
-
-
-##Result
-#ax = posteriors.plot(title=f'{state_name} - Daily Posterior for $R_t$',
-#           legend=False, 
-#           lw=1,
-#           c='k',
-#           alpha=.3,
-#           xlim=(0.4,6))
-
-#ax.set_xlabel('$R_t$');
-##plt.show()
-
 def highest_density_interval(pmf, p=.9, debug=False):
     # If we pass a DataFrame, just call this recursively on the columns
     if(isinstance(pmf, pd.DataFrame)):
@@ -508,94 +444,6 @@ def highest_density_interval(pmf, p=.9, debug=False):
                             f'High_{p*100:.0f}'])
 
 
-## Note that this takes a while to execute - it's not the most efficient algorithm
-#hdis = highest_density_interval(posteriors, p=.9)
-
-#most_likely = posteriors.idxmax().rename('ML')
-
-## Look into why you shift -1
-#result = pd.concat([most_likely, hdis], axis=1)
-
-#result.tail()
-
-#def plot_rt(result, ax, state_name):
-    
-#    ax.set_title(f"{state_name}")
-    
-#    # Colors
-#    ABOVE = [1,0,0]
-#    MIDDLE = [1,1,1]
-#    BELOW = [0,0,0]
-#    cmap = ListedColormap(np.r_[
-#        np.linspace(BELOW,MIDDLE,25),
-#        np.linspace(MIDDLE,ABOVE,25)
-#    ])
-#    color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
-    
-#    index = result['ML'].index.get_level_values('date')
-#    values = result['ML'].values
-    
-#    # Plot dots and line
-#    ax.plot(index, values, c='k', zorder=1, alpha=.25)
-#    ax.scatter(index,
-#               values,
-#               s=40,
-#               lw=.5,
-#               c=cmap(color_mapped(values)),
-#               edgecolors='k', zorder=2)
-    
-#    # Aesthetically, extrapolate credible interval by 1 day either side
-#    lowfn = interp1d(date2num(index),
-#                     result['Low_90'].values,
-#                     bounds_error=False,
-#                     fill_value='extrapolate')
-    
-#    highfn = interp1d(date2num(index),
-#                      result['High_90'].values,
-#                      bounds_error=False,
-#                      fill_value='extrapolate')
-    
-#    extended = pd.date_range(start=pd.Timestamp('2020-03-01'),
-#                             end=index[-1]+pd.Timedelta(days=1))
-    
-#    ax.fill_between(extended,
-#                    lowfn(date2num(extended)),
-#                    highfn(date2num(extended)),
-#                    color='k',
-#                    alpha=.1,
-#                    lw=0,
-#                    zorder=3)
-
-#    ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
-    
-#    # Formatting
-#    ax.xaxis.set_major_locator(mdates.MonthLocator())
-#    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-#    ax.xaxis.set_minor_locator(mdates.DayLocator())
-    
-#    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-#    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-#    ax.yaxis.tick_right()
-#    ax.spines['left'].set_visible(False)
-#    ax.spines['bottom'].set_visible(False)
-#    ax.spines['right'].set_visible(False)
-#    ax.margins(0)
-#    ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-#    ax.margins(0)
-#    ax.set_ylim(0.0, 5.0)
-#    ax.set_xlim(pd.Timestamp('2020-02-01'), result.index.get_level_values('date')[-1]+pd.Timedelta(days=1))
-#    fig.set_facecolor('w')
-
-    
-#fig, ax = plt.subplots(figsize=(600/72,400/72))
-
-#plot_rt(result, ax, state_name)
-#ax.set_title(f'Real-time $R_t$ for {state_name}')
-#ax.xaxis.set_major_locator(mdates.WeekdayLocator())
-#ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-
-##plt.show()
-
 #Choose an optimum sigma
 sigmas = np.linspace(0.01, 1.0, 20)
 #sigmas = []
@@ -614,7 +462,6 @@ for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby(level='
     #    continue
 
     print(state_name)
-    #cases = cases.diff().dropna()
     onset = statesOnset.filter(like=state_name, axis=0)
     onsetOriginal = onset
     onsetFromConfirmedOnly = confirmed_to_onset(confirmedOnly, p_onset_comfirmed_delay)
@@ -659,20 +506,6 @@ for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby(level='
     #infected_dom.to_csv(state_name + "_infected_dom.csv")
     #adjusted_dom.to_csv(state_name + "_adjusted_dom.csv")
 
-    #if revert_to_confirmed_base:
-    #    original, trimmed = prepare_cases_old(adjusted, cutoff=10)
-    #else:
-    #    trimmed = prepare_cases(adjusted, cutoff=10)
-    
-    #if len(trimmed) == 0:
-    #    if revert_to_confirmed_base:
-    #        original, trimmed = prepare_cases_old(adjusted, cutoff=2)
-    #    else:
-    #        trimmed = prepare_cases(adjusted, cutoff=2)
-    #    if len(trimmed) == 0:
-    #        print(state_name + ": too few cases for statistics")
-    #        continue
-
     if revert_to_confirmed_base:
         original, trimmed = prepare_cases_old(adjusted, cutoff=2)
         trimmed_dom = adjusted_dom[trimmed.index]
@@ -716,13 +549,11 @@ for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby(level='
     
     for sigma in sigmas:
         posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
-        #posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
         result['posteriors'].append(posteriors)
         result['log_likelihoods'].append(log_likelihood)
     
     # Store all results keyed off of state name
     results[state_name] = result
-    #clear_output(wait=True)
 
 print('Done.')
 
@@ -740,12 +571,6 @@ max_likelihood_index = total_log_likelihoods.argmax()
 # Select the value that has the highest log likelihood
 sigma = sigmas[max_likelihood_index]
 print("optimum sigma: " + str(sigma))
-
-## Plot it
-#fig, ax = plt.subplots()
-#ax.set_title(f"Maximum Likelihood value for $\sigma$ = {sigma:.2f}");
-#ax.plot(sigmas, total_log_likelihoods)
-#ax.axvline(sigma, color='k', linestyle=":")
 
 def posteriors_get_max_point(posteriors):
     max_rts = posteriors.idxmax().rename('ML')
@@ -810,7 +635,6 @@ for state_name, result in results.items():
     # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is already large
     stdCases = result['std_future_cases']
     if stdCases:
-    #if 1 == 2:
         bump_size = max(stdCases)
         for d in range(1, L):
             if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
@@ -872,6 +696,4 @@ print('Done final result.')
 for state_name, final_result in final_results.groupby("state"):
     final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
 print('Saved final result.')
-
-
 
