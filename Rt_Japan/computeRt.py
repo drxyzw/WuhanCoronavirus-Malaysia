@@ -57,23 +57,6 @@ singleTau = False
 sumStyle = "Nishiura" # "Exponential", "K-Sys"
 includePosterior = True
 
-
-# Ensure all case diffs are greater than zero
-def checkAllDiffPositive(dataToCheck):
-    for state, grp in dataToCheck.groupby('state'):
-        dataToCheckValues = dataToCheck[state].dropna()
-        is_positive = dataToCheckValues.ge(0)
-        try:
-            assert is_positive.all()
-        except AssertionError:
-            print(f"Warning: {state} has date with negative case counts")
-            print(dataToCheckValues[~is_positive])
-
-checkAllDiffPositive(statesConfirmedOnly)
-checkAllDiffPositive(statesConfirmedOnly_dom)
-checkAllDiffPositive(statesOnset)
-checkAllDiffPositive(statesOnset_dom)
-
 p_EPS = 0.001
 #p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
 P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
@@ -86,6 +69,23 @@ p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cd
 p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
 p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
 p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
+
+
+checkAllDiffPositive(statesConfirmedOnly)
+checkAllDiffPositive(statesConfirmedOnly_dom)
+checkAllDiffPositive(statesOnset)
+checkAllDiffPositive(statesOnset_dom)
+
+# Ensure all case diffs are greater than zero
+def checkAllDiffPositive(dataToCheck):
+    for state, grp in dataToCheck.groupby('state'):
+        dataToCheckValues = dataToCheck[state].dropna()
+        is_positive = dataToCheckValues.ge(0)
+        try:
+            assert is_positive.all()
+        except AssertionError:
+            print(f"Warning: {state} has date with negative case counts")
+            print(dataToCheckValues[~is_positive])
 
 def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue=True):
 
