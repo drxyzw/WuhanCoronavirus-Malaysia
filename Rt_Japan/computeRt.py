@@ -114,7 +114,7 @@ def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue
     else:
         return pd.Series(onsetEMS[:-nExtraDays], index=index[:-nExtraDays], name=confirmed.name)
 
-def confirmed_to_onset(confirmed, p_onset_comfirmed_delay, backProjection = True):
+def confirmed_to_onset(confirmed, p_onset_comfirmed_delay, revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision, backProjection):
     if revert_to_confirmed_base:
         return confirmed
     else:
@@ -144,7 +144,7 @@ def confirmed_to_onset(confirmed, p_onset_comfirmed_delay, backProjection = True
         
         return onset
 
-def onset_to_infection(onset, p_infection_onset_delay, backProjection = True):
+def onset_to_infection(onset, p_infection_onset_delay, revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision, backProjection):
     if revert_to_confirmed_base:
         return onset
     else:
@@ -260,7 +260,7 @@ def prepare_cases(new_cases, cutoff=25):
 
 
 #Function for Calculating the Posteriors
-def get_posteriors(sr, sr_dom, sigma=0.15):
+def get_posteriors(sr, sr_dom, singleTau, sumStyle, includePosterior, sigma=0.15):
     likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
     serial_interval_cumdensity = 0.
     prevTau = 0.
@@ -428,13 +428,19 @@ def posteriors_get_max_point(posteriors):
         max_rts[t] = rt
     return max_rts
 
-def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False):
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
     checkAllDiffPositive(statesOnset)
     checkAllDiffPositive(statesOnset_dom)
     checkAllDiffPositive(statesConfirmedOnly)
     checkAllDiffPositive(statesConfirmedOnly_dom)
     
-    targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    if obsDate == None:
+        lastDateOnsetUnix = statesOnset.index[-1][1].value / 10**9
+        lastDateOnsetUnix_dom = statesOnset_dom.index[-1][1].value / 10**9
+        lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
+        lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
+        obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
+    targets = statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
     results = {}
@@ -449,14 +455,14 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         print(state_name)
         onset = statesOnset.filter(like=state_name, axis=0)
         onsetOriginal = onset
-        onsetFromConfirmedOnly = confirmed_to_onset(confirmedOnly, p_onset_comfirmed_delay)
+        onsetFromConfirmedOnly = confirmed_to_onset(confirmed=confirmedOnly, p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly,  p_onset_comfirmed_delay)
         else:
             adjustedOnsetConfirmedOnly = onsetFromConfirmedOnly
         adjustedOnset = onset + adjustedOnsetConfirmedOnly
         adjustedOnset = adjustedOnset.dropna()
-        infected = onset_to_infection(adjustedOnset, p_infection_onset_delay)
+        infected = onset_to_infection(onset=adjustedOnset, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay)
         else:
@@ -465,14 +471,14 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
         onsetOriginal_dom = onset_dom
         onsetFromConfirmedOnly_dom = confirmed_to_onset(
-            statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay)
+            confirmed=statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
         else:
             adjustedOnsetConfirmedOnly_dom = onsetFromConfirmedOnly_dom
         adjustedOnset_dom = onset_dom + adjustedOnsetConfirmedOnly_dom
         adjustedOnset_dom = adjustedOnset_dom.dropna()
-        infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_onset_delay)
+        infected_dom = onset_to_infection(onset=adjustedOnset_dom, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom,  p_infection_confirm_delay)
         else:
@@ -533,7 +539,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         result['log_likelihoods'] = []
         
         for sigma in sigmas:
-            posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
+            posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, singleTau=singleTau, sumStyle=sumStyle, includePosterior=includePosterior, sigma=sigma)
             result['posteriors'].append(posteriors)
             result['log_likelihoods'].append(log_likelihood)
         
@@ -587,7 +593,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                     p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
                 bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
                 bumpedAdjusted_dom = adjusted_dom0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day   later
-                bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom, sigma=sigma)
+                bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom, singleTau=singleTau, sumStyle=sumStyle, includePosterior=includePosterior, sigma=sigma)
                 most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
                 most_likely_change = (most_likely_bumped - most_likely) / bump_size
                 most_likely_bumpeds.append(most_likely_change)
@@ -640,59 +646,4 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     for state_name, final_result in final_results.groupby("state"):
         final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
     print('Saved final result.')
-
-FILTERED_REGION_CODES = ['']
-#FILTERED_REGION_CODES = ['Kedah']
-
-# Load case file
-urlConfirmedOnly = 'data/confirmedOnlyForRt.csv'
-statesConfirmedOnly = pd.read_csv(urlConfirmedOnly,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlConfirmedOnly_dom = 'data/confirmedOnlyForRt_dom.csv'
-statesConfirmedOnly_dom = pd.read_csv(urlConfirmedOnly_dom,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlOnset = 'data/onsetForRt.csv'
-statesOnset = pd.read_csv(urlOnset,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlOnset_dom = 'data/onsetForRt_dom.csv'
-statesOnset_dom = pd.read_csv(urlOnset_dom,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-# Configuration
-includePosterior = True
-sumStyle = "Nishiura" # "Exponential", "K-Sys"
-rightCensorshipByDelayFunctionDevision = False
-singleTau = False
-obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
-revert_to_confirmed_base = False
-
-p_EPS = 0.001
-#p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
-P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
-p_onset_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
-p_onset_comfirmed_delay = p_onset_comfirmed_delay_cum[1:] - p_onset_comfirmed_delay_cum[:-1]
-p_onset_comfirmed_delay = np.insert(p_onset_comfirmed_delay, 0, p_EPS)
-
-P_INFECTION_ONSET_DELAY_T = np.linspace(0, 30, 31)
-p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T)
-p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
-p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
-p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
-
-computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base)
 
