@@ -17,64 +17,14 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 
-FILTERED_REGION_CODES = ['']
-#FILTERED_REGION_CODES = ['Kedah']
+# We create an array for every possible value of Rt
+R_T_MAX = 12
+r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 
-# Load case file
-urlConfirmedOnly = 'data/confirmedOnlyForRt.csv'
-statesConfirmedOnly = pd.read_csv(urlConfirmedOnly,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlConfirmedOnly_dom = 'data/confirmedOnlyForRt_dom.csv'
-statesConfirmedOnly_dom = pd.read_csv(urlConfirmedOnly_dom,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlOnset = 'data/onsetForRt.csv'
-statesOnset = pd.read_csv(urlOnset,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-urlOnset_dom = 'data/onsetForRt_dom.csv'
-statesOnset_dom = pd.read_csv(urlOnset_dom,
-                     usecols=['date', 'state', 'cases'],
-                     parse_dates=['date'],
-                     index_col=['state', 'date'],
-                     squeeze=True).sort_index()
-
-# Configuration
-obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
-revert_to_confirmed_base = False
-rightCensorshipByDelayFunctionDevision = False
-singleTau = False
-sumStyle = "Nishiura" # "Exponential", "K-Sys"
-includePosterior = True
-
-p_EPS = 0.001
-#p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
-P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
-p_onset_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
-p_onset_comfirmed_delay = p_onset_comfirmed_delay_cum[1:] - p_onset_comfirmed_delay_cum[:-1]
-p_onset_comfirmed_delay = np.insert(p_onset_comfirmed_delay, 0, p_EPS)
-
-P_INFECTION_ONSET_DELAY_T = np.linspace(0, 30, 31)
-p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T)
-p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
-p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
-p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
-
-
-checkAllDiffPositive(statesConfirmedOnly)
-checkAllDiffPositive(statesConfirmedOnly_dom)
-checkAllDiffPositive(statesOnset)
-checkAllDiffPositive(statesOnset_dom)
+#Choose an optimum sigma
+sigmas = np.linspace(0.01, 1.0, 20)
+#sigmas = []
+#sigmas.append(3.0)
 
 # Ensure all case diffs are greater than zero
 def checkAllDiffPositive(dataToCheck):
@@ -309,15 +259,6 @@ def prepare_cases(new_cases, cutoff=25):
     return truncated
 
 
-# We create an array for every possible value of Rt
-R_T_MAX = 12
-r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
-
-# Gamma is 1/serial interval
-# https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
-# https://www.nejm.org/doi/full/10.1056/NEJMoa2001316
-#GAMMA = 1/7
-
 #Function for Calculating the Posteriors
 def get_posteriors(sr, sr_dom, sigma=0.15):
     likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
@@ -325,6 +266,9 @@ def get_posteriors(sr, sr_dom, sigma=0.15):
     prevTau = 0.
     lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
     if singleTau:
+        # Gamma is 1/serial interval
+        # https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
+        # https://www.nejm.org/doi/full/10.1056/NEJMoa2001316
         taus = [7.]
     else:
         taus = np.linspace(0., 60.0, 61)
@@ -443,135 +387,6 @@ def highest_density_interval(pmf, p=.9, debug=False):
                      index=[f'Low_{p*100:.0f}',
                             f'High_{p*100:.0f}'])
 
-
-#Choose an optimum sigma
-sigmas = np.linspace(0.01, 1.0, 20)
-#sigmas = []
-#sigmas.append(3.0)
-
-targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
-statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
-
-results = {}
-adjustedCases = {}
-adjustedCases_dom = {}
-
-for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby(level='state'):
-    #if state_name != 'Johor':
-    #if state_name != 'AK':
-    #    continue
-
-    print(state_name)
-    onset = statesOnset.filter(like=state_name, axis=0)
-    onsetOriginal = onset
-    onsetFromConfirmedOnly = confirmed_to_onset(confirmedOnly, p_onset_comfirmed_delay)
-    if rightCensorshipByDelayFunctionDevision:
-        adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly, p_onset_comfirmed_delay)
-    else:
-        adjustedOnsetConfirmedOnly = onsetFromConfirmedOnly
-    adjustedOnset = onset + adjustedOnsetConfirmedOnly
-    adjustedOnset = adjustedOnset.dropna()
-    infected = onset_to_infection(adjustedOnset, p_infection_onset_delay)
-    if rightCensorshipByDelayFunctionDevision:
-        adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected, p_infection_confirm_delay)
-    else:
-        adjusted = infected
-
-    onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
-    onsetOriginal_dom = onset_dom
-    onsetFromConfirmedOnly_dom = confirmed_to_onset(
-        statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay)
-    if rightCensorshipByDelayFunctionDevision:
-        adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
-    else:
-        adjustedOnsetConfirmedOnly_dom = onsetFromConfirmedOnly_dom
-    adjustedOnset_dom = onset_dom + adjustedOnsetConfirmedOnly_dom
-    adjustedOnset_dom = adjustedOnset_dom.dropna()
-    infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_onset_delay)
-    if rightCensorshipByDelayFunctionDevision:
-        adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom, p_infection_confirm_delay)
-    else:
-        adjusted_dom = infected_dom
-
-    #onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
-    #onset.to_csv(state_name + "_onset.csv")
-    #infected.to_csv(state_name + "_infected.csv")
-    #adjusted.to_csv(state_name + "_adjusted.csv")
-    #onsetOriginal_dom.to_csv(state_name + "_onsetOriginal_dom.csv")
-    #confirmedOnly.to_csv(state_name + "_confirmedOnly.csv")
-    #onsetFromConfirmedOnly.to_csv(state_name + "_onsetFromConfirmed.csv")
-    #adjustedOnsetConfirmedOnly.to_csv(state_name + "_adjustedOnsetConfirmedOnly.csv")
-    #onsetFromConfirmedOnly_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
-    #onset_dom.to_csv(state_name + "_onset_dom.csv")
-    #infected_dom.to_csv(state_name + "_infected_dom.csv")
-    #adjusted_dom.to_csv(state_name + "_adjusted_dom.csv")
-
-    if revert_to_confirmed_base:
-        original, trimmed = prepare_cases_old(adjusted, cutoff=2)
-        trimmed_dom = adjusted_dom[trimmed.index]
-    else:
-        trimmed = prepare_cases(adjusted, cutoff=2)
-        trimmed_dom = adjusted_dom[trimmed.index]
-    if len(trimmed) == 0 or len(trimmed_dom) == 0:
-        print(state_name + ": too few cases for statistics")
-        continue
-    adjusted = trimmed
-    adjustedCases[state_name] = adjusted
-    adjusted_dom = trimmed_dom
-    adjustedCases_dom[state_name] = adjusted_dom
-
-    # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute recent onset cases
-    # t: target date
-    # T: latest date
-    # L: delay limit, min(L; cumulative(p_infection_onset_delay(0 to L)) > threshould)
-    P_DELAY_THRESHOLD = 0.99
-    lastDate = adjusted_dom.index[-1][1]
-    delayOffsetDays = (obsDate - lastDate).days
-    #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
-    L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) 
-    no_need_adjust = adjusted_dom[:-L].values
-    stdCases = []
-    if len(no_need_adjust) >= L:
-        for lag in range(1+delayOffsetDays, L):
-            stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
-
-    result = {}
-
-    # store std from uncertainty of future confirmed cases for later adjustment
-    result['std_future_cases'] = stdCases
-    #result['std_future_rt'] = stds_case_ratios
-
-    # Holds all posteriors with every given value of sigma
-    result['posteriors'] = []
-    
-    # Holds the log likelihood across all k for each value of sigma
-    result['log_likelihoods'] = []
-    
-    for sigma in sigmas:
-        posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
-        result['posteriors'].append(posteriors)
-        result['log_likelihoods'].append(log_likelihood)
-    
-    # Store all results keyed off of state name
-    results[state_name] = result
-
-print('Done.')
-
-# Each index of this array holds the total of the log likelihoods for
-# the corresponding index of the sigmas array.
-total_log_likelihoods = np.zeros_like(sigmas)
-
-# Loop through each state's results and add the log likelihoods to the running total.
-for state_name, result in results.items():
-    total_log_likelihoods += result['log_likelihoods']
-
-# Select the index with the largest log likelihood total
-max_likelihood_index = total_log_likelihoods.argmax()
-
-# Select the value that has the highest log likelihood
-sigma = sigmas[max_likelihood_index]
-print("optimum sigma: " + str(sigma))
-
 def posteriors_get_max_point(posteriors):
     max_rts = posteriors.idxmax().rename('ML')
     indexes = posteriors.index
@@ -613,87 +428,271 @@ def posteriors_get_max_point(posteriors):
         max_rts[t] = rt
     return max_rts
 
-# modify posteriors to include the uncertainty due to future confirmed cases
-for state_name, result in results.items():
-    posteriors = result['posteriors'][max_likelihood_index]
-    most_likely = posteriors_get_max_point(posteriors)
-    #stds_future_rt = result['std_future_rt']
-
-    # simulate Rt with bump on future confirmed case
-    most_likely_bumpeds = []
-    adjusted0 = adjustedCases[state_name]
-    adjusted_dom0 = adjustedCases_dom[state_name]
-
-    lastDate = max(adjusted0.index[-1][1], adjusted_dom0.index[-1][1])
-    delayOffsetDays = (obsDate - lastDate).days
-    p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
-    L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
-
-    # if series is not long enough to compute stdCases (thus Null),
-    # the series is too short and not statistically meaningful to calculate stdCases
-    # So we do not make adjustment for uncertaity of future cases modulation
-    # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is already large
-    stdCases = result['std_future_cases']
-    if stdCases:
-        bump_size = max(stdCases)
-        for d in range(1, L):
-            if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
-                p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len(p_infection_onset_delay_offsetted) + d)))
-            else:
-                p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
-            bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
-            bumpedAdjusted_dom = adjusted_dom0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
-            bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom, sigma=sigma)
-            most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
-            most_likely_change = (most_likely_bumped - most_likely) / bump_size
-            most_likely_bumpeds.append(most_likely_change)
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False):
+    checkAllDiffPositive(statesOnset)
+    checkAllDiffPositive(statesOnset_dom)
+    checkAllDiffPositive(statesConfirmedOnly)
+    checkAllDiffPositive(statesConfirmedOnly_dom)
     
-        stdRts = 0. * most_likely
-        for d in range(1, L):
-            stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
-        stdRts = np.sqrt(stdRts)[::-1]
-    #    stdRts.to_csv("stdRts.csv")
+    targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
-        # modify posteriors
-        for d in range(len(stdCases)):
-            if stdRts[d] < 0.001:
-                continue
-            normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
-            normal_dist /= normal_dist.sum(axis=0)
-            normal_dist /= normal_dist.sum(axis=1)[:,None]
-            posterior_to_be_modified = posteriors.iloc[:,-d-1]
-            posterior_modified = posterior_to_be_modified @ normal_dist
-            posteriors.iloc[:,-d-1] = posterior_modified
+    results = {}
+    adjustedCases = {}
+    adjustedCases_dom = {}
     
-            #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name   [1].strftime('%Y-%m-%d') + ".csv"
-            #posterior_to_be_modified.to_csv(posteriorsfilename_before)
-            #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name    [1].strftime('%Y-%m-%d') + "_after.csv"
-            #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
-            #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime  ('%Y-%m-%d') + "_normal_dist.csv"
-            #np.savetxt(normalfilename, normal_dist, delimiter=",")
+    for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby(level='state'):
+        #if state_name != 'Johor':
+        #if state_name != 'AK':
+        #    continue
+    
+        print(state_name)
+        onset = statesOnset.filter(like=state_name, axis=0)
+        onsetOriginal = onset
+        onsetFromConfirmedOnly = confirmed_to_onset(confirmedOnly, p_onset_comfirmed_delay)
+        if rightCensorshipByDelayFunctionDevision:
+            adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly,  p_onset_comfirmed_delay)
+        else:
+            adjustedOnsetConfirmedOnly = onsetFromConfirmedOnly
+        adjustedOnset = onset + adjustedOnsetConfirmedOnly
+        adjustedOnset = adjustedOnset.dropna()
+        infected = onset_to_infection(adjustedOnset, p_infection_onset_delay)
+        if rightCensorshipByDelayFunctionDevision:
+            adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay)
+        else:
+            adjusted = infected
+    
+        onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
+        onsetOriginal_dom = onset_dom
+        onsetFromConfirmedOnly_dom = confirmed_to_onset(
+            statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay)
+        if rightCensorshipByDelayFunctionDevision:
+            adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
+        else:
+            adjustedOnsetConfirmedOnly_dom = onsetFromConfirmedOnly_dom
+        adjustedOnset_dom = onset_dom + adjustedOnsetConfirmedOnly_dom
+        adjustedOnset_dom = adjustedOnset_dom.dropna()
+        infected_dom = onset_to_infection(adjustedOnset_dom, p_infection_onset_delay)
+        if rightCensorshipByDelayFunctionDevision:
+            adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom,  p_infection_confirm_delay)
+        else:
+            adjusted_dom = infected_dom
+    
+        #onsetOriginal.to_csv(state_name + "_onsetOriginal.csv")
+        #onset.to_csv(state_name + "_onset.csv")
+        #infected.to_csv(state_name + "_infected.csv")
+        #adjusted.to_csv(state_name + "_adjusted.csv")
+        #onsetOriginal_dom.to_csv(state_name + "_onsetOriginal_dom.csv")
+        #confirmedOnly.to_csv(state_name + "_confirmedOnly.csv")
+        #onsetFromConfirmedOnly.to_csv(state_name + "_onsetFromConfirmed.csv")
+        #adjustedOnsetConfirmedOnly.to_csv(state_name + "_adjustedOnsetConfirmedOnly.csv")
+        #onsetFromConfirmedOnly_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
+        #onset_dom.to_csv(state_name + "_onset_dom.csv")
+        #infected_dom.to_csv(state_name + "_infected_dom.csv")
+        #adjusted_dom.to_csv(state_name + "_adjusted_dom.csv")
+    
+        if revert_to_confirmed_base:
+            original, trimmed = prepare_cases_old(adjusted, cutoff=2)
+            trimmed_dom = adjusted_dom[trimmed.index]
+        else:
+            trimmed = prepare_cases(adjusted, cutoff=2)
+            trimmed_dom = adjusted_dom[trimmed.index]
+        if len(trimmed) == 0 or len(trimmed_dom) == 0:
+            print(state_name + ": too few cases for statistics")
+            continue
+        adjusted = trimmed
+        adjustedCases[state_name] = adjusted
+        adjusted_dom = trimmed_dom
+        adjustedCases_dom[state_name] = adjusted_dom
+    
+        # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute   recent onset cases
+        # t: target date
+        # T: latest date
+        # L: delay limit, min(L; cumulative(p_infection_onset_delay(0 to L)) > threshould)
+        P_DELAY_THRESHOLD = 0.99
+        lastDate = adjusted_dom.index[-1][1]
+        delayOffsetDays = (obsDate - lastDate).days
+        #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
+        L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) 
+        no_need_adjust = adjusted_dom[:-L].values
+        stdCases = []
+        if len(no_need_adjust) >= L:
+            for lag in range(1+delayOffsetDays, L):
+                stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
+    
+        result = {}
+    
+        # store std from uncertainty of future confirmed cases for later adjustment
+        result['std_future_cases'] = stdCases
+        #result['std_future_rt'] = stds_case_ratios
+    
+        # Holds all posteriors with every given value of sigma
+        result['posteriors'] = []
+        
+        # Holds the log likelihood across all k for each value of sigma
+        result['log_likelihoods'] = []
+        
+        for sigma in sigmas:
+            posteriors, log_likelihood = get_posteriors(adjusted, adjusted_dom, sigma=sigma)
+            result['posteriors'].append(posteriors)
+            result['log_likelihoods'].append(log_likelihood)
+        
+        # Store all results keyed off of state name
+        results[state_name] = result
+    
+    print('Done.')
+    
+    # Each index of this array holds the total of the log likelihoods for
+    # the corresponding index of the sigmas array.
+    total_log_likelihoods = np.zeros_like(sigmas)
+    
+    # Loop through each state's results and add the log likelihoods to the running total.
+    for state_name, result in results.items():
+        total_log_likelihoods += result['log_likelihoods']
+    
+    # Select the index with the largest log likelihood total
+    max_likelihood_index = total_log_likelihoods.argmax()
+    
+    # Select the value that has the highest log likelihood
+    sigma = sigmas[max_likelihood_index]
+    print("optimum sigma: " + str(sigma))
+    
+    # modify posteriors to include the uncertainty due to future confirmed cases
+    for state_name, result in results.items():
+        posteriors = result['posteriors'][max_likelihood_index]
+        most_likely = posteriors_get_max_point(posteriors)
+        #stds_future_rt = result['std_future_rt']
+    
+        # simulate Rt with bump on future confirmed case
+        most_likely_bumpeds = []
+        adjusted0 = adjustedCases[state_name]
+        adjusted_dom0 = adjustedCases_dom[state_name]
+    
+        lastDate = max(adjusted0.index[-1][1], adjusted_dom0.index[-1][1])
+        delayOffsetDays = (obsDate - lastDate).days
+        p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
+        L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
+    
+        # if series is not long enough to compute stdCases (thus Null),
+        # the series is too short and not statistically meaningful to calculate stdCases
+        # So we do not make adjustment for uncertaity of future cases modulation
+        # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is    already large
+        stdCases = result['std_future_cases']
+        if stdCases:
+            bump_size = max(stdCases)
+            for d in range(1, L):
+                if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
+                    p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len   (p_infection_onset_delay_offsetted) + d)))
+                else:
+                    p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
+                bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
+                bumpedAdjusted_dom = adjusted_dom0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day   later
+                bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom, sigma=sigma)
+                most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
+                most_likely_change = (most_likely_bumped - most_likely) / bump_size
+                most_likely_bumpeds.append(most_likely_change)
+        
+            stdRts = 0. * most_likely
+            for d in range(1, L):
+                stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+            stdRts = np.sqrt(stdRts)[::-1]
+        #    stdRts.to_csv("stdRts.csv")
+        
+            # modify posteriors
+            for d in range(len(stdCases)):
+                if stdRts[d] < 0.001:
+                    continue
+                normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
+                normal_dist /= normal_dist.sum(axis=0)
+                normal_dist /= normal_dist.sum(axis=1)[:,None]
+                posterior_to_be_modified = posteriors.iloc[:,-d-1]
+                posterior_modified = posterior_to_be_modified @ normal_dist
+                posteriors.iloc[:,-d-1] = posterior_modified
+        
+                #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name       [1].strftime('%Y-%m-%d') + ".csv"
+                #posterior_to_be_modified.to_csv(posteriorsfilename_before)
+                #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name        [1].strftime('%Y-%m-%d') + "_after.csv"
+                #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
+                #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime  ('%Y-%m-%   d') + "_normal_dist.csv"
+                #np.savetxt(normalfilename, normal_dist, delimiter=",")
+    
+        result['posteriors'][max_likelihood_index] = posteriors 
+    
+    
+    #Compile Final Results
+    final_results = None
+    
+    for state_name, result in results.items():
+        print(state_name)
+        posteriors = result['posteriors'][max_likelihood_index]
+        hdis_90 = highest_density_interval(posteriors, p=.9)
+        hdis_50 = highest_density_interval(posteriors, p=.5)
+        most_likely = posteriors.idxmax().rename('ML')
+        result = pd.concat([most_likely, hdis_90, hdis_50], axis=1)
+        if final_results is None:
+            final_results = result
+        else:
+            final_results = pd.concat([final_results, result])
+    
+    print('Done final result.')
+    
+    #Save final result to csv files
+    for state_name, final_result in final_results.groupby("state"):
+        final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
+    print('Saved final result.')
 
-    result['posteriors'][max_likelihood_index] = posteriors 
+FILTERED_REGION_CODES = ['']
+#FILTERED_REGION_CODES = ['Kedah']
 
+# Load case file
+urlConfirmedOnly = 'data/confirmedOnlyForRt.csv'
+statesConfirmedOnly = pd.read_csv(urlConfirmedOnly,
+                     usecols=['date', 'state', 'cases'],
+                     parse_dates=['date'],
+                     index_col=['state', 'date'],
+                     squeeze=True).sort_index()
 
-#Compile Final Results
-final_results = None
+urlConfirmedOnly_dom = 'data/confirmedOnlyForRt_dom.csv'
+statesConfirmedOnly_dom = pd.read_csv(urlConfirmedOnly_dom,
+                     usecols=['date', 'state', 'cases'],
+                     parse_dates=['date'],
+                     index_col=['state', 'date'],
+                     squeeze=True).sort_index()
 
-for state_name, result in results.items():
-    print(state_name)
-    posteriors = result['posteriors'][max_likelihood_index]
-    hdis_90 = highest_density_interval(posteriors, p=.9)
-    hdis_50 = highest_density_interval(posteriors, p=.5)
-    most_likely = posteriors.idxmax().rename('ML')
-    result = pd.concat([most_likely, hdis_90, hdis_50], axis=1)
-    if final_results is None:
-        final_results = result
-    else:
-        final_results = pd.concat([final_results, result])
+urlOnset = 'data/onsetForRt.csv'
+statesOnset = pd.read_csv(urlOnset,
+                     usecols=['date', 'state', 'cases'],
+                     parse_dates=['date'],
+                     index_col=['state', 'date'],
+                     squeeze=True).sort_index()
 
-print('Done final result.')
+urlOnset_dom = 'data/onsetForRt_dom.csv'
+statesOnset_dom = pd.read_csv(urlOnset_dom,
+                     usecols=['date', 'state', 'cases'],
+                     parse_dates=['date'],
+                     index_col=['state', 'date'],
+                     squeeze=True).sort_index()
 
-#Save final result to csv files
-for state_name, final_result in final_results.groupby("state"):
-    final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
-print('Saved final result.')
+# Configuration
+includePosterior = True
+sumStyle = "Nishiura" # "Exponential", "K-Sys"
+rightCensorshipByDelayFunctionDevision = False
+singleTau = False
+obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
+revert_to_confirmed_base = False
+
+p_EPS = 0.001
+#p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
+P_CONFIRMED_DELAY_T = np.linspace(0, 30, 31)
+p_onset_comfirmed_delay_cum = sps.weibull_min(c = 1.741, scale = 8.573).cdf(x = P_CONFIRMED_DELAY_T)
+p_onset_comfirmed_delay = p_onset_comfirmed_delay_cum[1:] - p_onset_comfirmed_delay_cum[:-1]
+p_onset_comfirmed_delay = np.insert(p_onset_comfirmed_delay, 0, p_EPS)
+
+P_INFECTION_ONSET_DELAY_T = np.linspace(0, 30, 31)
+p_infection_onset_delay_cum = sps.lognorm(scale = math.exp(1.519), s = 0.615).cdf(x = P_INFECTION_ONSET_DELAY_T)
+p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_delay_cum[:-1]
+p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
+p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
+
+computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base)
 
