@@ -203,7 +203,7 @@ def adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay):
 
 def adjust_infection_for_right_censorship(infection, p_infection_onset_delay):
     if revert_to_confirmed_base:
-        return onset, 0
+        return infection, 0
     else:
         cumulative_p_delay = p_infection_onset_delay.cumsum()
 
