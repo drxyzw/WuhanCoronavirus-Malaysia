@@ -224,6 +224,12 @@ Johor,2020-09-02,751
 Johor,2020-09-03,752
 Johor,2020-09-04,752
 Johor,2020-09-05,752
+Johor,2020-09-06,752
+Johor,2020-09-07,752
+Johor,2020-09-08,752
+Johor,2020-09-09,752
+Johor,2020-09-10,752
+Johor,2020-09-11,752
 Kedah,2020-01-26,0
 Kedah,2020-01-27,0
 Kedah,2020-01-28,1
@@ -448,6 +454,12 @@ Kedah,2020-09-02,218
 Kedah,2020-09-03,222
 Kedah,2020-09-04,223
 Kedah,2020-09-05,224
+Kedah,2020-09-06,224
+Kedah,2020-09-07,228
+Kedah,2020-09-08,250
+Kedah,2020-09-09,266
+Kedah,2020-09-10,270
+Kedah,2020-09-11,284
 Kelantan,2020-03-04,0
 Kelantan,2020-03-05,0
 Kelantan,2020-03-06,0
@@ -634,6 +646,12 @@ Kelantan,2020-09-02,160
 Kelantan,2020-09-03,160
 Kelantan,2020-09-04,160
 Kelantan,2020-09-05,160
+Kelantan,2020-09-06,160
+Kelantan,2020-09-07,160
+Kelantan,2020-09-08,160
+Kelantan,2020-09-09,160
+Kelantan,2020-09-10,160
+Kelantan,2020-09-11,160
 Malacca,2020-03-04,0
 Malacca,2020-03-05,0
 Malacca,2020-03-06,0
@@ -820,6 +838,12 @@ Malacca,2020-09-02,262
 Malacca,2020-09-03,262
 Malacca,2020-09-04,262
 Malacca,2020-09-05,262
+Malacca,2020-09-06,262
+Malacca,2020-09-07,262
+Malacca,2020-09-08,262
+Malacca,2020-09-09,262
+Malacca,2020-09-10,262
+Malacca,2020-09-11,262
 Negeri Sembilan,2020-02-04,1
 Negeri Sembilan,2020-02-05,2
 Negeri Sembilan,2020-02-06,2
@@ -1035,6 +1059,12 @@ Negeri Sembilan,2020-09-02,1034
 Negeri Sembilan,2020-09-03,1036
 Negeri Sembilan,2020-09-04,1037
 Negeri Sembilan,2020-09-05,1037
+Negeri Sembilan,2020-09-06,1037
+Negeri Sembilan,2020-09-07,1037
+Negeri Sembilan,2020-09-08,1038
+Negeri Sembilan,2020-09-09,1039
+Negeri Sembilan,2020-09-10,1039
+Negeri Sembilan,2020-09-11,1039
 Pahang,2020-03-04,0
 Pahang,2020-03-05,0
 Pahang,2020-03-06,0
@@ -1221,6 +1251,12 @@ Pahang,2020-09-02,371
 Pahang,2020-09-03,371
 Pahang,2020-09-04,371
 Pahang,2020-09-05,371
+Pahang,2020-09-06,371
+Pahang,2020-09-07,371
+Pahang,2020-09-08,371
+Pahang,2020-09-09,371
+Pahang,2020-09-10,371
+Pahang,2020-09-11,371
 Penang,2020-03-04,0
 Penang,2020-03-05,1
 Penang,2020-03-06,2
@@ -1407,6 +1443,12 @@ Penang,2020-09-02,136
 Penang,2020-09-03,136
 Penang,2020-09-04,136
 Penang,2020-09-05,136
+Penang,2020-09-06,137
+Penang,2020-09-07,138
+Penang,2020-09-08,138
+Penang,2020-09-09,138
+Penang,2020-09-10,138
+Penang,2020-09-11,138
 Perak,2020-03-04,0
 Perak,2020-03-05,0
 Perak,2020-03-06,0
@@ -1593,6 +1635,12 @@ Perak,2020-09-02,269
 Perak,2020-09-03,269
 Perak,2020-09-04,269
 Perak,2020-09-05,269
+Perak,2020-09-06,269
+Perak,2020-09-07,269
+Perak,2020-09-08,269
+Perak,2020-09-09,269
+Perak,2020-09-10,269
+Perak,2020-09-11,269
 Perlis,2020-03-04,0
 Perlis,2020-03-05,0
 Perlis,2020-03-06,0
@@ -1779,6 +1827,12 @@ Perlis,2020-09-02,32
 Perlis,2020-09-03,32
 Perlis,2020-09-04,32
 Perlis,2020-09-05,32
+Perlis,2020-09-06,32
+Perlis,2020-09-07,32
+Perlis,2020-09-08,33
+Perlis,2020-09-09,33
+Perlis,2020-09-10,33
+Perlis,2020-09-11,33
 Sabah,2020-03-04,1
 Sabah,2020-03-05,3
 Sabah,2020-03-06,4
@@ -1965,6 +2019,12 @@ Sabah,2020-09-02,426
 Sabah,2020-09-03,432
 Sabah,2020-09-04,432
 Sabah,2020-09-05,433
+Sabah,2020-09-06,435
+Sabah,2020-09-07,486
+Sabah,2020-09-08,548
+Sabah,2020-09-09,552
+Sabah,2020-09-10,592
+Sabah,2020-09-11,759
 Sarawak,2020-03-14,6
 Sarawak,2020-03-15,13
 Sarawak,2020-03-16,21
@@ -2141,6 +2201,12 @@ Sarawak,2020-09-02,699
 Sarawak,2020-09-03,699
 Sarawak,2020-09-04,699
 Sarawak,2020-09-05,699
+Sarawak,2020-09-06,699
+Sarawak,2020-09-07,699
+Sarawak,2020-09-08,699
+Sarawak,2020-09-09,700
+Sarawak,2020-09-10,700
+Sarawak,2020-09-11,700
 Selangor,2020-01-25,3
 Selangor,2020-01-26,3
 Selangor,2020-01-27,3
@@ -2366,6 +2432,12 @@ Selangor,2020-09-02,2175
 Selangor,2020-09-03,2175
 Selangor,2020-09-04,2177
 Selangor,2020-09-05,2177
+Selangor,2020-09-06,2177
+Selangor,2020-09-07,2179
+Selangor,2020-09-08,2188
+Selangor,2020-09-09,2189
+Selangor,2020-09-10,2190
+Selangor,2020-09-11,2191
 Terengganu,2020-03-15,2
 Terengganu,2020-03-16,4
 Terengganu,2020-03-17,7
@@ -2541,6 +2613,12 @@ Terengganu,2020-09-02,114
 Terengganu,2020-09-03,114
 Terengganu,2020-09-04,114
 Terengganu,2020-09-05,114
+Terengganu,2020-09-06,114
+Terengganu,2020-09-07,114
+Terengganu,2020-09-08,114
+Terengganu,2020-09-09,114
+Terengganu,2020-09-10,114
+Terengganu,2020-09-11,114
 Kuala Lumpur,2020-01-31,0
 Kuala Lumpur,2020-02-01,0
 Kuala Lumpur,2020-02-02,0
@@ -2760,6 +2838,12 @@ Kuala Lumpur,2020-09-02,2591
 Kuala Lumpur,2020-09-03,2592
 Kuala Lumpur,2020-09-04,2599
 Kuala Lumpur,2020-09-05,2603
+Kuala Lumpur,2020-09-06,2606
+Kuala Lumpur,2020-09-07,2610
+Kuala Lumpur,2020-09-08,2615
+Kuala Lumpur,2020-09-09,2616
+Kuala Lumpur,2020-09-10,2616
+Kuala Lumpur,2020-09-11,2616
 Putrajaya,2020-03-04,0
 Putrajaya,2020-03-05,0
 Putrajaya,2020-03-06,0
@@ -2946,6 +3030,12 @@ Putrajaya,2020-09-02,99
 Putrajaya,2020-09-03,99
 Putrajaya,2020-09-04,99
 Putrajaya,2020-09-05,99
+Putrajaya,2020-09-06,99
+Putrajaya,2020-09-07,99
+Putrajaya,2020-09-08,99
+Putrajaya,2020-09-09,99
+Putrajaya,2020-09-10,99
+Putrajaya,2020-09-11,99
 Labuan,2020-03-04,0
 Labuan,2020-03-05,0
 Labuan,2020-03-06,0
@@ -3132,6 +3222,12 @@ Labuan,2020-09-02,23
 Labuan,2020-09-03,23
 Labuan,2020-09-04,23
 Labuan,2020-09-05,23
+Labuan,2020-09-06,23
+Labuan,2020-09-07,23
+Labuan,2020-09-08,23
+Labuan,2020-09-09,23
+Labuan,2020-09-10,23
+Labuan,2020-09-11,23
 Malaysia,2020-01-25,4
 Malaysia,2020-01-26,4
 Malaysia,2020-01-27,4
@@ -3359,3 +3455,8 @@ Malaysia,2020-09-4,9385
 Malaysia,2020-09-5,9391
 Malaysia,2020-09-6,9397
 Malaysia,2020-09-7,9459
+Malaysia,2020-09-8,9559
+Malaysia,2020-09-9,9583
+Malaysia,2020-09-10,9628
+Malaysia,2020-09-11,9810
+Malaysia,2020-09-12,9868
