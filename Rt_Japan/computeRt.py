@@ -428,7 +428,7 @@ def posteriors_get_max_point(posteriors):
         max_rts[t] = rt
     return max_rts
 
-def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection = True):
     checkAllDiffPositive(statesOnset)
     checkAllDiffPositive(statesOnset_dom)
     checkAllDiffPositive(statesConfirmedOnly)
@@ -440,7 +440,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
         lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
         obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
-    targets = statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
     results = {}

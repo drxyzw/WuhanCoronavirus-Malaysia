@@ -1,5 +1,6 @@
 import sys
 print(sys.version)
+sys.path.insert(1, '../Rt')
 # For some reason Theano is unhappy when I run the GP, need to disable future warnings
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
