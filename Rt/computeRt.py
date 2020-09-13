@@ -175,7 +175,7 @@ def onset_to_infection(onset, p_infection_onset_delay, revert_to_confirmed_base,
         return onset
 
 
-def adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay):
+def adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay, revert_to_confirmed_base, obsDate):
     if revert_to_confirmed_base:
         return onset, 0
     else:
@@ -201,7 +201,7 @@ def adjust_onset_for_right_censorship(onset, p_onset_comfirmed_delay):
         
         return adjusted, cumulative_p_delay
 
-def adjust_infection_for_right_censorship(infection, p_infection_onset_delay):
+def adjust_infection_for_right_censorship(infection, p_infection_onset_delay, revert_to_confirmed_base, obsDate):
     if revert_to_confirmed_base:
         return infection, 0
     else:
@@ -440,7 +440,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
         lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
         obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
-    targets = statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
     results = {}
@@ -457,14 +457,14 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         onsetOriginal = onset
         onsetFromConfirmedOnly = confirmed_to_onset(confirmed=confirmedOnly, p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
-            adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly,  p_onset_comfirmed_delay)
+            adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly,  p_onset_comfirmed_delay, revert_to_confirmed_base, obsDate)
         else:
             adjustedOnsetConfirmedOnly = onsetFromConfirmedOnly
         adjustedOnset = onset + adjustedOnsetConfirmedOnly
         adjustedOnset = adjustedOnset.dropna()
         infected = onset_to_infection(onset=adjustedOnset, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
-            adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay)
+            adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay, revert_to_confirmed_base, obsDate)
         else:
             adjusted = infected
     
@@ -480,7 +480,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         adjustedOnset_dom = adjustedOnset_dom.dropna()
         infected_dom = onset_to_infection(onset=adjustedOnset_dom, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
-            adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom,  p_infection_confirm_delay)
+            adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom,  p_infection_confirm_delay, revert_to_confirmed_base, obsDate)
         else:
             adjusted_dom = infected_dom
     
