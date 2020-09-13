@@ -429,17 +429,25 @@ def posteriors_get_max_point(posteriors):
     return max_rts
 
 def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
-    checkAllDiffPositive(statesOnset)
-    checkAllDiffPositive(statesOnset_dom)
+    onsetHasContent = statesOnset != []
+    onset_domHasContent = statesOnset_dom != []
+
+    if onsetHasContent: checkAllDiffPositive(statesOnset)
+    if onset_domHasContent: checkAllDiffPositive(statesOnset_dom)
     checkAllDiffPositive(statesConfirmedOnly)
     checkAllDiffPositive(statesConfirmedOnly_dom)
     
     if obsDate == None:
-        lastDateOnsetUnix = statesOnset.index[-1][1].value / 10**9
-        lastDateOnsetUnix_dom = statesOnset_dom.index[-1][1].value / 10**9
-        lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
-        lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
-        obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
+        lastDateConfirmedOnly = max(statesConfirmedOnly.index.get_level_values('date'))
+        lastDateConfirmedOnly_dom = max(statesConfirmedOnly_dom.index.get_level_values('date'))
+        lastDateOnset = max(statesOnset.index.get_level_values('date')) if onsetHasContent else lastDateConfirmedOnly
+        lastDateOnset_dom = max(statesOnset_dom.index.get_level_values('date')) if onset_domHasContent else lastDateConfirmedOnly_dom
+        obsDate = max(lastDateConfirmedOnly, lastDateConfirmedOnly_dom, lastDateOnset, lastDateOnset_dom)
+        #lastDateOnsetUnix = statesOnset.index[-1][1].value / 10**9 if onsetHasContent else 0
+        #lastDateOnsetUnix_dom = statesOnset_dom.index[-1][1].value / 10**9 if onset_domHasContent else 0
+        #lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
+        #lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
+        #obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
     targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
@@ -453,31 +461,40 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #    continue
     
         print(state_name)
-        onset = statesOnset.filter(like=state_name, axis=0)
-        onsetOriginal = onset
         onsetFromConfirmedOnly = confirmed_to_onset(confirmed=confirmedOnly, p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjustedOnsetConfirmedOnly, cumulative_p_delay = adjust_onset_for_right_censorship(onsetFromConfirmedOnly,  p_onset_comfirmed_delay, revert_to_confirmed_base, obsDate)
         else:
             adjustedOnsetConfirmedOnly = onsetFromConfirmedOnly
-        adjustedOnset = onset + adjustedOnsetConfirmedOnly
+
+        if onsetHasContent:
+            onset = statesOnset.filter(like=state_name, axis=0)
+            onsetOriginal = onset
+            adjustedOnset = onset + adjustedOnsetConfirmedOnly
+        else:
+            adjustedOnset = adjustedOnsetConfirmedOnly
         adjustedOnset = adjustedOnset.dropna()
+
         infected = onset_to_infection(onset=adjustedOnset, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay, revert_to_confirmed_base, obsDate)
         else:
             adjusted = infected
     
-        onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
-        onsetOriginal_dom = onset_dom
         onsetFromConfirmedOnly_dom = confirmed_to_onset(
             confirmed=statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
         else:
             adjustedOnsetConfirmedOnly_dom = onsetFromConfirmedOnly_dom
-        adjustedOnset_dom = onset_dom + adjustedOnsetConfirmedOnly_dom
+        if onset_domHasContent:
+            onset_dom = statesOnset_dom.filter(like=state_name, axis=0)
+            onsetOriginal_dom = onset_dom
+            adjustedOnset_dom = onset_dom + adjustedOnsetConfirmedOnly_dom
+        else:
+            adjustedOnset_dom = adjustedOnsetConfirmedOnly_dom
         adjustedOnset_dom = adjustedOnset_dom.dropna()
+
         infected_dom = onset_to_infection(onset=adjustedOnset_dom, p_infection_onset_delay=p_infection_onset_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjusted_dom, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected_dom,  p_infection_confirm_delay, revert_to_confirmed_base, obsDate)
