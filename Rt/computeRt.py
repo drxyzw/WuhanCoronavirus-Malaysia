@@ -39,6 +39,10 @@ def checkAllDiffPositive(dataToCheck):
 
 def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue=True):
 
+    # To avoid 0.0/0.0 during computation, we add a tiny value to input data, and subtract the tiny value from and floor the result by 0.
+    epsilon = 0.001
+    confirmed = confirmed + epsilon
+
     nExtraDays = 0
     if addingExtraRows == True:
         # for stability, append 20 extra days from last date
@@ -99,7 +103,8 @@ def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue
         #    onsetEM[n] = onsetRaw[n] * confirmed[n] / mu[n]
 
         # S step
-        k = 2 # k has to be even integer
+        #k = 30 # k has to be even integer
+        k = 2 * (int)(p_delay.argmax(0)**2 / 2) # k has to be even integer
         w = []
         for i in range(k + 1):
             w.append(spsp.binom(k, i) / (2 ** k))
@@ -109,6 +114,11 @@ def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue
         l = l + 1
         storeOnsetResult.append(onsetEMS)
         onsetRaw = onsetEMS
+
+    # Because we added a tiny value to the input data, we subtract the tiny value and floor the result data by 0
+    onsetEMS = onsetEMS - epsilon
+    onsetEMS[onsetEMS < 0.0] = 0.0
+
     if nExtraDays == 0:
         return pd.Series(onsetEMS, index=index, name=confirmed.name)
     else:
@@ -261,10 +271,13 @@ def prepare_cases(new_cases, cutoff=25):
 
 #Function for Calculating the Posteriors
 def get_posteriors(sr, sr_dom, singleTau, sumStyle, includePosterior, sigma=0.15):
-    likelihoods = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
     serial_interval_cumdensity = 0.
     prevTau = 0.
-    lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
+    #lam = np.full_like(sr[:-1].values - r_t_range[:, None], 0.0)
+    lam = pd.DataFrame(data = 0.,
+        index = r_t_range,
+        columns = sr.index[1:])
+
     if singleTau:
         # Gamma is 1/serial interval
         # https://wwwnc.cdc.gov/eid/article/26/7/20-0282_article
@@ -298,6 +311,20 @@ def get_posteriors(sr, sr_dom, singleTau, sumStyle, includePosterior, sigma=0.15
         #data = sps.poisson.pmf(sr[1:].values, lam),
         index = r_t_range,
         columns = sr.index[1:])
+
+    ##when sr[i-1] = 0 (then lam(sr[i-1], r_t_range) = 0, so denominator = 0
+    ##Then we take limit of sr[i-1] -> +0
+    #if sr[previous_day] == 0.0:
+    #    numerator = 1. / factorial(sr_dom[current_day]) * np.exp(GAMMA * (r_t_range - 1.) *sr_do[current_day]) * current_prior
+
+    # When daily new case continues to be 0, likelihoods[current_day] becomes zero for all Rt.
+    # It means Rt is undetermined by recent cases.
+    # Only constraint current_prior which contains Gaussian(Rt - Rt[previous_day])
+    # To achieve this, we fill likelihoods[current_day] with 1.0 for all Rt
+    for i in range(len(likelihoods.columns)):
+        likelihoods_i = likelihoods[likelihoods.columns[i]]
+        if len(likelihoods_i[likelihoods_i != 0.0]) == 0:
+            likelihoods[likelihoods.columns[i]].values = [1.0] * len(likelihoods_i)
 
     # (3) Create the Gaussian Matrix
     process_matrix = sps.norm(loc=r_t_range,
@@ -334,11 +361,6 @@ def get_posteriors(sr, sr_dom, singleTau, sumStyle, includePosterior, sigma=0.15
             #(5b) Calculate the numerator of Bayes' Rule: P(k|R_t)P(R_t)
             numerator = likelihoods[current_day] * current_prior
             
-            #when sr[i-1] = 0 (then lam(sr[i-1], r_t_range) = 0, so denominator = 0
-            #Then we take limit of sr[i] -> +0
-            if sr[previous_day] == 0.0:
-                numerator = 1. / factorial(sr_dom[current_day]) * np.exp(GAMMA * (r_t_range - 1.) * sr_dom[current_day]) * current_prior
-
             #(5c) Calcluate the denominator of Bayes' Rule P(k)
             denominator = np.sum(numerator)
 
@@ -428,9 +450,24 @@ def posteriors_get_max_point(posteriors):
         max_rts[t] = rt
     return max_rts
 
-def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
-    onsetHasContent = statesOnset != []
-    onset_domHasContent = statesOnset_dom != []
+def diffCumulativeCase(cumulativeCase):
+    if type(cumulativeCase) is list and cumulativeCase == []:
+        return []
+    else:
+        diffCase = cumulativeCase[cumulativeCase != cumulativeCase] # no rows but only copy index and column
+        for state, grp in cumulativeCase.groupby('state'):
+            diffCase = diffCase.append(grp.diff().dropna())
+        return diffCase
+
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
+    if isCaseCumulative:
+        statesOnset = diffCumulativeCase(statesOnset)
+        statesOnset_dom = diffCumulativeCase(statesOnset_dom)
+        statesConfirmedOnly = diffCumulativeCase(statesConfirmedOnly)
+        statesConfirmedOnly_dom = diffCumulativeCase(statesConfirmedOnly_dom)
+
+    onsetHasContent = type(statesOnset) is not list or statesOnset != []
+    onset_domHasContent = type(statesOnset_dom) is not list or statesOnset_dom != []
 
     if onsetHasContent: checkAllDiffPositive(statesOnset)
     if onset_domHasContent: checkAllDiffPositive(statesOnset_dom)
@@ -448,6 +485,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
         #lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
         #obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
+    #targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
@@ -509,6 +547,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #confirmedOnly.to_csv(state_name + "_confirmedOnly.csv")
         #onsetFromConfirmedOnly.to_csv(state_name + "_onsetFromConfirmed.csv")
         #adjustedOnsetConfirmedOnly.to_csv(state_name + "_adjustedOnsetConfirmedOnly.csv")
+        #adjusted.to_csv(state_name + "_adjusted.csv")
         #onsetFromConfirmedOnly_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
         #onset_dom.to_csv(state_name + "_onset_dom.csv")
         #infected_dom.to_csv(state_name + "_infected_dom.csv")
@@ -516,13 +555,18 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     
         if revert_to_confirmed_base:
             original, trimmed = prepare_cases_old(adjusted, cutoff=2)
-            trimmed_dom = adjusted_dom[trimmed.index]
         else:
             trimmed = prepare_cases(adjusted, cutoff=2)
-            trimmed_dom = adjusted_dom[trimmed.index]
-        if len(trimmed) == 0 or len(trimmed_dom) == 0:
+
+        if len(trimmed) == 0:
             print(state_name + ": too few cases for statistics")
             continue
+        else:
+            trimmed_dom = adjusted_dom[trimmed.index]
+            if len(trimmed_dom) == 0:
+                print(state_name + ": too few domestic cases for statistics")
+                continue
+
         adjusted = trimmed
         adjustedCases[state_name] = adjusted
         adjusted_dom = trimmed_dom

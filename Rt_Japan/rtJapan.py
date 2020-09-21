@@ -20,9 +20,6 @@ from datetime import timedelta
 
 from computeRt import computeRt
 
-FILTERED_REGION_CODES = ['']
-#FILTERED_REGION_CODES = ['Kedah']
-
 # Load case file
 urlConfirmedOnly = 'data/confirmedOnlyForRt.csv'
 statesConfirmedOnly = pd.read_csv(urlConfirmedOnly,
@@ -54,12 +51,15 @@ statesOnset_dom = pd.read_csv(urlOnset_dom,
 
 # Configuration
 obsDate = datetime.strptime('2020-05-10', "%Y-%m-%d")
+isCaseCumulative = False
 revert_to_confirmed_base = False
 rightCensorshipByDelayFunctionDevision = False
 singleTau = False
 sumStyle = "Nishiura" # "Exponential", "K-Sys"
 includePosterior = True
 backProjection = True
+FILTERED_REGION_CODES = ['']
+#FILTERED_REGION_CODES = ['Kedah']
 
 p_EPS = 0.001
 #p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
@@ -74,5 +74,7 @@ p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_de
 p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
 p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
 
-computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base, backProjection)
+computeRt(statesOnset, statesOnset, statesConfirmedOnly, statesConfirmedOnly, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base, backProjection)
+
+#computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base, backProjection)
 
