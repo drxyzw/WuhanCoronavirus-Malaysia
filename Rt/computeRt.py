@@ -5,6 +5,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import os
+import os.path
 import requests
 import pandas as pd
 import numpy as np
@@ -588,6 +589,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                 stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
     
         result = {}
+
+        result['adjustedCases'] = adjusted
+        result['adjustedDomesticCases'] = adjusted_dom
     
         # store std from uncertainty of future confirmed cases for later adjustment
         result['std_future_cases'] = stdCases
@@ -695,7 +699,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         hdis_90 = highest_density_interval(posteriors, p=.9)
         hdis_50 = highest_density_interval(posteriors, p=.5)
         most_likely = posteriors.idxmax().rename('ML')
-        result = pd.concat([most_likely, hdis_90, hdis_50], axis=1)
+        adjustedCases = result["adjustedCases"].rename("adjustedCases")
+        adjustedDomesticCases = result["adjustedDomesticCases"].rename("adjustedDomesticCases")
+        result = pd.concat([most_likely, hdis_90, hdis_50, adjustedCases, adjustedDomesticCases], axis=1)
         if final_results is None:
             final_results = result
         else:
@@ -704,7 +710,14 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     print('Done final result.')
     
     #Save final result to csv files
-    for state_name, final_result in final_results.groupby("state"):
-        final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
+    for state_name, confirmedOnly in statesConfirmedlOnly_to_process.groupby("state"):
+        filename = "data/" + state_name + ".csv"
+        if os.path.isfile(filename):
+            os.remove(filename)
+        if final_results is not None and state_name in final_results.index:
+            final_result = final_results.filter(like=state_name, axis=0)
+            final_result.loc[state_name].to_csv(filename)
+    #for state_name, final_result in final_results.groupby("state"):
+    #    final_result.loc[state_name].to_csv("data/" + state_name + ".csv")
     print('Saved final result.')
 
