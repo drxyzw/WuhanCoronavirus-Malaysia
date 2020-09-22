@@ -519,9 +519,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
             adjusted, cumulative_p_infection_onset_delay = adjust_infection_for_right_censorship(infected,  p_infection_confirm_delay, revert_to_confirmed_base, obsDate)
         else:
             adjusted = infected
-    
+        confirmedOnly_dom = statesConfirmedOnly_dom.filter(like=state_name, axis=0)
         onsetFromConfirmedOnly_dom = confirmed_to_onset(
-            confirmed=statesConfirmedOnly_dom.filter(like=state_name, axis=0), p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
+            confirmed=confirmedOnly_dom, p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
             adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
         else:
@@ -549,6 +549,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #onsetFromConfirmedOnly.to_csv(state_name + "_onsetFromConfirmed.csv")
         #adjustedOnsetConfirmedOnly.to_csv(state_name + "_adjustedOnsetConfirmedOnly.csv")
         #adjusted.to_csv(state_name + "_adjusted.csv")
+        #confirmedOnly_dom.to_csv(state_name + "_confirmedOnly_dom.csv")
         #onsetFromConfirmedOnly_dom.to_csv(state_name + "_onsetFromConfirmed_dom.csv")
         #onset_dom.to_csv(state_name + "_onset_dom.csv")
         #infected_dom.to_csv(state_name + "_infected_dom.csv")
@@ -592,6 +593,8 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
 
         result['adjustedCases'] = adjusted
         result['adjustedDomesticCases'] = adjusted_dom
+        result['confirmedOnlyCases'] = confirmedOnly
+        result['confirmedOnlyDomesticCases'] = confirmedOnly_dom
     
         # store std from uncertainty of future confirmed cases for later adjustment
         result['std_future_cases'] = stdCases
@@ -701,7 +704,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         most_likely = posteriors.idxmax().rename('ML')
         adjustedCases = result["adjustedCases"].rename("adjustedCases")
         adjustedDomesticCases = result["adjustedDomesticCases"].rename("adjustedDomesticCases")
-        result = pd.concat([most_likely, hdis_90, hdis_50, adjustedCases, adjustedDomesticCases], axis=1)
+        confirmedOnlyCases = result["confirmedOnlyCases"].rename("confirmedOnlyCases")
+        confirmedOnlyDomesticCases = result["confirmedOnlyDomesticCases"].rename("confirmedOnlyDomesticCases")
+        result = pd.concat([most_likely, hdis_90, hdis_50, adjustedCases, adjustedDomesticCases, confirmedOnlyCases, confirmedOnlyDomesticCases], axis=1)
         if final_results is None:
             final_results = result
         else:
