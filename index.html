@@ -593,7 +593,8 @@
 					data.setColumnProperty(3, 'role', 'interval');
 					data.setColumnProperty(4, 'role', 'interval');
 					data.setColumnProperty(5, 'role', 'interval');
-					data.setColumnLabel(6, 'New infected cases');
+					data.setColumnLabel(6, 'Newly infected cases');
+					data.setColumnLabel(8, 'Newly confirmed cases');
 					var options =
 					{
 						title: "Rt/cases - " + areaName + " (CI: 50/90%)",
@@ -608,10 +609,11 @@
 						},
 						series: {
 							0: {targetAxisIndex: 0, type: 'line'},
-							1: {targetAxisIndex: 1, type: 'bars', color: 'orange'}
+							1: {targetAxisIndex: 1, type: 'bars', color: 'orange'},
+							2: {targetAxisIndex: 1, type: 'bars', color: 'green'}
 						},
 						hAxis: {
-							title: "Estimated infection date",
+							title: "Date",
 							minorGridlines: { count:0 },
 							format: 'dd-MMM',
 							viewWindow: {
@@ -652,8 +654,9 @@
 					dateFormatter.format(data, 0);
 					var caseFormatter = new google.visualization.NumberFormat({pattern: '#,##0'});
 					caseFormatter.format(data, 6);
+					caseFormatter.format(data, 8);
 					var view = new google.visualization.DataView(data);
-					view.hideColumns([7]);
+					view.hideColumns([7, 9]);
  
 					chart.draw(view, options);
 					drawAxisLine(chart, MCO, 'MCO');
