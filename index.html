@@ -652,9 +652,11 @@
 					<!-- var chart = new google.visualization.LineChart(document.getElementById("Rt-" + areaName)); -->
 					var dateFormatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 					dateFormatter.format(data, 0);
-					var caseFormatter = new google.visualization.NumberFormat({pattern: '#,##0'});
-					caseFormatter.format(data, 6);
-					caseFormatter.format(data, 8);
+					var estimatedCaseFormatter = new google.visualization.NumberFormat({pattern: '#,###.0'});
+					estimatedCaseFormatter.format(data, 6);
+					var confirmedCaseFormatter = new google.visualization.NumberFormat({pattern: '#,##0'});
+					estimatedCaseFormatter.format(data, 6);
+					confirmedCaseFormatter.format(data, 8);
 					var view = new google.visualization.DataView(data);
 					view.hideColumns([7, 9]);
  
