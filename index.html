@@ -602,8 +602,12 @@
 						chartArea: {
 							left: '15%',
 							top: '10%',
-							width: '80%',
+							width: '75%',
 							height: '80%'
+						},
+						series: {
+							0: {targetAxisIndex: 0, type: 'line'},
+							1: {targetAxisIndex: 1, type: 'bars', color: 'orange'}
 						},
 						hAxis: {
 							title: "Date",
@@ -613,15 +617,22 @@
 								min: new Date(2020, 3-1, 1),
 							},
 						},
-						vAxis: {
+						vAxes:
+							{0: {
 							minorGridlines: { count:0 },
 							viewWindow: {
 								max: 4.0,
 								min: 0.0,
+							}
 							},
-						},
-						seriesType: 'line',
-						series: {6: {type: 'bars'}},
+							1: {
+							minorGridlines: { count:0 },
+							viewWindow: {
+								max: 200,
+								min: 0,
+							}
+							}
+							},
 						legend: {
 							position: 'none',
 						},
@@ -636,7 +647,10 @@
 					<!-- var chart = new google.visualization.LineChart(document.getElementById("Rt-" + areaName)); -->
 					var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 					formatter.format(data, 0);
-					chart.draw(data, options);
+					var view = new google.visualization.DataView(data);
+					view.hideColumns([7]);
+ 
+					chart.draw(view, options);
 					drawAxisLine(chart, MCO, 'MCO');
 				});
 			}
