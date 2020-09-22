@@ -374,7 +374,7 @@
 					},
 					backgroundColor: {
 						fill: 'honeydew'
-					},
+					}
 				};
 				var chart = new google.visualization.LineChart(document.getElementById("nationwide-dynamics"));
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
@@ -643,7 +643,8 @@
 						},
 						intervals: {'style':'area'},
 						width: '100%',
-						height: '100%'
+						height: '100%',
+						focusTarget: 'category'
 					};
 					var chart = new google.visualization.ComboChart(document.getElementById("Rt-" + areaName));
 					<!-- var chart = new google.visualization.LineChart(document.getElementById("Rt-" + areaName)); -->
