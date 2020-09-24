@@ -587,8 +587,19 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         stdCases = []
         if len(no_need_adjust) >= L:
             for lag in range(1+delayOffsetDays, L):
-                stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag]))
-    
+                stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag], ddof=1))
+
+        covCases = [[0.0] * (L-1-delayOffsetDays) for i in range(L-1-delayOffsetDays)]
+        if len(no_need_adjust) >= L:
+            for lag1 in range(1+delayOffsetDays, L):
+                laggedX1 = no_need_adjust[lag1:] - no_need_adjust[:-lag1]
+                for lag2 in range(1+delayOffsetDays, lag1+1):
+                    laggedX2 = no_need_adjust[lag2:] - no_need_adjust[:-lag2]
+                    covCases[lag1-1-delayOffsetDays][lag2-1-delayOffsetDays] = np.cov(laggedX1, laggedX2[:-(lag1-lag2)] if lag1 > lag2 else laggedX2, bias=False)[0][1]
+            for lag1 in range(1+delayOffsetDays, L):
+                for lag2 in range(lag1+1, L):
+                    covCases[lag1-1-delayOffsetDays][lag2-1-delayOffsetDays] = covCases[lag2-1-delayOffsetDays][lag1-1-delayOffsetDays]
+
         result = {}
 
         result['adjustedCases'] = adjusted
@@ -598,6 +609,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     
         # store std from uncertainty of future confirmed cases for later adjustment
         result['std_future_cases'] = stdCases
+        result['cov_future_cases'] = covCases
         #result['std_future_rt'] = stds_case_ratios
     
         # Holds all posteriors with every given value of sigma
@@ -645,18 +657,19 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         lastDate = max(adjusted0.index[-1][1], adjusted_dom0.index[-1][1])
         delayOffsetDays = (obsDate - lastDate).days
         p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
-        L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
+        L_offset = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
     
         # if series is not long enough to compute stdCases (thus Null),
         # the series is too short and not statistically meaningful to calculate stdCases
         # So we do not make adjustment for uncertaity of future cases modulation
         # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is    already large
         stdCases = result['std_future_cases']
-        if stdCases:
+        covCases = result['cov_future_cases']
+        if stdCases and covCases:
             bump_size = max(stdCases)
-            for d in range(1, L):
+            for d in range(1, L_offset):
                 if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
-                    p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len   (p_infection_onset_delay_offsetted) + d)))
+                    p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len(p_infection_onset_delay_offsetted) + d)))
                 else:
                     p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
                 bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
@@ -667,8 +680,11 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                 most_likely_bumpeds.append(most_likely_change)
         
             stdRts = 0. * most_likely
-            for d in range(1, L):
-                stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+            #for d in range(1, L_offset):
+            #    stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+            for d1 in range(1, L_offset):
+                for d2 in range(1, L_offset):
+                    stdRts += most_likely_bumpeds[d1-1]*most_likely_bumpeds[d2-1] * covCases[d1-1][d2-1]
             stdRts = np.sqrt(stdRts)[::-1]
         #    stdRts.to_csv("stdRts.csv")
         
