@@ -3,7 +3,7 @@ Statistics of Wuhan coronavirus (COVID-19) in Malaysia<br>
 Summary is<br>
 https://drxyzw.github.io/WuhanCoronavirus-Malaysia/<br>
 <br>
-Number statistics is under "data" folder.<br> 
+Case number analysis result is under /data folder.<br> 
 <ul><li>Total</li>
 <ul>
 Nationwide total in Malaysia. The data is taken from Star online website.</li>
@@ -22,3 +22,5 @@ Number for each state in Malaysia. The data is taken from Wikipedia.</li>
 <li>byStateDynamics.csv - New cases vs cumulative cases. Any exponential growth is on y=x line.</li>
 </ul>
 </ul>
+Rt (effective reproduction number) analysis is under /Rt/data folder.<br>
+<ui><li>[State name].csv - Rt of each state. Nationwide result is Malaysia.csv.</li></ui>
