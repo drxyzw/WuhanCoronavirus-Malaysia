@@ -523,7 +523,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         onsetFromConfirmedOnly_dom = confirmed_to_onset(
             confirmed=confirmedOnly_dom, p_onset_comfirmed_delay=p_onset_comfirmed_delay, revert_to_confirmed_base=revert_to_confirmed_base, rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision, backProjection=backProjection)
         if rightCensorshipByDelayFunctionDevision:
-            adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_infection_confirm_delay)
+            adjustedOnsetConfirmedOnly_dom, cumulative_p_delay = adjust_onset_for_right_censorship  (onsetFromConfirmedOnly_dom, p_onset_comfirmed_delay)
         else:
             adjustedOnsetConfirmedOnly_dom = onsetFromConfirmedOnly_dom
         if onset_domHasContent:
@@ -574,7 +574,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         adjusted_dom = trimmed_dom
         adjustedCases_dom[state_name] = adjusted_dom
     
-        # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute   recent onset cases
+        # Include uncertainty of adjustment on onset on right side because we don't know future confirmed cases to compute recent onset cases
         # t: target date
         # T: latest date
         # L: delay limit, min(L; cumulative(p_infection_onset_delay(0 to L)) > threshould)
@@ -583,7 +583,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         delayOffsetDays = (obsDate - lastDate).days
         #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
         L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) 
-        no_need_adjust = adjusted_dom[:-L].values
+        # covariace and std of confirmed cases
+        # no_need_adjust = adjusted_dom[:-L].values
+        no_need_adjust = confirmedOnly_dom[:-L+len(adjusted_dom)-len(confirmedOnly_dom)].values
         stdCases = []
         if len(no_need_adjust) >= L:
             for lag in range(1+delayOffsetDays, L):
@@ -656,7 +658,8 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     
         lastDate = max(adjusted0.index[-1][1], adjusted_dom0.index[-1][1])
         delayOffsetDays = (obsDate - lastDate).days
-        p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
+        p_infection_onset_delay_offsetted = p_infection_confirm_delay[delayOffsetDays:]
+        #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
         L_offset = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
     
         # if series is not long enough to compute stdCases (thus Null),
