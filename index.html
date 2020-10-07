@@ -53,26 +53,6 @@
 			drawChartLatestTotal();
 			drawChartDailyByStates();
 			drawChartDailyDynamicsByStates();
-			
-			drawRtChart("Malaysia");
-			drawRtChart("Johor");
-			drawRtChart("Kedah");
-			drawRtChart("Kelantan");
-			drawRtChart("Malacca");
-			drawRtChart("Negeri Sembilan");
-			drawRtChart("Pahang");
-			drawRtChart("Penang");
-			drawRtChart("Perak");
-			drawRtChart("Perlis");
-			drawRtChart("Sabah");
-			drawRtChart("Sarawak");
-			drawRtChart("Selangor");
-			drawRtChart("Terengganu");
-			drawRtChart("Kuala Lumpur");
-			drawRtChart("Putrajaya");
-			drawRtChart("Labuan");
-			
-			document.getElementById("defaultOpen").click();
 		}
 		function switchLinearLog() {
 			logScale = !logScale;
@@ -552,106 +532,6 @@
 			}
 			svgElement.appendChild(svgText);
 			return svgElement;
-		}
-
-
-		function drawRtChart(areaName) {
-			var fileExists = true;
-			$.get("./Rt/data/" + areaName + ".csv", function(data) {
-			}).fail(function() {
-				fileExists = false;
-				var tag_id = document.getElementById("Rt-" + areaName);
-				var a = Math.log(10.0);
-				tag_id.innerHTML = "<span style='font-family:Arial; font-size:20px; font-weight:bold;'>" + "Rt - " + areaName + ": too few cases to calculate Rt</span>";
-			});
-			
-			if(!fileExists) {
-				var tag_id = document.getElementById("Rt-" + areaName);
-				tag_id.innerHTML('innerHTML');
-			} else {
-				$.get("./Rt/data/" + areaName + ".csv", function(csvString) {
-					<!-- Rt-plot -->
-					var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
-					for(var i = 1; i < arrayData.length; ++i) {
-						arrayData[i][0] = new Date(arrayData[i][0]);
-					}
-					var data = new google.visualization.arrayToDataTable(arrayData);
-					data.setColumnLabel(1, 'Rt');
-					data.setColumnProperty(2, 'role', 'interval');
-					data.setColumnProperty(3, 'role', 'interval');
-					data.setColumnProperty(4, 'role', 'interval');
-					data.setColumnProperty(5, 'role', 'interval');
-					data.setColumnLabel(6, 'Newly infected cases');
-					data.setColumnLabel(8, 'Newly confirmed cases');
-					var options =
-					{
-						title: "Rt/cases - " + areaName + " (CI: 50/90%)",
-						titleTextStyle : {
-							fontSize: 20
-						},
-						chartArea: {
-							left: '15%',
-							top: '10%',
-							width: '75%',
-							height: '80%'
-						},
-						series: {
-							0: {targetAxisIndex: 0, type: 'line'},
-							1: {targetAxisIndex: 1, type: 'bars', color: 'orange'},
-							2: {targetAxisIndex: 1, type: 'bars', color: 'darkviolet'}
-						},
-						hAxis: {
-							title: "Date",
-							minorGridlines: { count:0 },
-							format: 'dd-MMM',
-							viewWindow: {
-								min: new Date(2020, 3-1, 1),
-							},
-						},
-						vAxes:
-							{0: {
-							minorGridlines: { count:0 },
-							viewWindow: {
-								max: 4.0,
-								min: 0.0,
-							}
-							},
-							1: {
-							minorGridlines: { count:0 },
-							viewWindow: {
-								max: 200,
-								min: 0,
-							},
-							format: '##.#'
-							}
-							},
-						legend: {
-							position: 'none',
-						},
-						backgroundColor: {
-							fill: 'FFFAFA'
-						},
-						intervals: {'style':'area'},
-						width: '100%',
-						height: '100%',
-						focusTarget: 'category'
-					};
-					var chart = new google.visualization.ComboChart(document.getElementById("Rt-" + areaName));
-					<!-- var chart = new google.visualization.LineChart(document.getElementById("Rt-" + areaName)); -->
-					var dateFormatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
-					dateFormatter.format(data, 0);
-					var estimatedCaseFormatter = new google.visualization.NumberFormat({pattern: '#,###.0'});
-					estimatedCaseFormatter.format(data, 6);
-					var confirmedCaseFormatter = new google.visualization.NumberFormat({pattern: '#,##0'});
-					estimatedCaseFormatter.format(data, 6);
-					confirmedCaseFormatter.format(data, 8);
-					var view = new google.visualization.DataView(data);
-					view.hideColumns([7, 9]);
- 
-					chart.draw(view, options);
-					drawAxisLine(chart, MCO, 'MCO');
-				});
-			}
 		}
     </script>
 </head>
