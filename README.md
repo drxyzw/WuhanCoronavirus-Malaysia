@@ -23,4 +23,7 @@ Number for each state in Malaysia. The data is taken from Wikipedia.</li>
 </ul>
 </ul>
 Rt (effective reproduction number) analysis is under /Rt/data folder.<br>
-<ui><li>[State name].csv - Rt of each state. Nationwide result is Malaysia.csv.</li></ui>
+<ul><li>[State name].csv - Rt of each state. Nationwide result is Malaysia.csv.</li>
+<li>Document is https://github.com/drxyzw/WuhanCoronavirus-Malaysia/tree/master/doc/Rt-Malaysia.ipynb</li></ul>
+
+
