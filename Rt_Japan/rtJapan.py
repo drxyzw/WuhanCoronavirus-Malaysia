@@ -60,6 +60,7 @@ includePosterior = True
 backProjection = True
 FILTERED_REGION_CODES = ['']
 #FILTERED_REGION_CODES = ['Kedah']
+filterInclusive = False
 
 p_EPS = 0.001
 #p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
@@ -74,7 +75,7 @@ p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_de
 p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
 p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
 
-computeRt(statesOnset, statesOnset, statesConfirmedOnly, statesConfirmedOnly, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base, backProjection)
+computeRt(statesOnset, statesOnset, statesConfirmedOnly, statesConfirmedOnly, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, filterInclusive, revert_to_confirmed_base, backProjection)
 
 #computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior, sumStyle, rightCensorshipByDelayFunctionDevision, singleTau, obsDate, FILTERED_REGION_CODES, revert_to_confirmed_base, backProjection)
 

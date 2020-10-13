@@ -35,6 +35,7 @@ includePosterior = True
 backProjection = True
 #FILTERED_REGION_CODES = ['Malaysia']
 FILTERED_REGION_CODES = ['']
+filterInclusive = False
 
 p_EPS = 0.001
 #p_onset_comfirmed_delay = pd.read_csv("data/onset_confirmed_delay.csv", index_col=None, header=None, squeeze=True)
@@ -49,4 +50,4 @@ p_infection_onset_delay = p_infection_onset_delay_cum[1:] - p_infection_onset_de
 p_infection_onset_delay = np.insert(p_infection_onset_delay, 0, p_EPS)
 p_infection_confirm_delay = np.convolve(p_onset_comfirmed_delay, p_infection_onset_delay)
 
-computeRt(statesOnset = [], statesOnset_dom = [], statesConfirmedOnly = states, statesConfirmedOnly_dom = states, isCaseCumulative = isCaseCumulative, p_onset_comfirmed_delay = p_onset_comfirmed_delay, p_infection_onset_delay = p_infection_onset_delay, p_infection_confirm_delay = p_infection_confirm_delay, includePosterior = includePosterior, sumStyle = sumStyle, rightCensorshipByDelayFunctionDevision = rightCensorshipByDelayFunctionDevision, singleTau = singleTau, FILTERED_REGION_CODES = FILTERED_REGION_CODES, revert_to_confirmed_base = revert_to_confirmed_base, backProjection = backProjection)
+computeRt(statesOnset = [], statesOnset_dom = [], statesConfirmedOnly = states, statesConfirmedOnly_dom = states, isCaseCumulative = isCaseCumulative, p_onset_comfirmed_delay = p_onset_comfirmed_delay, p_infection_onset_delay = p_infection_onset_delay, p_infection_confirm_delay = p_infection_confirm_delay, includePosterior = includePosterior, sumStyle = sumStyle, rightCensorshipByDelayFunctionDevision = rightCensorshipByDelayFunctionDevision, singleTau = singleTau, FILTERED_REGION_CODES = FILTERED_REGION_CODES, filterInclusive = filterInclusive, revert_to_confirmed_base = revert_to_confirmed_base, backProjection = backProjection)

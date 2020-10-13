@@ -460,7 +460,7 @@ def diffCumulativeCase(cumulativeCase):
             diffCase = diffCase.append(grp.diff().dropna())
         return diffCase
 
-def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], revert_to_confirmed_base = False, backProjection=True):
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], filterInclusive = False, revert_to_confirmed_base = False, backProjection=True):
     if isCaseCumulative:
         statesOnset = diffCumulativeCase(statesOnset)
         statesOnset_dom = diffCumulativeCase(statesOnset_dom)
@@ -486,8 +486,10 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #lateDateConfirmedOnly = statesConfirmedOnly.index[-1][1].value / 10**9
         #lateDateConfirmedOnly_dom = statesConfirmedOnly_dom.index[-1][1].value / 10**9
         #obsDate = pd.Timestamp(max(lastDateOnsetUnix, lastDateOnsetUnix_dom, lateDateConfirmedOnly, lateDateConfirmedOnly_dom), unit='s')
-    #targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
-    targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    if filterInclusive:
+        targets = statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
+    else:
+        targets = ~statesConfirmedOnly.index.get_level_values('state').isin(FILTERED_REGION_CODES)
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
     results = {}
