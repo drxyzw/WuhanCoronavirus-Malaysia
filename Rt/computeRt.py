@@ -13,6 +13,7 @@ import scipy.stats as sps
 from scipy.special import factorial
 import math
 import scipy.special as spsp
+#import scipy.linalg
 
 from datetime import date
 from datetime import datetime
@@ -23,7 +24,7 @@ R_T_MAX = 12
 r_t_range = np.linspace(0, R_T_MAX, R_T_MAX*100+1)
 
 #Choose an optimum sigma
-sigmas = np.linspace(0.01, 1.0, 20)
+sigmas = np.linspace(0.01, 1.0, 30)
 #sigmas = []
 #sigmas.append(3.0)
 
@@ -46,8 +47,8 @@ def backprojNP(confirmed, p_delay, addingExtraRows=False, extraRowsWithLastValue
 
     nExtraDays = 0
     if addingExtraRows == True:
-        # for stability, append 20 extra days from last date
-        nExtraDays = 20
+        # for stability, append 30 extra days from last date
+        nExtraDays = 30
         for i in range(nExtraDays):
             newIndex = [(confirmed.index[-1][0], confirmed.index[-1][1] + timedelta(days=1))]
             if extraRowsWithLastValue:
@@ -460,7 +461,7 @@ def diffCumulativeCase(cumulativeCase):
             diffCase = diffCase.append(grp.diff().dropna())
         return diffCase
 
-def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], filterInclusive = False, revert_to_confirmed_base = False, backProjection=True):
+def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmedOnly_dom, p_onset_comfirmed_delay, p_infection_onset_delay, p_infection_confirm_delay, isCaseCumulative, includePosterior = True, sumStyle = "Nishiura", rightCensorshipByDelayFunctionDevision = False, singleTau = False, obsDate = None, FILTERED_REGION_CODES = [''], filterInclusive = False, revert_to_confirmed_base = False, backProjection=True, leftUncertaintyStyle="ConfirmedTotal"):
     if isCaseCumulative:
         statesOnset = diffCumulativeCase(statesOnset)
         statesOnset_dom = diffCumulativeCase(statesOnset_dom)
@@ -493,6 +494,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     statesConfirmedlOnly_to_process = statesConfirmedOnly.loc[targets]
     
     results = {}
+
+    confirmedOnlys = {}
+    confirmedOnlys_dom = {}
     adjustedCases = {}
     adjustedCases_dom = {}
     
@@ -571,6 +575,9 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                 print(state_name + ": too few domestic cases for statistics")
                 continue
 
+        confirmedOnlys[state_name] = confirmedOnly
+        confirmedOnlys_dom[state_name] = confirmedOnly_dom
+
         adjusted = trimmed
         adjustedCases[state_name] = adjusted
         adjusted_dom = trimmed_dom
@@ -586,12 +593,12 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
         L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) 
         # covariace and std of confirmed cases
-        # no_need_adjust = adjusted_dom[:-L].values
-        no_need_adjust = confirmedOnly_dom[:-L+len(adjusted_dom)-len(confirmedOnly_dom)].values
+        no_need_adjust = adjusted_dom[:-L].values
         stdCases = []
         if len(no_need_adjust) >= L:
             for lag in range(1+delayOffsetDays, L):
-                stdCases.append(np.std(no_need_adjust[lag:] - no_need_adjust[:-lag], ddof=1))
+                lnReturn = np.log((no_need_adjust[lag:] + 0.5)/(no_need_adjust[:-lag] + 0.5))
+                stdCases.append(np.std(lnReturn, ddof=1))
 
         covCases = [[0.0] * (L-1-delayOffsetDays) for i in range(L-1-delayOffsetDays)]
         if len(no_need_adjust) >= L:
@@ -614,7 +621,6 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         # store std from uncertainty of future confirmed cases for later adjustment
         result['std_future_cases'] = stdCases
         result['cov_future_cases'] = covCases
-        #result['std_future_rt'] = stds_case_ratios
     
         # Holds all posteriors with every given value of sigma
         result['posteriors'] = []
@@ -651,10 +657,11 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     for state_name, result in results.items():
         posteriors = result['posteriors'][max_likelihood_index]
         most_likely = posteriors_get_max_point(posteriors)
-        #stds_future_rt = result['std_future_rt']
-    
+
         # simulate Rt with bump on future confirmed case
         most_likely_bumpeds = []
+        confirmedOnly0 = confirmedOnlys[state_name]
+        confirmedOnly0_dom = confirmedOnlys_dom[state_name]
         adjusted0 = adjustedCases[state_name]
         adjusted_dom0 = adjustedCases_dom[state_name]
     
@@ -670,28 +677,32 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         # This no-treating strategy should be alright because confidence interval from Poisson/gamma distribution is    already large
         stdCases = result['std_future_cases']
         covCases = result['cov_future_cases']
-        if stdCases and covCases:
-            bump_size = max(stdCases)
-            for d in range(1, L_offset):
-                if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
-                    p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len(p_infection_onset_delay_offsetted) + d)))
-                else:
-                    p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
-                bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
-                bumpedAdjusted_dom = adjusted_dom0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day   later
-                bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom, singleTau=singleTau, sumStyle=sumStyle, includePosterior=includePosterior, sigma=sigma)
-                most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
-                most_likely_change = (most_likely_bumped - most_likely) / bump_size
-                most_likely_bumpeds.append(most_likely_change)
-        
-            stdRts = 0. * most_likely
-            #for d in range(1, L_offset):
-            #    stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
-            for d1 in range(1, L_offset):
-                for d2 in range(1, L_offset):
-                    stdRts += most_likely_bumpeds[d1-1]*most_likely_bumpeds[d2-1] * covCases[d1-1][d2-1]
-            stdRts = np.sqrt(stdRts)[::-1]
-        #    stdRts.to_csv("stdRts.csv")
+
+        if leftUncertaintyStyle == "Nothing":
+            posteriors = posteriors
+        elif leftUncertaintyStyle == "ConfirmedDecomposed":
+            if stdCases and covCases:
+                bump_size = max(stdCases)
+                for d in range(1, L_offset):
+                    if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
+                        p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len(p_infection_onset_delay_offsetted) + d)))
+                    else:
+                        p_delay_values = np.resize(p_infection_onset_delay_offsetted[d:], (1, len(adjusted0)))[0]
+                    bumpedAdjusted = adjusted0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d-day later
+                    bumpedAdjusted_dom = adjusted_dom0 + bump_size * p_delay_values[::-1] # +1 of the confirmed cases of d- day later
+                    bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted,    bumpedAdjusted_dom, singleTau=singleTau,   sumStyle=sumStyle, includePosterior=includePosterior,     sigma=sigma)
+                    most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
+                    most_likely_change = (most_likely_bumped - most_likely) / bump_size
+                    most_likely_bumpeds.append(most_likely_change)
+            
+                stdRts = 0. * most_likely
+                #for d in range(1, L_offset):
+                #    stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
+                for d1 in range(1, L_offset):
+                    for d2 in range(1, L_offset):
+                        stdRts += most_likely_bumpeds[d1 - 1] * most_likely_bumpeds[d2 - 1] * covCases[d1 - 1][d2 - 1]
+                stdRts = np.sqrt(stdRts)[::-1]
+            #    stdRts.to_csv("stdRts.csv")
         
             # modify posteriors
             for d in range(len(stdCases)):
@@ -700,17 +711,120 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                 normal_dist = sps.norm(loc=r_t_range, scale=stdRts[d]).pdf(r_t_range[:,None])
                 normal_dist /= normal_dist.sum(axis=0)
                 normal_dist /= normal_dist.sum(axis=1)[:,None]
-                posterior_to_be_modified = posteriors.iloc[:,-d-1]
+                posterior_to_be_modified = posteriors.iloc[:,-d - 1]
                 posterior_modified = posterior_to_be_modified @ normal_dist
-                posteriors.iloc[:,-d-1] = posterior_modified
+                posteriors.iloc[:,-d - 1] = posterior_modified
         
-                #posteriorsfilename_before = posterior_to_be_modified.name[0] + posterior_to_be_modified.name       [1].strftime('%Y-%m-%d') + ".csv"
+                #posteriorsfilename_before = posterior_to_be_modified.name[0] +
+                #posterior_to_be_modified.name [1].strftime('%Y-%m-%d') +
+                #".csv"
                 #posterior_to_be_modified.to_csv(posteriorsfilename_before)
-                #posteriorsfilename_after = posterior_to_be_modified.name[0] + posterior_to_be_modified.name        [1].strftime('%Y-%m-%d') + "_after.csv"
-                #np.savetxt(posteriorsfilename_after, posterior_modified, delimiter=",")
-                #normalfilename = posterior_to_be_modified.name[0] + posterior_to_be_modified.name[1].strftime  ('%Y-%m-%   d') + "_normal_dist.csv"
+                #posteriorsfilename_after = posterior_to_be_modified.name[0] +
+                #posterior_to_be_modified.name [1].strftime('%Y-%m-%d') +
+                #"_after.csv"
+                #np.savetxt(posteriorsfilename_after, posterior_modified,
+                #delimiter=",")
+                #normalfilename = posterior_to_be_modified.name[0] +
+                #posterior_to_be_modified.name[1].strftime ('%Y-%m-% d') +
+                #"_normal_dist.csv"
                 #np.savetxt(normalfilename, normal_dist, delimiter=",")
     
+        elif leftUncertaintyStyle == "ConfirmedTotal":
+            if stdCases:
+                if L_offset - len(stdCases) > 0:
+                    stdCasesToBump = np.pad(stdCases, (L_offset - len(stdCases), 0), 'constant', constant_values = (0.0, 0))
+                    #stdCasesToBump = np.concatenate((np.zeros(L_offset -
+                    #len(stdCases))), stdCases)
+                else:
+                    stdCasesToBump = np.resize(stdCases, (1, L_offset))[0]
+
+                extraRowsWithLastValue = True
+                confirmedOnly0_extension = confirmedOnly0
+                confirmedOnly0_dom_extension = confirmedOnly0_dom
+                for i in range(L_offset):
+                    newIndex = [(confirmedOnly0_extension.index[-1][0], confirmedOnly0_extension.index[-1][1] + timedelta(days=1))]
+                    if extraRowsWithLastValue:
+                        row = pd.Series(index=newIndex, data=confirmedOnly0_extension[-1])
+                        row_dom = pd.Series(index=newIndex, data=confirmedOnly0_dom_extension[-1])
+                    else:
+                        row = pd.Series(index=newIndex, data=[0])
+                        row_dom = pd.Series(index=newIndex, data=[0])
+                    confirmedOnly0_extension = confirmedOnly0_extension.append(row)
+                    confirmedOnly0_dom_extension = confirmedOnly0_dom_extension.append(row_dom)
+
+                if len(confirmedOnly0_extension) - len(stdCasesToBump) > 0:
+                    stdCasesToBump = np.concatenate(([0.] * (len(confirmedOnly0_extension) - len(stdCasesToBump)), stdCasesToBump))
+                else:
+                    stdCasesToBump = np.resize(stdCasesToBump, (1, len(confirmedOnly0_extension)))[0]
+
+                for i in [-1, 1]:
+                    bumpedConfirmedOnly = (confirmedOnly0_extension + 0.5) * np.exp(stdCasesToBump * i) - 0.5
+                    bumpedOnsetFromConfirmedOnly0 = confirmed_to_onset(confirmed=bumpedConfirmedOnly,   p_onset_comfirmed_delay=p_onset_comfirmed_delay,  revert_to_confirmed_base=revert_to_confirmed_base,   rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision,    backProjection=backProjection)
+                    bumpedAdjusted = onset_to_infection(onset=bumpedOnsetFromConfirmedOnly0,    p_infection_onset_delay=p_infection_onset_delay,   revert_to_confirmed_base=revert_to_confirmed_base,    rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision,     backProjection=backProjection)
+
+                    bumpedConfirmedOnly_dom = (confirmedOnly0_dom_extension + 0.5) * np.exp(stdCasesToBump * i) - 0.5
+                    bumpedOnsetFromConfirmedOnly0_dom = confirmed_to_onset  (confirmed=bumpedConfirmedOnly_dom, p_onset_comfirmed_delay=p_onset_comfirmed_delay,   revert_to_confirmed_base=revert_to_confirmed_base,   rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision,    backProjection=backProjection)
+                    bumpedAdjusted_dom = onset_to_infection(onset=bumpedOnsetFromConfirmedOnly0_dom,    p_infection_onset_delay=p_infection_onset_delay,   revert_to_confirmed_base=revert_to_confirmed_base,    rightCensorshipByDelayFunctionDevision=rightCensorshipByDelayFunctionDevision,     backProjection=backProjection)
+    
+                    bumpedPosteriors, dummy = get_posteriors(bumpedAdjusted, bumpedAdjusted_dom,    singleTau=singleTau, sumStyle=sumStyle,includePosterior=includePosterior,  sigma=sigma)
+                    if i == -1:
+                        bumpedPosteriorsMinus = bumpedPosteriors
+                    else:
+                        bumpedPosteriorsPlus = bumpedPosteriors
+                #most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
+                #most_likely_change = most_likely_bumped - most_likely
+                #stdRts = most_likely_change[-(len(adjusted0) - L_offset):]
+                ## stdRts.to_csv("stdRts.csv")
+
+                # modify posteriors
+                bumpedPosteriorsMinus = bumpedPosteriorsMinus[posteriors.columns]
+                bumpedPosteriorsPlus = bumpedPosteriorsPlus[posteriors.columns]
+                most_likely_bumped_plus = posteriors_get_max_point(bumpedPosteriorsPlus)
+                most_likely_bumped_minus = posteriors_get_max_point(bumpedPosteriorsMinus)
+                most_likely = posteriors_get_max_point(posteriors)
+
+
+                #posteriors = 2. / 3. * posteriors + (bumpedPosteriorsMinus + bumpedPosteriorsPlus) / 6.
+                #posteriors = (bumpedPosteriorsMinus + bumpedPosteriorsPlus) / 2.
+                for d in range(L_offset):
+                    Rt_plus = most_likely_bumped_plus[-d-1]
+                    Rt = most_likely[-d-1]
+                    Rt_minus = most_likely_bumped_minus[-d-1]
+                    # Assuming a displaced LN distribution: R+b = (R0 + b)exp(sW-s*s/2)
+                    # Rt_plus + b = (R0 + b)exp(s-s*s/2)
+                    # Rt + b = (R0 + b)exp(-s*s/2)
+                    # Rt_minus + b = (R0 + b)exp(-s-s*s/2)
+                    b = (Rt*Rt - Rt_plus*Rt_minus) / (2.*Rt - Rt_plus - Rt_minus)
+                    b = min(b, 0.0)
+                    s = 0.5 * (math.log(Rt_plus - b) - math.log(Rt_minus - b))
+                    R0 = (Rt - b) * math.exp(0.5*s**2) + b
+
+                    if s < 0.001:
+                        continue
+                    r_t_range_for_ln = r_t_range
+                    r_t_range_for_ln[0] = 0.0001
+                    lnormal_dist = sps.lognorm(s=s, loc=b, scale=r_t_range-b).pdf(r_t_range[:,None])
+                    lnormal_dist /= lnormal_dist.sum(axis=0)
+                    lnormal_dist /= lnormal_dist.sum(axis=1)[:,None]
+                    posterior_to_be_modified = posteriors.iloc[:,-d - 1]
+                    posterior_modified = posterior_to_be_modified @ lnormal_dist
+                    posteriors.iloc[:,-d - 1] = posterior_modified
+            
+                    #posteriorsfilename_before = posterior_to_be_modified.name[0] +
+                    #posterior_to_be_modified.name [1].strftime('%Y-%m-%d') + ".csv"
+                        #posterior_to_be_modified.to_csv(posteriorsfilename_before)
+                        #posteriorsfilename_after = posterior_to_be_modified.name[0] +
+                        #posterior_to_be_modified.name [1].strftime('%Y-%m-%d') +
+                        #"_after.csv"
+                        #np.savetxt(posteriorsfilename_after, posterior_modified,
+                        #delimiter=",")
+                        #normalfilename = posterior_to_be_modified.name[0] +
+                        #posterior_to_be_modified.name[1].strftime ('%Y-%m-% d') +
+                        #"_normal_dist.csv"
+                        #np.savetxt(normalfilename, normal_dist, delimiter=",")
+
+        else:
+            raise NameError("leftUncertaintyStyle must be OnsetTotal or ConfirmedDecomposed.")
         result['posteriors'][max_likelihood_index] = posteriors 
     
     
