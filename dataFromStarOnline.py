@@ -43,7 +43,13 @@ tableBody = parseFlourishTable(body)
 locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
-	day, monthStr = dateRaw.split("-")
+	if "-" in dateRaw:
+		day, monthStr = dateRaw.split("-")
+	elif " " in dateRaw:
+		day, monthStr = dateRaw.split(" ")
+	else:
+		raise ValueError("Cannot parse date string: " + dateRaw)
+
 	try:
 		if monthStr == "Sept":
 			monthStr = "Sep"
