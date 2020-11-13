@@ -51,13 +51,13 @@ jobs:
       run: |
         git config user.email "$GIT_OWNER_EMAIL"
         git config user.name "drxyzw"
-        if [[ `git status --porcelain` ]]; then
-          git add .
-          git commit -a -m "Automatically updating daily CSV data"
-          git remote rm origin
-          git remote add origin https://drxyzw:$PUSH_TOKEN@github.com/drxyzw/WuhanCoronavirus-Malaysia.git
-          git push origin HEAD:master
-        else
-          echo 'there is no change'
-        fi
+        # if [[ `git status --porcelain` ]]; then
+        #   git add .
+        #   git commit -a -m "Automatically updating daily CSV data"
+        #   git remote rm origin
+        #   git remote add origin https://drxyzw:$PUSH_TOKEN@github.com/drxyzw/WuhanCoronavirus-Malaysia.git
+        #   git push origin HEAD:master
+        # else
+        #   echo 'there is no change'
+        # fi
 
