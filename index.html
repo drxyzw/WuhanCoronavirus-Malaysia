@@ -135,7 +135,7 @@
 					max = Math.max(max, arrayData[i][1], arrayData[i][2], arrayData[i][3]); 
 					min = Math.min(min, arrayData[i][4]); 
 				}
-				var axisMax = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
+				var axisMax = 10.0 * Math.pow(100, Math.ceil(Math.log(max/10.0) / Math.log(100.0)));
 				var axisMin = Math.sign(min) * Math.pow(10, Math.ceil(Math.log(Math.abs(min)) / Math.log(10.0)));
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
@@ -160,6 +160,7 @@
 						minorGridlines: { count:0 },
 						scaleType: logScaleChange ? 'mirrorLog' : 'null',
 						viewWindow: {
+							<!-- max: logScaleChange ? axisMax : null, -->
 							min: logScaleChange ? axisMin : null
 						}
 					},
@@ -186,7 +187,7 @@
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 6*d);
 						drawLine(chart, arrayData[1][0], guideLineStart, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/(4.0*Math.pow(1.4,d)), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
+						drawText(chart, textDate, axisMax/(40.0*Math.pow(1.4,d)), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 				}
 			});
@@ -228,10 +229,13 @@
 				for(var i = 1; i < arrayData.length; ++i) {
 					arrayData[i][0] = new Date(arrayData[i][0]);
 				}
-				var max = arrayData[arrayData.length-1][1];
+				var max = 0;
+				for(var i = 1; i < arrayData[arrayData.length-1].length; ++i) {
+					max = Math.max(max, arrayData[arrayData.length-1][i]);
+				}
 				var axisMax10 = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
 				var axisMax5 = 5*Math.pow(10, Math.ceil(Math.log(max/5) / Math.log(10.0)));
-				var axisMax = Math.max(axisMax10, axisMax5);
+				var axisMax = Math.min(axisMax10, axisMax5);
 				var axisMin = 10.0;
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
