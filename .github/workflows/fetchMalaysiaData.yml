@@ -39,7 +39,7 @@ jobs:
     - name: Get the number of infecteds by states from Wikipedia
       run: |
         cd ./
-        python dataFromWikipedia.py
+        python dataFromHealthDirectorBlog.py
     - name: Get the number of nationwide total from The Star Online
       run: |
         cd ./
