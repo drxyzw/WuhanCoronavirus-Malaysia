@@ -1,3 +1,5 @@
+# Based on R sctipt: https://gist.github.com/wnarifin/a608e60b6d35fdb369ee8133b30d36ab
+
 from datetime import datetime
 from datetime import timedelta
 import requests
