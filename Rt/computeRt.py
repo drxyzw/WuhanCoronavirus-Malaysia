@@ -803,7 +803,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                         continue
                     r_t_range_for_ln = r_t_range
                     r_t_range_for_ln[0] = 0.0001
-                    lnormal_dist = sps.lognorm(s=s, loc=b, scale=r_t_range-b).pdf(r_t_range[:,None])
+                    lnormal_dist = sps.lognorm(s=s, loc=-b, scale=r_t_range+b).pdf(r_t_range[:,None])
                     lnormal_dist /= lnormal_dist.sum(axis=0)
                     lnormal_dist /= lnormal_dist.sum(axis=1)[:,None]
                     posterior_to_be_modified = posteriors.iloc[:,-d - 1]
