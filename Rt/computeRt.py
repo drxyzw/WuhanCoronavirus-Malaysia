@@ -791,19 +791,19 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                     Rt = most_likely[-d-1]
                     Rt_minus = most_likely_bumped_minus[-d-1]
                     # Assuming a displaced LN distribution: R-b = (R0 - b)exp(sW-s*s/2)
-                    # Rt_plus + b = (R0 + b)exp(s-s*s/2)
-                    # Rt + b = (R0 + b)exp(-s*s/2)
-                    # Rt_minus + b = (R0 + b)exp(-s-s*s/2)
-                    b = (Rt*Rt - Rt_plus*Rt_minus) / (2.*Rt - Rt_plus - Rt_minus)
-                    b = max(b, 0.0)
-                    s = 0.5 * (math.log(Rt_plus + b) - math.log(Rt_minus + b))
-                    R0 = (Rt + b) * math.exp(0.5*s**2) - b
+                    # Rt_plus - b = (R0 - b)exp(s-s*s/2)
+                    # Rt - b = (R0 - b)exp(-s*s/2)
+                    # Rt_minus - b = (R0 - b)exp(-s-s*s/2)
+                    b = -(Rt*Rt - Rt_plus*Rt_minus) / (2.*Rt - Rt_plus - Rt_minus)
+                    b = min(b, 0.0)
+                    s = 0.5 * (math.log(Rt_plus - b) - math.log(Rt_minus - b))
+                    R0 = (Rt - b) * math.exp(0.5*s**2) + b
 
                     if s < 0.001:
                         continue
                     r_t_range_for_ln = r_t_range
                     r_t_range_for_ln[0] = 0.0001
-                    lnormal_dist = sps.lognorm(s=s, loc=-b, scale=r_t_range+b).pdf(r_t_range[:,None])
+                    lnormal_dist = sps.lognorm(s=s, loc=b, scale=r_t_range-b).pdf(r_t_range[:,None])
                     lnormal_dist /= lnormal_dist.sum(axis=0)
                     lnormal_dist /= lnormal_dist.sum(axis=1)[:,None]
                     posterior_to_be_modified = posteriors.iloc[:,-d - 1]
