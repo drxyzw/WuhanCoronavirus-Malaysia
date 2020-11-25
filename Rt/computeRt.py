@@ -790,13 +790,13 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                     Rt_plus = most_likely_bumped_plus[-d-1]
                     Rt = most_likely[-d-1]
                     Rt_minus = most_likely_bumped_minus[-d-1]
-                    # Assuming a displaced LN distribution: R+b = (R0 + b)exp(sW-s*s/2)
-                    # Rt_plus + b = (R0 + b)exp(s-s*s/2)
-                    # Rt + b = (R0 + b)exp(-s*s/2)
-                    # Rt_minus + b = (R0 + b)exp(-s-s*s/2)
-                    b = (Rt*Rt - Rt_plus*Rt_minus) / (2.*Rt - Rt_plus - Rt_minus)
-                    b = min(b, 0.0)
-                    s = 0.5 * (math.log(Rt_plus - b) - math.log(Rt_minus - b))
+                    # Assuming a displaced LN distribution: R-b = (R0 - b)exp(sW-s*s/2)
+                    # Rt_plus - b = (R0 - b)exp(s-s*s/2)
+                    # Rt - b = (R0 - b)exp(-s*s/2)
+                    # Rt_minus - b = (R0 - b)exp(-s-s*s/2)
+                    b = -(Rt*Rt - Rt_plus*Rt_minus) / (2.*Rt - Rt_plus - Rt_minus)
+                    b = max(b, 0.0)
+                    s = 0.5 * (math.log(Rt_plus + b) - math.log(Rt_minus + b))
                     R0 = (Rt - b) * math.exp(0.5*s**2) + b
 
                     if s < 0.001:
