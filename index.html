@@ -135,7 +135,7 @@
 					max = Math.max(max, arrayData[i][1], arrayData[i][2], arrayData[i][3]); 
 					min = Math.min(min, arrayData[i][4]); 
 				}
-				var axisMax = 10.0 * Math.pow(100, Math.ceil(Math.log(max/10.0) / Math.log(100.0)));
+				var axisMax = 10.0 * Math.pow(10, Math.ceil(Math.log(max/10.0) / Math.log(10.0)));
 				var axisMin = Math.sign(min) * Math.pow(10, Math.ceil(Math.log(Math.abs(min)) / Math.log(10.0)));
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
@@ -157,6 +157,8 @@
 					},
 					vAxis: {
 						title: "Cases",
+						gridlines: { count: 6 },
+						<!-- gridlines: { interval: [10, 100,　1000]}, -->
 						minorGridlines: { count:0 },
 						scaleType: logScaleChange ? 'mirrorLog' : 'null',
 						viewWindow: {
@@ -187,7 +189,7 @@
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 6*d);
 						drawLine(chart, arrayData[1][0], guideLineStart, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/(40.0*Math.pow(1.4,d)), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
+						drawText(chart, textDate, axisMax/(200.0*Math.pow(1.4,-d)), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 				}
 			});
