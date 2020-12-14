@@ -107,11 +107,9 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
             if tableTag != None:
                 tableBody = tableTag.tbody if (tableTag.find('tbody') != None) else tableTag
                 if tableBody.find('td').text == 'NEGERI':
-                    #print(table)
                     outputRow = []
                     dateStr = str(d_int) + "/" + str(m_int) + "/" + y
                     outputRow.append(dateStr)
-                    #tableBody = table.table.tbody
                     for state in statesDestinationOrdered:
                         i = stateNames_ab.index (state)
                         stateName_full = stateNames_full[i]
