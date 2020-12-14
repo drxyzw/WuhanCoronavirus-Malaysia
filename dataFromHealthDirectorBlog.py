@@ -103,25 +103,28 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
         stateNames_full, stateNames_ab = zip(*stateNames)
     
         for table in tables:
-            if table.find('table').find ('tbody').find('td').text == 'NEGERI':
-                #print(table)
-                outputRow = []
-                dateStr = str(d_int) + "/" + str(m_int) + "/" + y
-                outputRow.append(dateStr)
-                tableBody = table.table.tbody
-                for state in statesDestinationOrdered:
-                    i = stateNames_ab.index (state)
-                    stateName_full = stateNames_full[i]
-                    for row in  tableBody.findAll("tr"):
-                        cells = row.findAll ("td")
-                        if str.strip(cells  [0].text) == stateName_full:
-                            newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells[1].text)) # new case might be a form of "total new cases (import cases
-                            newCases = str(newCases)
-                            cumulCases = str.strip(cells[2].text)
-                            combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
-                            outputRow.append(combinedCases)
-                outputRow.append(url) # Source column
-                outputRows.append(outputRow)
+            tableTag = table.find('table')
+            if tableTag != None:
+                tableBody = tableTag.tbody if (tableTag.find('tbody') != None) else tableTag
+                if tableBody.find('td').text == 'NEGERI':
+                    #print(table)
+                    outputRow = []
+                    dateStr = str(d_int) + "/" + str(m_int) + "/" + y
+                    outputRow.append(dateStr)
+                    #tableBody = table.table.tbody
+                    for state in statesDestinationOrdered:
+                        i = stateNames_ab.index (state)
+                        stateName_full = stateNames_full[i]
+                        for row in  tableBody.findAll("tr"):
+                            cells = row.findAll ("td")
+                            if str.strip(cells  [0].text) == stateName_full:
+                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells  [1].text)) # new case might be a form of "total new cases (import     cases
+                                newCases = str(newCases)
+                                cumulCases = str.strip(cells[2].text)
+                                combinedCases = (cumulCases + "(" + newCases + ")") if newCases !=   "0" else cumulCases
+                                outputRow.append(combinedCases)
+                    outputRow.append(url) # Source column
+                    outputRows.append(outputRow)
     
     writer = csv.writer(csvfile)
     writer.writerows(outputRows)
