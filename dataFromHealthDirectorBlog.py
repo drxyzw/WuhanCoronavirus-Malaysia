@@ -116,7 +116,7 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
                         for row in  tableBody.findAll("tr"):
                             cells = row.findAll ("td")
                             if str.strip(cells  [0].text) == stateName_full:
-                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells  [1].text)) # new case might be a form of "total new cases (import     cases
+                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells  [1].text)) # new case might be a form of "[total new cases] ([import     cases]"
                                 newCases = str(newCases)
                                 cumulCases = str.strip(cells[2].text)
                                 combinedCases = (cumulCases + "(" + newCases + ")") if newCases !=   "0" else cumulCases
