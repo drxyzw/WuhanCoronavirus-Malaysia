@@ -13,19 +13,19 @@ from dataCreateByState import cell2TwoNumbersByBracket
 stateNames = [
     ["SABAH", "SB"],
     ["SELANGOR", "SE"],
-    ["W.P. KUALA LUMPUR", "KL"],
+    [["W.P. KUALA LUMPUR", "WP KUALA LUMPUR"], "KL"],
     ["KEDAH", "KD"],
     ["NEGERI SEMBILAN", "NS"],
     ["PULAU PINANG", "PG"],
     ["SARAWAK", "SR"],
-    ["W.P. LABUAN", "LB"],
+    [["W.P. LABUAN", "WP LABUAN"], "LB"],
     ["JOHOR", "JH"],
     ["PERAK", "PK"],
     ["PAHANG", "PH"],
     ["MELAKA", "ML"],
     ["TERENGGANU", "TR"],
     ["KELANTAN", "KE"],
-    ["W.P. PUTRAJAYA", "PT"],
+    [["W.P. PUTRAJAYA", "WP PUTRAJAYA"], "PT"],
     ["PERLIS", "PR"]
     ]
 
@@ -113,13 +113,15 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
                     for state in statesDestinationOrdered:
                         i = stateNames_ab.index (state)
                         stateName_full = stateNames_full[i]
-                        for row in  tableBody.findAll("tr"):
+                        for row in tableBody.findAll("tr"):
                             cells = row.findAll ("td")
-                            if str.strip(cells  [0].text) == stateName_full:
+                            cellText = str.strip(cells[0].text)
+                            cellText = ' '.join(cellText.split())
+                            if (type(stateName_full) is str and cellText == stateName_full) or (type(stateName_full) is list and any(x == cellText for x in stateName_full)):
                                 newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells  [1].text)) # new case might be a form of "[total new cases] ([import     cases]"
                                 newCases = str(newCases)
                                 cumulCases = str.strip(cells[2].text)
-                                combinedCases = (cumulCases + "(" + newCases + ")") if newCases !=   "0" else cumulCases
+                                combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
                                 outputRow.append(combinedCases)
                     outputRow.append(url) # Source column
                     outputRows.append(outputRow)
