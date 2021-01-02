@@ -37,9 +37,12 @@ for lineBytes in urllib.request.urlopen(page):
 tableHeader = parseFlourishTable(columnNames)
 tableHeaderNp = np.array(tableHeader)
 tableBody = parseFlourishTable(body)
+tableBody.reverse()
 # 1) convert date DD/MMM to DD/MM/YYYY format
 # 2) make sure that no comma containing number. it will screw up csv file.
 #  example: 3,211 in csv file could be interpolated as 3 and 211 in two columns
+year = 2020
+month_last = 0
 locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 for i in range(len(tableBody)):
 	dateRaw = tableBody[i][0]
@@ -59,7 +62,9 @@ for i in range(len(tableBody)):
 			month = datetime.strptime(monthStr, '%B').month
 		except ValueError:
 			raise ValueError("Cannot parse month string: " + monthStr)
-	dateStr = "2020-" + str(month).zfill(2) + "-" + str(day)
+	if month == 1 and month_last == 12:
+		year += 1
+	dateStr = str(year) + "-" + str(month).zfill(2) + "-" + str(day).zfill(2)
 	if dateStr == "2020-08-19":
 		tableBody[i][4] = '8925'
 	tableBody[i][0] = dateStr
@@ -67,8 +72,9 @@ for i in range(len(tableBody)):
 	tableBody[i][2] = str(locale.atoi(tableBody[i][2]))
 	tableBody[i][3] = str(locale.atoi(tableBody[i][3]))
 	tableBody[i][4] = str(locale.atoi(tableBody[i][4]))
+	month_last = month
 
-tableBodyNp = np.flip(np.array(tableBody), axis = 0)
+tableBodyNp = np.array(tableBody)
 table = np.append(tableHeaderNp, tableBodyNp, axis = 0)
 
 # save a total number file
