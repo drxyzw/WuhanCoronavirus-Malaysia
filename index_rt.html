@@ -10,6 +10,16 @@
 		var logScale = true;
 		var logScaleChange = true;
 		var MCO = new Date(2020, 3-1, 18);
+		var chartSettings = {};
+			$.ajax({
+				url: './Rt/chartSettings.json',
+				async: false,
+				dataType: 'json',
+				success: function(jsonData) {
+					chartSettings = jsonData;
+				}
+			});
+
 		google.charts.load('current', {'packages':['corechart', 'line']});
 		google.charts.setOnLoadCallback(drawChartFirst);
 		
@@ -64,8 +74,6 @@
 			drawRtChart("Kuala Lumpur");
 			drawRtChart("Putrajaya");
 			drawRtChart("Labuan");
-			
-			document.getElementById("defaultOpen").click();
 		}
 		function drawAxisLine(chart, x, text, textOffsetX = 0, textOffsetY = 0) {
 			var layout = chart.getChartLayoutInterface();
@@ -104,6 +112,52 @@
 			return svgElement;
 		}
 
+		function addChartGradient(chart, dataLength) {
+			var layout = chart.getChartLayoutInterface();
+			var chartArea = layout.getChartAreaBoundingBox();
+			var svg = chart.getContainer().getElementsByTagName('svg')[0];
+			var totalGradientWidth = chartSettings.delay_cut_off_days;
+			var totalGradientWidthRatio = totalGradientWidth / dataLength;
+			var totalGradientWidthPerc = ((100 - totalGradientWidthRatio * 100) | 0).toString() + '%';
+			
+			var properties = {
+				id: "chartGradient",
+				x1: totalGradientWidthPerc,
+				y1: "0%",
+				x2: "100%",
+				y2: "0%",
+				stops: [
+					{ offset: '0%', 'stop-color': '#3366CC', 'stop-opacity': 1 },
+					{ offset: '100%', 'stop-color': '#3366CC', 'stop-opacity': 0 }
+				]
+			};
+			
+			createGradient(svg, properties);
+			var chartPath = svg.getElementsByTagName('path')[2];
+			chartPath.setAttribute('stroke', 'url(#chartGradient)');
+		}
+		
+		function createGradient(svg, properties) {
+			var svgNS = svg.namespaceURI;
+			var grad = document.createElementNS(svgNS, 'linearGradient');
+			grad.setAttribute('id', properties.id);
+			["x1", "y1", "x2", "y2"].forEach(function(name) {
+				if(properties.hasOwnProperty(name)) {
+					grad.setAttribute(name, properties[name]);
+				}
+			});
+			for (var i = 0; i < properties.stops.length; ++i) {
+				var attrs = properties.stops[i];
+				var stop = document.createElementNS(svgNS, 'stop');
+				for (var attr in attrs) {
+					if (attrs.hasOwnProperty(attr)) stop.setAttribute(attr, attrs[attr]);
+				}
+				grad.appendChild(stop);
+			}
+			
+			var defs = svg.querySelector('defs') || svg.insertBefore(document.createElementNS(svg, 'defs'), svg.firstChild);
+			return defs.appendChild(grad);
+		}
 
 		function drawRtChart(areaName) {
 			var fileExists = true;
@@ -201,6 +255,10 @@
  
 					chart.draw(view, options);
 					drawAxisLine(chart, MCO, 'MCO');
+					<!-- google.visualization.events.addOneTimeListener(chart, 'ready', function() { -->
+						<!-- addChartGradient(chart, arrayData.length-1); -->
+					<!-- }); -->
+					addChartGradient(chart, arrayData.length-1);
 				});
 			}
 		}

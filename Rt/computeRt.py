@@ -18,6 +18,7 @@ import scipy.special as spsp
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+import json
 
 # We create an array for every possible value of Rt
 R_T_MAX = 12
@@ -592,6 +593,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         delayOffsetDays = (obsDate - lastDate).days
         #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
         L = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) 
+
         # covariace and std of confirmed cases
         no_need_adjust = adjusted_dom[:-L].values
         stdCases = []
@@ -669,8 +671,15 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         delayOffsetDays = (obsDate - lastDate).days
         p_infection_onset_delay_offsetted = p_infection_confirm_delay[delayOffsetDays:]
         #p_infection_onset_delay_offsetted = p_infection_onset_delay[delayOffsetDays:]
-        L_offset = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
-    
+        L_infection_onset = np.argmax(np.cumsum(p_infection_onset_delay) > P_DELAY_THRESHOLD) - delayOffsetDays
+        # save file
+        chartSettings_py = {
+           "delay_cut_off_days": int(L_infection_onset),
+           "delay_cut_off_prob": P_DELAY_THRESHOLD
+        }
+        with open('chartSettings.json', 'w') as json_file:
+            json.dump(chartSettings_py, json_file)
+
         # if series is not long enough to compute stdCases (thus Null),
         # the series is too short and not statistically meaningful to calculate stdCases
         # So we do not make adjustment for uncertaity of future cases modulation
@@ -683,7 +692,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
         elif leftUncertaintyStyle == "ConfirmedDecomposed":
             if stdCases and covCases:
                 bump_size = max(stdCases)
-                for d in range(1, L_offset):
+                for d in range(1, L_infection_onset):
                     if len(adjusted0) - len(p_infection_onset_delay_offsetted) + d > 0:
                         p_delay_values = np.concatenate((p_infection_onset_delay_offsetted[d:], np.zeros(len(adjusted0) - len(p_infection_onset_delay_offsetted) + d)))
                     else:
@@ -696,10 +705,10 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                     most_likely_bumpeds.append(most_likely_change)
             
                 stdRts = 0. * most_likely
-                #for d in range(1, L_offset):
+                #for d in range(1, L_infection_onset):
                 #    stdRts += most_likely_bumpeds[d-1]**2 * stdCases[d-1]**2
-                for d1 in range(1, L_offset):
-                    for d2 in range(1, L_offset):
+                for d1 in range(1, L_infection_onset):
+                    for d2 in range(1, L_infection_onset):
                         stdRts += most_likely_bumpeds[d1 - 1] * most_likely_bumpeds[d2 - 1] * covCases[d1 - 1][d2 - 1]
                 stdRts = np.sqrt(stdRts)[::-1]
             #    stdRts.to_csv("stdRts.csv")
@@ -731,17 +740,17 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
     
         elif leftUncertaintyStyle == "ConfirmedTotal":
             if stdCases:
-                if L_offset - len(stdCases) > 0:
-                    stdCasesToBump = np.pad(stdCases, (L_offset - len(stdCases), 0), 'constant', constant_values = (0.0, 0))
-                    #stdCasesToBump = np.concatenate((np.zeros(L_offset -
+                if L_infection_onset - len(stdCases) > 0:
+                    stdCasesToBump = np.pad(stdCases, (L_infection_onset - len(stdCases), 0), 'constant', constant_values = (0.0, 0))
+                    #stdCasesToBump = np.concatenate((np.zeros(L_infection_onset -
                     #len(stdCases))), stdCases)
                 else:
-                    stdCasesToBump = np.resize(stdCases, (1, L_offset))[0]
+                    stdCasesToBump = np.resize(stdCases, (1, L_infection_onset))[0]
 
                 extraRowsWithLastValue = True
                 confirmedOnly0_extension = confirmedOnly0
                 confirmedOnly0_dom_extension = confirmedOnly0_dom
-                for i in range(L_offset):
+                for i in range(L_infection_onset):
                     newIndex = [(confirmedOnly0_extension.index[-1][0], confirmedOnly0_extension.index[-1][1] + timedelta(days=1))]
                     if extraRowsWithLastValue:
                         row = pd.Series(index=newIndex, data=confirmedOnly0_extension[-1])
@@ -773,7 +782,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
                         bumpedPosteriorsPlus = bumpedPosteriors
                 #most_likely_bumped = posteriors_get_max_point(bumpedPosteriors)
                 #most_likely_change = most_likely_bumped - most_likely
-                #stdRts = most_likely_change[-(len(adjusted0) - L_offset):]
+                #stdRts = most_likely_change[-(len(adjusted0) - L_infection_onset):]
                 ## stdRts.to_csv("stdRts.csv")
 
                 # modify posteriors
@@ -786,7 +795,7 @@ def computeRt(statesOnset, statesOnset_dom, statesConfirmedOnly, statesConfirmed
 
                 #posteriors = 2. / 3. * posteriors + (bumpedPosteriorsMinus + bumpedPosteriorsPlus) / 6.
                 #posteriors = (bumpedPosteriorsMinus + bumpedPosteriorsPlus) / 2.
-                for d in range(L_offset):
+                for d in range(L_infection_onset):
                     Rt_plus = most_likely_bumped_plus[-d-1]
                     Rt = most_likely[-d-1]
                     Rt_minus = most_likely_bumped_minus[-d-1]
