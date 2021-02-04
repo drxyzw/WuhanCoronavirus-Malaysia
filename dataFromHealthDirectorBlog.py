@@ -121,6 +121,11 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
                                 newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells  [1].text)) # new case might be a form of "[total new cases] ([import     cases]"
                                 newCases = str(newCases)
                                 cumulCases = str.strip(cells[2].text)
+
+                                # when blog post number is incorrect
+                                if d_int == 7 and m_int == 1 and y == "2021" and state == "KL":
+                                    cumulCases = "15,258"
+
                                 combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
                                 outputRow.append(combinedCases)
                     outputRow.append(url) # Source column
