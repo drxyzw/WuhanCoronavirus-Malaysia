@@ -240,7 +240,7 @@
 				}
 				var axisMax10 = Math.pow(10, Math.ceil(Math.log(max) / Math.log(10.0)));
 				var axisMax5 = 5*Math.pow(10, Math.ceil(Math.log(max/5) / Math.log(10.0)));
-				var axisMax = Math.min(axisMax10, axisMax5);
+				var axisMax = axisMax10; //Math.min(axisMax10, axisMax5);
 				var axisMin = 10.0;
 				var data = new google.visualization.arrayToDataTable(arrayData);
 				var options =
@@ -250,7 +250,7 @@
 						fontSize: 20
 					},
 					chartArea: {
-						left: '15%',
+						left: '16%',
 						top: '10%',
 						width: '60%',
 						height: '80%'
@@ -290,7 +290,7 @@
 						var textDate = new Date(arrayData[1][0]);
 						textDate.setDate(textDate.getDate() + tDouble*d - 4*d);
 						drawLine(chart, arrayData[1][0], axisMin, anchorDate, axisMax);
-						drawText(chart, textDate, axisMax/2.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
+						drawText(chart, textDate, axisMax/3.0/(1.0^d), 'Double every ' + d.toString() + ' days', 8, 0, '#F08080');
 					}
 			});
 				
