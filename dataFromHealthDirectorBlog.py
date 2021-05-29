@@ -48,6 +48,42 @@ statesDestinationOrdered = [
         "LB"
     ]
 
+def getHealthDirectorBlogHtml(thisdate, isToday):
+    y = thisdate.strftime("%Y")
+    m = thisdate.strftime("%m")
+    m_int = thisdate.month
+    m_malay = months_malay[m_int-1]
+    d = thisdate.strftime("%d")
+    d_int = thisdate.day
+    thisdate_minus1 = thisdate + timedelta(days = -1)
+    y_m1 = thisdate_minus1.strftime("%Y")
+    m_m1 = thisdate_minus1.strftime("%m")
+    m_int_m1 = thisdate_minus1.month
+    m_malay_m1 = months_malay[m_int_m1-1]
+    d_m1 = thisdate_minus1.strftime("%d")
+    d_int_m1 = thisdate_minus1.day
+    
+    url = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019covid-19-di-malaysia/"
+    suburl = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-" + str(d_int) + "-" + m_malay + "-" + y + "-2020-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia/"
+    url2 = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int_m1) + "-" + m_malay + "-" + y_m1  + "-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia-2/"
+    # check if url exists
+    request_res = requests.head(url)
+    if(request_res.status_code != 200):
+        request_res = requests.head (suburl)
+        if(request_res.status_code != 200):
+            request_res = requests.head (url2)
+            if(request_res.status_code != 200):
+                if(isToday):
+                    return None
+                else:
+                    raise Exception("none of urls exists  or is valid: " + url + ", " + suburl +"," + url2)
+            else:
+                url = url2
+        else:
+            url = suburl
+    html = urlopen(url)
+    return html
+
 rawCSVFilename = './data/byStatesRaw.csv'
 with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
     lines = list(csv.reader(csvfile))
@@ -65,39 +101,10 @@ with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read
     
     for i in range(l):
         thisdate = startdate + timedelta(days = i)
-        y = thisdate.strftime("%Y")
-        m = thisdate.strftime("%m")
-        m_int = thisdate.month
-        m_malay = months_malay[m_int-1]
-        d = thisdate.strftime("%d")
-        d_int = thisdate.day
-        thisdate_minus1 = thisdate + timedelta(days = -1)
-        y_m1 = thisdate_minus1.strftime("%Y")
-        m_m1 = thisdate_minus1.strftime("%m")
-        m_int_m1 = thisdate_minus1.month
-        m_malay_m1 = months_malay[m_int_m1-1]
-        d_m1 = thisdate_minus1.strftime("%d")
-        d_int_m1 = thisdate_minus1.day
-    
-        url = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia/"
-        suburl = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-" + str(d_int) + "-" + m_malay + "-" + y + "-2020-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia/"
-        url2 = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int_m1) + "-" + m_malay + "-" + y_m1  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia-2/"
-        # check if url exists
-        request_res = requests.head(url)
-        if(request_res.status_code != 200):
-            request_res = requests.head (suburl)
-            if(request_res.status_code != 200):
-                request_res = requests.head (url2)
-                if(request_res.status_code != 200):
-                    if(i == l - 1):
-                        break
-                    else:
-                        raise Exception("none of urls exists  or is valid: " + url + ", " + suburl + "," + url2)
-                else:
-                    url = url2
-            else:
-                url = suburl
-        html = urlopen(url)
+
+        html = getHealthDirectorBlogHtml(thisdate, i == l - 1)
+        if i == l - 1 and html == None:
+            break
         soup = BeautifulSoup(html,  'html.parser')
         tables = soup.findAll("figure", {"class": "wp-block-table"})
         stateNames_full, stateNames_ab = zip(*stateNames)
@@ -106,6 +113,8 @@ with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read
             tableTag = table.find('table')
             if tableTag != None:
                 tableBody = tableTag.tbody if (tableTag.find('tbody') != None) else tableTag
+
+                # loading by-state table
                 headers = tableBody.findAll('td')
                 header0 = headers[0].text
                 header1 = headers[1].text
