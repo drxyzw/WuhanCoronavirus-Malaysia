@@ -76,7 +76,7 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
             request_res = requests.head (url2)
             if(request_res.status_code != 200):
                 if(isToday):
-                    return None
+                    return None, None
                 else:
                     raise Exception("none of urls exists  or is valid: " + url + ", " + suburl +"," + url2)
             else:
@@ -84,9 +84,18 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
         else:
             url = suburl
     html = urlopen(url)
-    return html
+    return html, url
 
 today = datetime.today()
+# load nationwide data
+rawTotalCSVFilename = './data/totalRaw.csv'
+headers = ["Date", "Total cases", "New cases", "Total deaths", "Total recovered"]
+with open(rawTotalCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
+    lines = list(csv.reader(csvfile))
+    lastDateStr = lines[-1][0]
+    lastDate = datetime.strptime(lastDateStr, "%Y-%m-%d")
+
+# load by-state data
 rawByStateCSVFilename = './data/byStatesRaw.csv'
 with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
     lines = list(csv.reader(csvfile))
@@ -101,7 +110,7 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
     
     for i in range(l):
         thisdate = startdate + timedelta(days = i)
-        html = getHealthDirectorBlogHtml(thisdate, i == l - 1)
+        html, url = getHealthDirectorBlogHtml(thisdate, i == l - 1)
         if i == l - 1 and html == None:
             break
         soup = BeautifulSoup(html,  'html.parser')
@@ -146,4 +155,4 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerows(outputRows)
 
-createByStateData(rawByStateCSVFilename = rawByStateCSVFilename)
+createByStateData(rawCSVFilename = rawByStateCSVFilename)
