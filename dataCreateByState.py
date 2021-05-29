@@ -59,7 +59,7 @@ def processColumnNames(columnRaw):
     return switcher.get(columnRaw, "Invalid input column")
 
 def createByStateData(rawCSVFilename):
-    with open(rawCSVFilename, newline='') as csvfile:
+    with open(rawCSVFilename, newline='', encoding='utf-8') as csvfile:
         data = list(csv.reader(csvfile))
     # below is specific to the table on Malaysia's Wikipedia page
     

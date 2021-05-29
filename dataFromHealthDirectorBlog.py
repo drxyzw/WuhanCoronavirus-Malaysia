@@ -49,7 +49,7 @@ statesDestinationOrdered = [
     ]
 
 rawCSVFilename = './data/byStatesRaw.csv'
-with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and file cursor at the beginning
+with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
     lines = list(csv.reader(csvfile))
     lastDateStr = lines[-1][0]
     lastDate = datetime.strptime(lastDateStr, "%d/%m/%Y")
@@ -106,7 +106,11 @@ with open(rawCSVFilename, 'r+', newline='') as csvfile: # read and append, and f
             tableTag = table.find('table')
             if tableTag != None:
                 tableBody = tableTag.tbody if (tableTag.find('tbody') != None) else tableTag
-                if tableBody.find('td').text == 'NEGERI':
+                headers = tableBody.findAll('td')
+                header0 = headers[0].text
+                header1 = headers[1].text
+                header2 = headers[2].text
+                if header0 == 'NEGERI' and header1.startswith("BILANGAN KES BAHARU") and header2 == "BILANGAN KES KUMULATIF":
                     outputRow = []
                     dateStr = str(d_int) + "/" + str(m_int) + "/" + y
                     outputRow.append(dateStr)
