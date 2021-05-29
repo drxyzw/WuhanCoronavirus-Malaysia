@@ -48,6 +48,8 @@ statesDestinationOrdered = [
         "LB"
     ]
 
+months_malay = ["januari", "februari", "mac", "april", "mei", "jun", "julai",    "ogos", "september", "oktober", "november", "disember"]
+
 def getHealthDirectorBlogHtml(thisdate, isToday):
     y = thisdate.strftime("%Y")
     m = thisdate.strftime("%m")
@@ -84,24 +86,21 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
     html = urlopen(url)
     return html
 
-rawCSVFilename = './data/byStatesRaw.csv'
-with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
+today = datetime.today()
+rawByStateCSVFilename = './data/byStatesRaw.csv'
+with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
     lines = list(csv.reader(csvfile))
     lastDateStr = lines[-1][0]
     lastDate = datetime.strptime(lastDateStr, "%d/%m/%Y")
 
-    today = datetime.today()
-
     startdate = lastDate + timedelta(days = 1)
     enddate = today
     l = (enddate - startdate).days + 1
-    months_malay = ["januari", "februari", "mac", "april", "mei", "jun", "julai",    "ogos", "september", "oktober", "november", "disember"]
     outputRows = []
     outputHeader = ["Date"] +   statesDestinationOrdered + ["Source"]
     
     for i in range(l):
         thisdate = startdate + timedelta(days = i)
-
         html = getHealthDirectorBlogHtml(thisdate, i == l - 1)
         if i == l - 1 and html == None:
             break
@@ -116,11 +115,11 @@ with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read
 
                 # loading by-state table
                 headers = tableBody.findAll('td')
-                header0 = headers[0].text
-                header1 = headers[1].text
-                header2 = headers[2].text
-                if header0 == 'NEGERI' and header1.startswith("BILANGAN KES BAHARU") and header2 == "BILANGAN KES KUMULATIF":
+                if headers[0].text == 'NEGERI' and headers[1].text.startswith("BILANGAN KES BAHARU") and headers[2].text == "BILANGAN KES KUMULATIF":
                     outputRow = []
+                    y = thisdate.strftime("%Y")
+                    m_int = thisdate.month
+                    d_int = thisdate.day
                     dateStr = str(d_int) + "/" + str(m_int) + "/" + y
                     outputRow.append(dateStr)
                     for state in statesDestinationOrdered:
@@ -147,4 +146,4 @@ with open(rawCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read
     writer = csv.writer(csvfile)
     writer.writerows(outputRows)
 
-createByStateData(rawCSVFilename = rawCSVFilename)
+createByStateData(rawByStateCSVFilename = rawByStateCSVFilename)
