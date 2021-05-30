@@ -109,8 +109,8 @@
 				formatter.format(data, 0);
 				chart.draw(data, options);
 				drawAxisLine(chart, MCO, 'MCO');
-				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
-				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -65);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -65);
 				
 				if(logScale) {
 					var tDouble = Math.log(axisMax/axisMin)/Math.log(2.0);
@@ -182,9 +182,9 @@
 				var formatter = new google.visualization.DateFormat({pattern: 'dd-MMM'});
 				formatter.format(data, 0);
 				chart.draw(data, options);
-				drawAxisLine(chart, MCO, 'MCO', -70);
-				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
-				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
+				drawAxisLine(chart, MCO, 'MCO', -65);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -65);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -65);
 				
 				if(logScaleChange) {
 					var guideLineStart = Math.max(1, axisMin);
@@ -284,8 +284,8 @@
 				formatter.format(data, 0);
 				chart.draw(data, options);
 				drawAxisLine(chart, MCO, 'MCO');
-				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
-				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -65);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -65);
 				var tDouble = Math.log(axisMax/axisMin)/Math.log(2.0);
 				if(logScale)
 					for(var d = 2; d <=8; d = d + 3) {
@@ -372,7 +372,7 @@
 					drawLine(chart, axisMin, axisMin*i, axisMax/i, axisMax);
 					drawLine(chart, axisMin*i, axisMin, axisMax, axisMax/i);
 				}
-				drawText(chart, axisMax/30, axisMax/30, 'exponential growth', 14, 45.0, '#F08080');
+				drawText(chart, axisMax/100, axisMax/100, 'exponential growth', 14, 45.0, '#F08080');
 				if(idxMCO > 0) {
 					drawCircle(chart, arrayData[idxMCO][0], arrayData[idxMCO][1], 5, 'MCO', '#00cccc');
 				}
@@ -500,7 +500,7 @@
 						drawCircle(chart, arrayData[idxMCO3s[j]][0], arrayData[idxMCO3s[j]][j], 5, '', colors[j-1]);
 					}
 				}
-				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0, '#F08080');
+				drawText(chart, axisYMax/100, axisYMax/100, 'exponential growth', 18, 45.0, '#F08080');
 				drawText(chart, axisYMax*0.01, axisYMax*0.6, 'Circle = MCO, MCO2.0, MCO3.0', 18, 0.0, '#00cccc');
 			});
 		}
@@ -543,7 +543,7 @@
 			var xLoc = layout.getXLocation(x);
 			var yLoc = layout.getYLocation(y);
 			svg.appendChild(createCircle(xLoc, yLoc, r, color, 4));
-			svg.appendChild(createText(xLoc-50, yLoc+r-20, text, color, 18, 0));
+			svg.appendChild(createText(xLoc-50, yLoc+r-20, text, color, 14, 0));
 		}
 		function createCircle(x, y, r, color, w) {
 			var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
