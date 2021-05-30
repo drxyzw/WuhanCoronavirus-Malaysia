@@ -520,7 +520,7 @@
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(x);
 			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4, false));
-			svg.appendChild(createText(xLoc + 10 + textOffsetX, chartArea.top + 0.1 * chartArea.height + textOffsetY, text, '#00cccc', 16, 0));
+			svg.appendChild(createText(xLoc + 10 + textOffsetX, chartArea.top + 0.1 * chartArea.height + textOffsetY, text, '#00cccc', 14, 0));
 		}
 		
 		function createLine(x1, y1, x2, y2, color, w, arrow) {
