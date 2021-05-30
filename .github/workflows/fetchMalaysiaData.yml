@@ -40,10 +40,10 @@ jobs:
       run: |
         cd ./
         python dataFromHealthDirectorBlog.py
-    - name: Get the number of nationwide total from The Star Online
-      run: |
-        cd ./
-        python dataFromStarOnline.py
+    #- name: Get the number of nationwide total from The Star Online
+    #  run: |
+    #    cd ./
+    #    python dataFromStarOnline.py
     - name: Export the above results to GitHub repository
       env:
         GIT_OWNER_EMAIL: ${{ secrets.GIT_OWNER_EMAIL }}
