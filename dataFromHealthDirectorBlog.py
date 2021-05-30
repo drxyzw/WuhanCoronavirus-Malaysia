@@ -7,8 +7,10 @@ import urllib.request
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import csv
+import re
 from dataCreateByState import createByStateData
 from dataCreateByState import cell2TwoNumbersByBracket
+from dataCreateTotal import createTotalData
 
 stateNames = [
     ["SABAH", "SB"],
@@ -65,7 +67,7 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
     d_m1 = thisdate_minus1.strftime("%d")
     d_int_m1 = thisdate_minus1.day
     
-    url = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019covid-19-di-malaysia/"
+    url = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia/"
     suburl = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-" + str(d_int) + "-" + m_malay + "-" + y + "-2020-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia/"
     url2 = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int_m1) + "-" + m_malay + "-" + y_m1  + "-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia-2/"
     # check if url exists
@@ -94,6 +96,35 @@ with open(rawTotalCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: #
     lines = list(csv.reader(csvfile))
     lastDateStr = lines[-1][0]
     lastDate = datetime.strptime(lastDateStr, "%Y-%m-%d")
+    startdate = lastDate + timedelta(days = 1)
+    enddate = today
+    l = (enddate - startdate).days + 1
+    outputRows = []
+    outputHeader = lines[0]
+    for i in range(l):
+        outputRow = [""] * len(outputHeader)
+        thisdate = startdate + timedelta(days = i)
+        html, url = getHealthDirectorBlogHtml(thisdate, i == l - 1)
+        if i == l - 1 and html == None:
+            break
+        soup = BeautifulSoup(html,  'html.parser')
+        lists = soup.find_all('li')
+        cases = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes baharu" in s.text][0].text.replace(',',''))
+        total_cases = cases[1]
+        new_cases = cases[0]
+        total_deaths = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes kematian" in s.text][0].text.replace(',',''))[1]
+        total_rec = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes sembuh" in s.text][0].text.replace(',',''))[1]
+        outputRow[0] = str(thisdate.year) + "-" + str(thisdate.month).zfill(2) + "-" + str(thisdate.day).zfill(2)
+        outputRow[1] = str(total_cases)
+        outputRow[2] = str(new_cases)
+        outputRow[3] = str(total_deaths)
+        outputRow[4] = str(total_rec)
+        outputRows.append(outputRow)
+    writer = csv.writer(csvfile)
+    writer.writerows(outputRows)
+reader = csv.reader(open(rawTotalCSVFilename, "r"), delimiter=",")
+totalTable = list(reader)
+createTotalData(totalTable)
 
 # load by-state data
 rawByStateCSVFilename = './data/byStatesRaw.csv'
@@ -156,3 +187,4 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
     writer.writerows(outputRows)
 
 createByStateData(rawCSVFilename = rawByStateCSVFilename)
+print("Finished")

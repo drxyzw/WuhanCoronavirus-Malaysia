@@ -105,6 +105,5 @@ table = np.append(tableHeaderNp, tableBodyNp, axis = 0)
 savetxt('./data/totalRaw.csv', table, delimiter = ',', fmt = '%s')
 
 createTotalData(table)
-
 print("Finished")
 
