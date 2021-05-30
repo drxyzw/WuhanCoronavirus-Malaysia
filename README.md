@@ -5,7 +5,7 @@ https://drxyzw.github.io/WuhanCoronavirus-Malaysia/
   
 ## Case number analysis result is under /data folder.   
 * Total  
-    Nationwide total in Malaysia. The data is taken from Star online website.
+    Nationwide total in Malaysia. The data is taken from Star online website until 22 April 2021, and from a blog of Health Director of Malaysia since 23 April 2021.
   * totalRaw.csv - Raw data from Star online. Below data files are generated from this raw file.
   * dailyTotal.csv - Statistics of cumulative cases, deaths, recovered cases, and active cases. Cumulative cases are on confirmed basis.
   * dailyTotalChange.csv - Daily change of dailyTotal.csv.
