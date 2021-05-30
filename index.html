@@ -11,6 +11,7 @@
 		var logScaleChange = true;
 		var MCO = new Date(2020, 3-1, 18);
 		var MCO2 = new Date(2021, 1-1, 13);
+		var MCO3 = new Date(2021, 5-1, 12);
 		google.charts.load('current', {'packages':['corechart', 'line']});
 		google.charts.setOnLoadCallback(drawChartFirst);
 		
@@ -108,7 +109,8 @@
 				formatter.format(data, 0);
 				chart.draw(data, options);
 				drawAxisLine(chart, MCO, 'MCO');
-				drawAxisLine(chart, MCO2, 'MCO2.0', -85);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
 				
 				if(logScale) {
 					var tDouble = Math.log(axisMax/axisMin)/Math.log(2.0);
@@ -181,7 +183,8 @@
 				formatter.format(data, 0);
 				chart.draw(data, options);
 				drawAxisLine(chart, MCO, 'MCO', -70);
-				drawAxisLine(chart, MCO2, 'MCO2.0', -85);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
 				
 				if(logScaleChange) {
 					var guideLineStart = Math.max(1, axisMin);
@@ -281,7 +284,8 @@
 				formatter.format(data, 0);
 				chart.draw(data, options);
 				drawAxisLine(chart, MCO, 'MCO');
-				drawAxisLine(chart, MCO2, 'MCO2.0', -85);
+				drawAxisLine(chart, MCO2, 'MCO2.0', -70);
+				drawAxisLine(chart, MCO3, 'MCO3.0', -70);
 				var tDouble = Math.log(axisMax/axisMin)/Math.log(2.0);
 				if(logScale)
 					for(var d = 2; d <=8; d = d + 3) {
@@ -300,7 +304,7 @@
 				<!-- nationwide-dynamics -->
 				var arrayData = $.csv.toArrays(csvString, {onParseValue: $.csv.hooks.castToScalar});
 				arrayData[0].splice(2, 0,'');
-				var idxMCO = -1, idxMCO2 = -1;
+				var idxMCO = -1, idxMCO2 = -1, idxMCO3 = -1;
 				for(var i = 1; i < arrayData.length; ++i) {
 					arrayData[i].splice(2, 0, null);
 					arrayData[i][3] = new Date(arrayData[i][3]);
@@ -309,6 +313,9 @@
 					}
 					if(arrayData[i][3].getYear() == MCO2.getYear() && arrayData[i][3].getMonth() == MCO2.getMonth() && arrayData[i][3].getDate() == MCO2.getDate()) {
 						idxMCO2 = i;
+					}
+					if(arrayData[i][3].getYear() == MCO3.getYear() && arrayData[i][3].getMonth() == MCO3.getMonth() && arrayData[i][3].getDate() == MCO3.getDate()) {
+						idxMCO3 = i;
 					}
 				}
 				arrayData.push([arrayData[arrayData.length-1][0], arrayData[arrayData.length-1][1], -1, arrayData[arrayData.length-1][3]]);
@@ -372,6 +379,9 @@
 				if(idxMCO2 > 0) {
 					drawCircle(chart, arrayData[idxMCO2][0], arrayData[idxMCO2][1], 5, 'MCO2.0', '#00cccc');
 				}
+				if(idxMCO3 > 0) {
+					drawCircle(chart, arrayData[idxMCO3][0], arrayData[idxMCO3][1], 5, 'MCO3.0', '#00cccc');
+				}
 			});
 		}
 		function drawChartDailyDynamicsByStates() {
@@ -381,9 +391,11 @@
 				<!-- idxMCOs = the first and last indices are not used -->
 				var idxMCOs = new Array(arrayData[0].length);
 				var idxMCO2s = new Array(arrayData[0].length);
+				var idxMCO3s = new Array(arrayData[0].length);
 				for(var j = 0; j < idxMCOs.length; ++j) {
 					idxMCOs[j] = -1;
 					idxMCO2s[j] = -1;
+					idxMCO3s[j] = -1;
 				}
 				var dateColumn = 17;
 				var yMax = 0;
@@ -400,6 +412,13 @@
 						for(var j = 1; j < arrayData[0].length - 1; ++j) {
 							if(arrayData[i][j] != null) {
 								idxMCO2s[j] = i;
+							}
+						}
+					}
+					if(arrayData[i][dateColumn].getYear() == MCO3.getYear() && arrayData[i][dateColumn].getMonth() == MCO3.getMonth() && arrayData[i][dateColumn].getDate() == MCO3.getDate()) {
+						for(var j = 1; j < arrayData[0].length - 1; ++j) {
+							if(arrayData[i][j] != null) {
+								idxMCO3s[j] = i;
 							}
 						}
 					}
@@ -477,9 +496,12 @@
 					if(idxMCO2s[j] > 0) {
 						drawCircle(chart, arrayData[idxMCO2s[j]][0], arrayData[idxMCO2s[j]][j], 5, '', colors[j-1]);
 					}
+					if(idxMCO3s[j] > 0) {
+						drawCircle(chart, arrayData[idxMCO3s[j]][0], arrayData[idxMCO3s[j]][j], 5, '', colors[j-1]);
+					}
 				}
 				drawText(chart, axisYMax/5, axisYMax/5, 'exponential growth', 18, 45.0, '#F08080');
-				drawText(chart, axisYMax*0.01, axisYMax*0.6, 'Circle = MCO, MCO2.0', 18, 0.0, '#00cccc');
+				drawText(chart, axisYMax*0.01, axisYMax*0.6, 'Circle = MCO, MCO2.0, MCO3.0', 18, 0.0, '#00cccc');
 			});
 		}
 		function drawLine(chart, x1, y1, x2, y2) {
@@ -498,7 +520,7 @@
 			var svg = chart.getContainer().getElementsByTagName('svg')[0];
 			var xLoc = layout.getXLocation(x);
 			svg.appendChild(createLine(xLoc, chartArea.top + chartArea.height, xLoc, chartArea.top, '#00cccc', 4, false));
-			svg.appendChild(createText(xLoc + 10 + textOffsetX, chartArea.top + 0.1 * chartArea.height + textOffsetY, text, '#00cccc', 18, 0));
+			svg.appendChild(createText(xLoc + 10 + textOffsetX, chartArea.top + 0.1 * chartArea.height + textOffsetY, text, '#00cccc', 16, 0));
 		}
 		
 		function createLine(x1, y1, x2, y2, color, w, arrow) {
@@ -521,7 +543,7 @@
 			var xLoc = layout.getXLocation(x);
 			var yLoc = layout.getYLocation(y);
 			svg.appendChild(createCircle(xLoc, yLoc, r, color, 4));
-			svg.appendChild(createText(xLoc, yLoc+r-30, text, color, 18, 0));
+			svg.appendChild(createText(xLoc-50, yLoc+r-20, text, color, 18, 0));
 		}
 		function createCircle(x, y, r, color, w) {
 			var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
