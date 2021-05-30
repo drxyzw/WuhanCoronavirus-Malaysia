@@ -18,7 +18,8 @@ https://drxyzw.github.io/WuhanCoronavirus-Malaysia/
   * newDailyInfectedByStates.csv - Daily change of totalInfectedByStates.csv.
   * byStateDynamics.csv - New cases vs cumulative cases. Any exponential growth is on y=x line.
 ## Rt (effective reproduction number) analysis is under /Rt/data folder.  
-* [State name].csv - Rt of each state. Nationwide result is Malaysia.csv.
+* [State name].csv - Rt of each state.
+* Malaysia.csv - Rt of nationwide total.
 * Document is https://github.com/drxyzw/WuhanCoronavirus-Malaysia/tree/master/doc/Rt-Malaysia.ipynb
 
 
