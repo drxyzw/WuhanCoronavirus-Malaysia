@@ -113,7 +113,7 @@ with open(rawTotalCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: #
         total_cases = cases[1]
         new_cases = cases[0]
         total_deaths = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes kematian" in s.text][0].text.replace(',',''))[1]
-        total_rec = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes sembuh" in s.text][0].text.replace(',',''))[1]
+        total_rec = re.findall(r'\d*\.?\d+',[s for s in lists if "Kes sembuh" in s.text or "Kes   sembuh" in s.text][0].text.replace(',',''))[1]
         outputRow[0] = str(thisdate.year) + "-" + str(thisdate.month).zfill(2) + "-" + str(thisdate.day).zfill(2)
         outputRow[1] = str(total_cases)
         outputRow[2] = str(new_cases)
