@@ -160,6 +160,7 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
 
                 # loading by-state table
                 headers = tableBody.findAll('td')
+                # up to 10 Aug 2021
                 if headers[0].text == 'NEGERI' and headers[1].text.startswith("BILANGAN KES BAHARU") and headers[2].text == "BILANGAN KES KUMULATIF":
                     outputRow = []
                     y = thisdate.strftime("%Y")
@@ -182,6 +183,35 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
                                 # when blog post number is incorrect
                                 if d_int == 7 and m_int == 1 and y == "2021" and state == "KL":
                                     cumulCases = "15,258"
+
+                                combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
+                                outputRow.append(combinedCases)
+                    outputRow.append(url) # Source column
+                    outputRows.append(outputRow)
+
+                # 11 Aug 2021 to 21 Aug 2021
+                if headers[0].text == 'NEGERI' and headers[3].text.startswith("BILANGAN KES BAHARU") and headers[4].text == "BILANGAN KES KUMULATIF":
+                    outputRow = []
+                    y = thisdate.strftime("%Y")
+                    m_int = thisdate.month
+                    d_int = thisdate.day
+                    dateStr = str(d_int) + "/" + str(m_int) + "/" + y
+                    outputRow.append(dateStr)
+                    for state in statesDestinationOrdered:
+                        i = stateNames_ab.index (state)
+                        stateName_full = stateNames_full[i]
+                        for row in tableBody.findAll("tr"):
+                            cells = row.findAll ("td")
+                            cellText = str.strip(cells[0].text)
+                            cellText = ' '.join(cellText.split())
+                            if (type(stateName_full) is str and cellText == stateName_full) or (type(stateName_full) is list and any(x == cellText for x in stateName_full)):
+                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells[3].text)) # new case might be a form of "[total new cases] ([import cases]"
+                                newCases = str(newCases)
+                                cumulCases = str.strip(cells[4].text)
+
+                                # when blog post number is incorrect
+                                #if d_int == 7 and m_int == 1 and y == "2021" and state == "KL":
+                                #    cumulCases = "15,258"
 
                                 combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
                                 outputRow.append(combinedCases)
