@@ -70,6 +70,7 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
     url = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia/"
     suburl = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-" + str(d_int) + "-" + m_malay + "-" + y + "-2020-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia/"
     url2 = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-kpk-" + str(d_int_m1) + "-" + m_malay + "-" + y_m1  + "-situasi-semasa-jangkitan-penyakitcoronavirus-2019-covid-19-di-malaysia-2/"
+    url_ybmk = "https://kpkesihatan.com/" + y + "/" + m + "/" + d + "/kenyataan-akhbar-ybmk-" + str(d_int) + "-" + m_malay + "-" + y  + "-situasi-semasa-jangkitan-penyakit-coronavirus-2019-covid-19-di-malaysia/"
     # check if url exists
     request_res = requests.head(url)
     if(request_res.status_code != 200):
@@ -77,10 +78,14 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
         if(request_res.status_code != 200):
             request_res = requests.head (url2)
             if(request_res.status_code != 200):
-                if(isToday):
-                    return None, None
+                request_res = requests.head (url_ybmk)
+                if(request_res.status_code != 200):
+                    if(isToday):
+                        return None, None
+                    else:
+                        raise Exception("none of urls exists  or is valid: " + url + ", " + suburl + "," + url2 + "," + url_ymbk)
                 else:
-                    raise Exception("none of urls exists  or is valid: " + url + ", " + suburl +"," + url2)
+                    url = url_ybmk
             else:
                 url = url2
         else:
