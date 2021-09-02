@@ -83,7 +83,7 @@ def getHealthDirectorBlogHtml(thisdate, isToday):
                     if(isToday):
                         return None, None
                     else:
-                        raise Exception("none of urls exists  or is valid: " + url + ", " + suburl + "," + url2 + "," + url_ymbk)
+                        raise Exception("none of urls exists  or is valid: " + url + ", " + suburl + "," + url2 + "," + url_ybmk)
                 else:
                     url = url_ybmk
             else:
