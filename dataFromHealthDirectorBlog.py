@@ -135,6 +135,7 @@ createTotalData(totalTable)
 rawByStateCSVFilename = './data/byStatesRaw.csv'
 with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile: # read and append, and file cursor at the beginning
     lines = list(csv.reader(csvfile))
+    lastLine = lines[-1]
     lastDateStr = lines[-1][0]
     lastDate = datetime.strptime(lastDateStr, "%d/%m/%Y")
 
@@ -169,8 +170,8 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
                     dateStr = str(d_int) + "/" + str(m_int) + "/" + y
                     outputRow.append(dateStr)
                     for state in statesDestinationOrdered:
-                        i = stateNames_ab.index (state)
-                        stateName_full = stateNames_full[i]
+                        k = stateNames_ab.index (state)
+                        stateName_full = stateNames_full[k]
                         for row in tableBody.findAll("tr"):
                             cells = row.findAll ("td")
                             cellText = str.strip(cells[0].text)
@@ -188,9 +189,8 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
                                 outputRow.append(combinedCases)
                     outputRow.append(url) # Source column
                     outputRows.append(outputRow)
-
                 # 11 Aug 2021 to 21 Aug 2021
-                if headers[0].text == 'NEGERI' and headers[3].text.startswith("BILANGAN KES BAHARU") and headers[4].text == "BILANGAN KES KUMULATIF":
+                elif headers[0].text == 'NEGERI' and headers[3].text.startswith("BILANGAN KES BAHARU") and headers[4].text == "BILANGAN KES KUMULATIF":
                     outputRow = []
                     y = thisdate.strftime("%Y")
                     m_int = thisdate.month
@@ -198,14 +198,14 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
                     dateStr = str(d_int) + "/" + str(m_int) + "/" + y
                     outputRow.append(dateStr)
                     for state in statesDestinationOrdered:
-                        i = stateNames_ab.index (state)
-                        stateName_full = stateNames_full[i]
+                        k = stateNames_ab.index(state)
+                        stateName_full = stateNames_full[k]
                         for row in tableBody.findAll("tr"):
                             cells = row.findAll ("td")
                             cellText = str.strip(cells[0].text)
                             cellText = ' '.join(cellText.split())
                             if (type(stateName_full) is str and cellText == stateName_full) or (type(stateName_full) is list and any(x == cellText for x in stateName_full)):
-                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells[3].text)) # new case might be a form of "[total new cases] ([import cases]"
+                                newCases, dummy = cell2TwoNumbersByBracket(str.strip(cells[3].text)) # new case might be a form of "[total new cases] ([import cases])"
                                 newCases = str(newCases)
                                 cumulCases = str.strip(cells[4].text)
 
@@ -213,6 +213,40 @@ with open(rawByStateCSVFilename, 'r+', newline='', encoding='utf-8') as csvfile:
                                 #if d_int == 7 and m_int == 1 and y == "2021" and state == "KL":
                                 #    cumulCases = "15,258"
 
+                                combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
+                                outputRow.append(combinedCases)
+                    outputRow.append(url) # Source column
+                    outputRows.append(outputRow)
+                # after 22 Aug 2021
+                elif headers[0].text == 'NEGERI' and headers[1].text.startswith("JUMLAH KES"):
+                    outputRow = []
+                    y = thisdate.strftime("%Y")
+                    m_int = thisdate.month
+                    d_int = thisdate.day
+                    dateStr = str(d_int) + "/" + str(m_int) + "/" + y
+                    outputRow.append(dateStr)
+                    for state in statesDestinationOrdered:
+                        k = stateNames_ab.index (state)
+                        stateName_full = stateNames_full[k]
+                        for row in tableBody.findAll("tr"):
+                            cells = row.findAll ("td")
+                            cellText = str.strip(cells[0].text)
+                            cellText = ' '.join(cellText.split())
+                            if (type(stateName_full) is str and cellText == stateName_full) or (type(stateName_full) is list and any(x == cellText for x in stateName_full)):
+                                newCasesNum, dummy = cell2TwoNumbersByBracket(str.strip(cells[1].text)) # new case might be a form of "[total new cases] ([import cases])"
+                                newCases = str(newCasesNum)
+                                # have to get the previous cumulative number
+                                # if i > 0 (previous data exists in outputRows), we use it
+                                # if i = 0 (no data in outputRows yet), we use the last row of csvfile
+                                prevLine = lastLine if i == 0 else outputRows[-1]
+                                j = statesDestinationOrdered.index(state)
+                                prevCumulCases, dummy = cell2TwoNumbersByBracket(str.strip(prevLine[1 + j])) # "[prev cumul cases] ([prev new cases])"
+                                cumulCasesNum = prevCumulCases + newCasesNum
+                                cumulCases = f'{cumulCasesNum:,}'
+
+                                # when blog post number is incorrect
+                                #if d_int == 7 and m_int == 1 and y == "2021" and state == "KL":
+                                #    cumulCases = "15,258"
                                 combinedCases = (cumulCases + "(" + newCases + ")") if newCases != "0" else cumulCases
                                 outputRow.append(combinedCases)
                     outputRow.append(url) # Source column
