@@ -47,6 +47,9 @@ for i in range((int)((endDate - startDate) / np.timedelta64(1, "D")) + 1):
     lastTotalDeaths = totalDeaths
     lastTotalRecovered = totalRecovered
 file_total_raw_append.to_csv(rawTotalCSVFilename, mode = "a", header = False, index = False)
+reader = csv.reader(open(rawTotalCSVFilename, "r"), delimiter=",")
+totalTable = list(reader)
+createTotalData(totalTable)
 
 # by state data
 rawByStateCSVFilename = './data/byStatesRaw.csv'
@@ -76,6 +79,7 @@ for i in range((int)((endDate - startDate) / np.timedelta64(1, "D")) + 1):
     file_by_state_raw_append.loc[i]['Source'] = file_case_states
     lastCases = cases
 file_by_state_raw_append.to_csv(rawByStateCSVFilename, mode = "a", header = False, index = False)
+createByStateData(rawCSVFilename = rawByStateCSVFilename)
 
 print("Finished!")
 
