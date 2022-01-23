@@ -78,10 +78,12 @@ for i in range((int)((endDate - startDate) / np.timedelta64(1, "D")) + 1):
     cases = np.add(newCases, lastCases)
     cumulNewCases = [cumulAndNewCases2Cell(cases[i], newCases[i]) for i in range(len(outputStateColumn))]
     file_by_state_raw_append.loc[i] = dict(zip(outputStateColumn, cumulNewCases))
-    print(date.strftime("%d/%m/%Y"))
-    print(file_case_states)
-    file_by_state_raw_append.loc[i]['Date'] = date.strftime("%d/%m/%Y")
-    file_by_state_raw_append.loc[i]['Source'] = file_case_states
+    #print(date.strftime("%d/%m/%Y"))
+    #print(file_case_states)
+    file_by_state_raw_append.loc[i, 'Date'] = date.strftime("%d/%m/%Y")
+    file_by_state_raw_append.loc[i, 'Source'] = file_case_states
+    #file_by_state_raw_append.loc[i]['Date'] = date.strftime("%d/%m/%Y")
+    #file_by_state_raw_append.loc[i]['Source'] = file_case_states
     lastCases = cases
 file_by_state_raw_append.to_csv(rawByStateCSVFilename, mode = "a", header = False, index = False)
 createByStateData(rawCSVFilename = rawByStateCSVFilename)
