@@ -126,8 +126,7 @@ def createByStateData(rawCSVFilename):
         columns[i] = processColumnNames(columnsRaw[i])
     datesStr = [""] * (len(data)-1)
     cumulCases = [[0 for x in range(len(columns)-1)] for y in range (len(data)-1)]
-    for i in range(1, len(data)-1):
-    #for i in range(1, len(data)):
+    for i in range(1, len(data)):
         dateStr = data[i][0]
         #print(dateStr)
         #print(dateStr.split("/"))
