@@ -129,6 +129,7 @@ def createByStateData(rawCSVFilename):
     for i in range(1, len(data)):
         dateStr = data[i][0]
         print(dateStr)
+        print(dateStr.split("/"))
         day, month, year = dateStr.split("/")
         datesStr[i-1] = str(year) + "-" + str(month).zfill(2) + "-" + str   (day).zfill(2)
     
