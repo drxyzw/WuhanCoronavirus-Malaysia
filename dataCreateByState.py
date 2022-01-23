@@ -128,8 +128,6 @@ def createByStateData(rawCSVFilename):
     cumulCases = [[0 for x in range(len(columns)-1)] for y in range (len(data)-1)]
     for i in range(1, len(data)):
         dateStr = data[i][0]
-        #print(dateStr)
-        #print(dateStr.split("/"))
         day, month, year = dateStr.split("/")
         datesStr[i-1] = str(year) + "-" + str(month).zfill(2) + "-" + str   (day).zfill(2)
     
