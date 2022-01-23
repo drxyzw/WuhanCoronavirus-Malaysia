@@ -72,16 +72,16 @@ lastCases = [cell2TwoNumbersByBracket(file_by_state_raw_last_row[state])[0] for 
 file_by_state_raw_append = pd.DataFrame(columns=file_by_state_raw_last_row.index.values)
 csv_case_states_new = csv_case_states[csv_case_states['date'] >= startDate]
 
-#for i in range((int)((endDate - startDate) / np.timedelta64(1, "D")) + 1):
-#    date = startDate + np.timedelta64(i, "D")
-#    newCases = [csv_case_states_new[(csv_case_states_new['date'] == date) & (csv_case_states_new['state'] == state)]['cases_new'].values[0] for state in inputStateLabel]
-#    cases = np.add(newCases, lastCases)
-#    cumulNewCases = [cumulAndNewCases2Cell(cases[i], newCases[i]) for i in range(len(outputStateColumn))]
-#    file_by_state_raw_append.loc[i] = dict(zip(outputStateColumn, cumulNewCases))
-#    file_by_state_raw_append.loc[i]['Date'] = date.strftime("%d/%m/%Y")
-#    file_by_state_raw_append.loc[i]['Source'] = file_case_states
-#    lastCases = cases
-#file_by_state_raw_append.to_csv(rawByStateCSVFilename, mode = "a", header = False, index = False)
+for i in range((int)((endDate - startDate) / np.timedelta64(1, "D")) + 1):
+    date = startDate + np.timedelta64(i, "D")
+    newCases = [csv_case_states_new[(csv_case_states_new['date'] == date) & (csv_case_states_new['state'] == state)]['cases_new'].values[0] for state in inputStateLabel]
+    cases = np.add(newCases, lastCases)
+    cumulNewCases = [cumulAndNewCases2Cell(cases[i], newCases[i]) for i in range(len(outputStateColumn))]
+    file_by_state_raw_append.loc[i] = dict(zip(outputStateColumn, cumulNewCases))
+    file_by_state_raw_append.loc[i]['Date'] = date.strftime("%d/%m/%Y")
+    file_by_state_raw_append.loc[i]['Source'] = file_case_states
+    lastCases = cases
+file_by_state_raw_append.to_csv(rawByStateCSVFilename, mode = "a", header = False, index = False)
 createByStateData(rawCSVFilename = rawByStateCSVFilename)
 
 print("Finished!")
