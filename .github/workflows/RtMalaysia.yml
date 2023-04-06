@@ -4,9 +4,8 @@
 name: compute Rt in Malaysia
 
 on:
-  schedule:
-#    - cron: 20 0/2 * * * # 20 mins, every 2 hours
-  workflow_dispatch:
+#  schedule:
+#    - cron: 20 0/2 * * * # 20 mins, every 2 hours  workflow_dispatch:
     branches: [ master ]
 #  push:
 #    branches: [ master ]
