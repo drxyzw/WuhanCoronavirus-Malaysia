@@ -4,8 +4,8 @@
 name: Fetching data in Malaysia
 
 on:
-  schedule:
-    - cron: 12 0/2 * * * # 12 mins, every 2 hours
+#  schedule:
+#    - cron: 12 0/2 * * * # 12 mins, every 2 hours
   workflow_dispatch:
     branches: [ master ]
 #  push:
